@@ -4,7 +4,7 @@ package xyz.digitalbank.demo.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -88,7 +88,8 @@ public class LoginFragment extends Fragment {
                         MainActivity.appPreference.setLoginStatus(true); // set login status in sharedPreference
                         loginFromActivityListener.login(
                                 response.body().getauthToken());
-                    } else if (response.body().getResponse().equals("login_failed")){
+                    } else {
+                        // Login failed
                         MainActivity.appPreference.showToast("Error. Login Failed");
                         emailInput.setText("");
                         passwordInput.setText("");

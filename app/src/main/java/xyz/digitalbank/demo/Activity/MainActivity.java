@@ -1,9 +1,8 @@
 package xyz.digitalbank.demo.Activity;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.FrameLayout;
-
 import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.Extras.AppPreference;
 import xyz.digitalbank.demo.Fragments.LoginFragment;

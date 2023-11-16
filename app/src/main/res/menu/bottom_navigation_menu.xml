@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_check_accounts"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Check Accounts" />
+
+    <item
+        android:id="@+id/action_transfer"
+        android:icon="@android:drawable/ic_menu_send"
+        android:title="Transfer" />
+
+    <item
+        android:id="@+id/action_atm_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="ATM Search" />
+
+    <item
+        android:id="@+id/action_contact"
+        android:icon="@android:drawable/stat_sys_speakerphone"
+        android:title="Contact" />
+</menu>

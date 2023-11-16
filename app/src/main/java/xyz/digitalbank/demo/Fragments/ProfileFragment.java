@@ -1,19 +1,20 @@
 package xyz.digitalbank.demo.Fragments;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.view.MenuItem;
+import androidx.annotation.NonNull;
 
 
 /**
@@ -29,12 +30,34 @@ public class ProfileFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                // Handle clicks on the icons here
+                switch (item.getItemId()) {
+                    case R.id.action_check_accounts:
+                        // Handle check accounts icon click
+                        return true;
+                    case R.id.action_transfer:
+                        // Handle transfer icon click
+                        return true;
+                    case R.id.action_atm_search:
+                        // Handle ATM search icon click
+                        return true;
+                    case R.id.action_contact:
+                        // Handle contact icon click
+                        return true;
+                }
+                return false;
+            }
+        });
 
         name = view.findViewById(R.id.name);
         // Keep only the greeting message
@@ -57,6 +80,7 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
+
  // ending onCreateView
 
     @Override
