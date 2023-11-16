@@ -10,36 +10,40 @@
     android:layout_marginTop="10dp"
     tools:context=".Fragments.ProfileFragment">
 
+    <!-- Move the TextViews to the center of the screen -->
     <TextView
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:textSize="17sp"
         android:textColor="@color/colorPrimaryDark"
-        android:layout_marginTop="40dp" />
+        android:layout_centerInParent="true"/>
 
     <TextView
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:textColor="#000"
         android:textSize="15sp"
         android:layout_below="@id/name"/>
 
+    <!-- Add a circular login button in the top right corner -->
+
     <Button
         android:id="@+id/logoutBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="30dp"
-        android:background="@android:color/holo_orange_light"
-        android:text="Log Out"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="51dp"
+        android:layout_marginEnd="24dp"
+        android:background="@android:drawable/ic_lock_power_off"
+        android:gravity="right|top"
         android:textAllCaps="false"
         android:textColor="#fff"
-        android:textSize="16sp"
-        android:layout_below="@id/email" />
+        android:textSize="16sp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

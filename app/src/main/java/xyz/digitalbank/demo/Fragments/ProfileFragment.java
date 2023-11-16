@@ -15,11 +15,11 @@ import xyz.digitalbank.demo.Services.MyInterface;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
+import xyz.digitalbank.demo.Activity.atm_search;
+import android.content.Intent;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ProfileFragment extends Fragment {
     private TextView name, email;
     private Button logoutBtn;
@@ -49,8 +49,8 @@ public class ProfileFragment extends Fragment {
                         // Handle transfer icon click
                         return true;
                     case R.id.action_atm_search:
-                        // Handle ATM search icon click
-                        return true;
+                        startActivity(new Intent(getActivity(), atm_search.class));
+                         return true;
                     case R.id.action_contact:
                         // Handle contact icon click
                         return true;
