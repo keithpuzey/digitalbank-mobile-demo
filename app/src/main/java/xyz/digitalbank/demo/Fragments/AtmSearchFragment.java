@@ -1,5 +1,13 @@
-package xyz.digitalbank.demo.Activity;
+package xyz.digitalbank.demo.Fragments;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+
+import xyz.digitalbank.demo.R;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -32,19 +40,20 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 
-public class atm_search extends AppCompatActivity {
+public class AtmSearchFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private View view;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.atm_search);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.atm_search, container, false);
 
         // Check and request location permission if not granted
-        if (ActivityCompat.checkSelfPermission(this,
+        if (ActivityCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         } else {
@@ -53,13 +62,11 @@ public class atm_search extends AppCompatActivity {
         }
 
         // Find the "ATM Search" button by its ID
-        Button atmSearchButton = findViewById(R.id.action_atm_search);
+        Button atmSearchButton = view.findViewById(R.id.action_atm_search);
         // Find the "Get IP Address" button by its ID
-        Button getIpButton = findViewById(R.id.action_get_ip);
+        Button getIpButton = view.findViewById(R.id.action_get_ip);
         // Find the "Custom Request" button by its ID
-        Button customRequestButton = findViewById(R.id.action_custom_request);
-
-
+        Button customRequestButton = view.findViewById(R.id.action_custom_request);
 
         // Set an OnClickListener for the ATM Search button
         atmSearchButton.setOnClickListener(v -> getLocationAndMakeRequest());
@@ -70,26 +77,12 @@ public class atm_search extends AppCompatActivity {
         // Set an OnClickListener for the Custom Request button
         customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
 
-
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_atm_search:
-                // Handle ATM search icon click
-                getLocationAndMakeRequest();
-                return true;
-            // Add other cases if needed
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return view;
     }
 
     private void getLocationAndMakeRequest() {
         // Get the location manager
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
         // Check if GPS and network location providers are enabled
         if (locationManager != null &&
@@ -152,8 +145,8 @@ public class atm_search extends AppCompatActivity {
                                         Log.d("FormattedInfo", formattedInfo);
 
                                         // Display the formatted information on the screen
-                                        runOnUiThread(() -> {
-                                            TextView responseTextView = findViewById(R.id.responseTextView);
+                                        requireActivity().runOnUiThread(() -> {
+                                            TextView responseTextView = view.findViewById(R.id.responseTextView);
                                             responseTextView.setText(formattedInfo);
                                         });
 
@@ -219,8 +212,8 @@ public class atm_search extends AppCompatActivity {
                     String ipAddress = jsonResponse.optString("ip", "");
 
                     // Display the IP address on the screen
-                    runOnUiThread(() -> {
-                        TextView ipTextView = findViewById(R.id.responseTextView);
+                    requireActivity().runOnUiThread(() -> {
+                        TextView ipTextView = view.findViewById(R.id.responseTextView);
                         ipTextView.setText("IP Address: " + ipAddress);
                     });
 
@@ -284,10 +277,9 @@ public class atm_search extends AppCompatActivity {
                     // Log the second API response
                     Log.d("SecondApiResponse", "Response: " + formattedInfo);
 
-
                     // Display the second API response including the IP address
-                    runOnUiThread(() -> {
-                        TextView responseTextView = findViewById(R.id.responseTextView);
+                    requireActivity().runOnUiThread(() -> {
+                        TextView responseTextView = view.findViewById(R.id.responseTextView);
                         responseTextView.setText("Response for IP Address " + ipAddress + ":\n" + formattedInfo);
                     });
 
@@ -297,8 +289,8 @@ public class atm_search extends AppCompatActivity {
                     connection.disconnect();
 
                     // Third request to another API using the latitude and longitude
-                    String gpsApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat="+lat+"&lon="+ lon;
-                    Log.d("Coordinates", "Debug: " + gpsApiUrl );
+                    String gpsApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + lat + "&lon=" + lon;
+                    Log.d("Coordinates", "Debug: " + gpsApiUrl);
                     new Thread(() -> {
                         try {
                             URL urlgps = new URL(gpsApiUrl);
@@ -340,18 +332,14 @@ public class atm_search extends AppCompatActivity {
                                 Log.d("FormattedInfo", gpsformattedInfo);
 
                                 // Display the second API response including the IP address
-                                runOnUiThread(() -> {
-                                    TextView responseTextView = findViewById(R.id.responseTextView);
+                                requireActivity().runOnUiThread(() -> {
+                                    TextView responseTextView = view.findViewById(R.id.responseTextView);
                                     responseTextView.setText("Response for IP / GPS Location " + ipAddress + ":\n" + gpsformattedInfo);
                                 });
 
                             } catch (JSONException e) {
                                 e.printStackTrace(); // Handle the exception in an appropriate way
                             }
-
-
-
-
 
                             // Close connections
                             bufferedReader.close();
@@ -363,7 +351,6 @@ public class atm_search extends AppCompatActivity {
                         }
                     }).start();
 
-
                 } catch (JSONException e) {
                     e.printStackTrace(); // Handle the exception in an appropriate way
                 }
@@ -374,73 +361,70 @@ public class atm_search extends AppCompatActivity {
         }).start();
     }
 
+    private void showCustomRequestDialog() {
+        // Create an AlertDialog with an EditText for user input
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Enter Zip Code");
 
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
 
-         private void showCustomRequestDialog() {
-            // Create an AlertDialog with an EditText for user input
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Enter Zip Code");
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String userInput = input.getText().toString().trim();
+            if (!TextUtils.isEmpty(userInput)) {
+                // Perform the custom request with the entered text
+                performCustomRequest(userInput);
+            } else {
+                // Handle empty input (e.g., show a message to the user)
+                Toast.makeText(requireContext(), "Enter Zip code", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                String userInput = input.getText().toString().trim();
-                if (!TextUtils.isEmpty(userInput)) {
-                    // Perform the custom request with the entered text
-                    performCustomRequest(userInput);
-                } else {
-                    // Handle empty input (e.g., show a message to the user)
-                    Toast.makeText(this, "Enter Zip code", Toast.LENGTH_SHORT).show();
+        builder.show();
+    }
+
+    private void performCustomRequest(String userInput) {
+        // Construct the URL with the user input
+        String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/zip?zipcode=" + userInput;
+
+        // Perform network request on a separate thread
+        new Thread(() -> {
+            try {
+                URL url = new URL(apiUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                // Read the response
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    response.append(line);
                 }
-            });
 
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+                // Handle the response as needed
+                Log.d("CustomRequest", "Response: " + response.toString());
 
-            builder.show();
-        }
+                // Display the custom request response
+                requireActivity().runOnUiThread(() -> {
+                    TextView responseTextView = view.findViewById(R.id.responseTextView);
+                    responseTextView.setText("Nearest ATM:\n" + response.toString());
+                });
 
-        private void performCustomRequest(String userInput) {
-            // Construct the URL with the user input
-            String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/zip?zipcode=" + userInput;
+                // Close connections
+                bufferedReader.close();
+                inputStream.close();
+                connection.disconnect();
 
-            // Perform network request on a separate thread
-            new Thread(() -> {
-                try {
-                    URL url = new URL(apiUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-
-                    // Read the response
-                    InputStream inputStream = connection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    // Handle the response as needed
-                    Log.d("CustomRequest", "Response: " + response.toString());
-
-                    // Display the custom request response
-                    runOnUiThread(() -> {
-                        TextView responseTextView = findViewById(R.id.responseTextView);
-                        responseTextView.setText("Nearest ATM:\n" + response.toString());
-                    });
-
-                    // Close connections
-                    bufferedReader.close();
-                    inputStream.close();
-                    connection.disconnect();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

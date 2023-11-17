@@ -6,15 +6,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-
-    public static Retrofit getApiClient(String baseUrl){
+    private static final String BASE_URL = "http://dbankdemo.com/";
+    public static Retrofit getRetrofitInstance() {
+        // Create and configure your Retrofit instance here
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                // Set base URL, converters, etc.
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-        Log.e("RetrofitClient", baseUrl);
-
         return retrofit;
     }
 }

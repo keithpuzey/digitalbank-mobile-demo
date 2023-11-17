@@ -52,10 +52,11 @@ public class AppPreference {
         editor.commit();
     }
     public void setauthToken(String authToken) {
-        editor.putString(String.valueOf(R.string.s_pref_authToken), authToken);
-        editor.commit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("authToken", authToken);
+        editor.apply();
     }
-    public String getCreDate(){
+     public String getCreDate(){
         return sharedPreferences.getString(String.valueOf(R.string.s_pref_date), "date");
     }
     public String getauthToken(){

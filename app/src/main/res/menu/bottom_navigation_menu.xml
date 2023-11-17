@@ -3,7 +3,7 @@
     <item
         android:id="@+id/action_check_accounts"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="Check Accounts" />
+        android:title="My Accounts" />
 
     <item
         android:id="@+id/action_transfer"
@@ -13,10 +13,10 @@
     <item
         android:id="@+id/action_atm_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="ATM Search" />
+        android:title="ATM NearMe" />
 
     <item
-        android:id="@+id/action_contact"
-        android:icon="@android:drawable/stat_sys_speakerphone"
-        android:title="Contact" />
+        android:id="@+id/action_logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="Logout" />
 </menu>

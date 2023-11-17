@@ -18,6 +18,7 @@ import retrofit2.Response;
 import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.Model.User;
 import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Services.ServiceApi;
 
 
 /**
@@ -71,7 +72,8 @@ public class RegistrationFragment extends Fragment {
             MainActivity.appPreference.showToast("Create a password at least 6 characters long.");
         }
         else {
-            Call<User> userCall = MainActivity.serviceApi.doRegistration(name, email, phone, password);
+            Call<User> userCall = ((MainActivity) getActivity()).getServiceApi().doRegistration(name, email, phone, password);
+
             userCall.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {

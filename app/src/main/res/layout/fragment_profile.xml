@@ -29,23 +29,7 @@
         android:textSize="15sp"
         android:layout_below="@id/name"/>
 
-    <!-- Add a circular login button in the top right corner -->
-
-    <Button
-        android:id="@+id/logoutBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="51dp"
-        android:layout_marginEnd="24dp"
-        android:background="@android:drawable/ic_lock_power_off"
-        android:gravity="right|top"
-        android:textAllCaps="false"
-        android:textColor="#fff"
-        android:textSize="16sp" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +38,7 @@
         app:menu="@menu/bottom_navigation_menu" />
 
     <FrameLayout
-        android:id="@+id/fragment_container"
+        android:id="@+id/profile_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottomNavigationView"
