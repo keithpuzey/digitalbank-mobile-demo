@@ -83,7 +83,6 @@ public class LoginFragment extends Fragment {
         String Password = passwordInput.getText().toString();
 
 
-
         if (TextUtils.isEmpty(Email)) {
             MainActivity.appPreference.showToast("Your email is required.");
         } else if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()) {
@@ -99,8 +98,14 @@ public class LoginFragment extends Fragment {
                 public void onResponse(Call<User> call, Response<User> response) {
                     if (response.body() != null) {
                         Log.d("Response", "Response: " + response.body());
+
+
+
                         MainActivity.appPreference.setLoginStatus(true);
                         loginFromActivityListener.login(response.body().getauthToken());
+                        // Now you can use the authToken variable wherever needed
+                        // For example, setting it to a TextView named authTokenTextView
+
 
                     } else {
                         // Login failed

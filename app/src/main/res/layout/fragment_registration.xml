@@ -47,6 +47,59 @@
         android:inputType="textPassword"
         android:id="@+id/passwordInput"/>
 
+    <Spinner
+        android:id="@+id/titleSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/title_options"
+        android:prompt="@string/select_title" />
+
+    <EditText
+        android:id="@+id/dobInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Date of Birth"
+        android:inputType="date" />
+
+    <EditText
+        android:id="@+id/ssnInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Social Security Number"
+        android:inputType="number" />
+    <EditText
+        android:id="@+id/addressInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ssnInput"
+        android:layout_marginTop="16dp"
+        android:hint="Address"/>
+
+    <EditText
+        android:id="@+id/cityInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addressInput"
+        android:layout_marginTop="16dp"
+        android:hint="City"/>
+
+    <EditText
+        android:id="@+id/zipCodeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cityInput"
+        android:layout_marginTop="16dp"
+        android:hint="Zip Code"/>
+
+
+
+    <Button
+        android:id="@+id/cancelBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel" />
+
+
     <Button
         android:id="@+id/regBtn"
         android:layout_marginTop="30dp"

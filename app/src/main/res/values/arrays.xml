@@ -1,0 +1,7 @@
+<resources>
+    <array name="title_array">
+        <item>Mr</item>
+        <item>Mrs</item>
+        <item>Other</item>
+    </array>
+</resources>

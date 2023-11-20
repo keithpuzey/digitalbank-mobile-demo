@@ -38,6 +38,8 @@ import android.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.Toast;
+import xyz.digitalbank.demo.Constants.Constant;
+
 
 
 public class AtmSearchFragment extends Fragment {

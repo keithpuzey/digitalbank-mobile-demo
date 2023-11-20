@@ -11,4 +11,13 @@
     <string name="s_pref_authToken">sh_preference_authToken</string>
 
 
+
+        <string-array name="title_options">
+            <item>Mr</item>
+            <item>Mrs</item>
+            <item>Other</item>
+        </string-array>
+
+        <string name="select_title">Select Title</string>
+
 </resources>
