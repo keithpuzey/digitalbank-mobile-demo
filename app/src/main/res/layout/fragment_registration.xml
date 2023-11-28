@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:layout_margin="10dp">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,93 +27,169 @@
         android:textSize="18sp"
         android:gravity="center_horizontal"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Full Name"
-        android:inputType="textCapCharacters"
-        android:id="@+id/nameInput"/>
-
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:id="@+id/emailInput"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Phone"
-        android:inputType="number"
-        android:id="@+id/phoneInput"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:id="@+id/passwordInput"/>
-
     <Spinner
         android:id="@+id/titleSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/title_options"
-        android:prompt="@string/select_title" />
+        android:prompt="@string/select_title"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="First Name"
+        android:id="@+id/FnameInput"
+        android:layout_marginTop="16dp"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last Name"
+        android:id="@+id/LnameInput"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:id="@+id/genderRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/maleRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Male"/>
+
+        <RadioButton
+            android:id="@+id/femaleRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Female"/>
+    </RadioGroup>
 
     <EditText
         android:id="@+id/dobInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Date of Birth"
-        android:inputType="date" />
+        android:inputType="date"
+        android:layout_marginTop="16dp"/>
 
     <EditText
         android:id="@+id/ssnInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Social Security Number"
-        android:inputType="number" />
+        android:inputType="number"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:id="@+id/emailInput"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:id="@+id/passwordInput"
+        android:layout_marginTop="16dp" />
+
     <EditText
         android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ssnInput"
         android:layout_marginTop="16dp"
         android:hint="Address"/>
 
     <EditText
-        android:id="@+id/cityInput"
+        android:id="@+id/localityInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addressInput"
         android:layout_marginTop="16dp"
-        android:hint="City"/>
+        android:hint="Locality"/>
+
+    <EditText
+        android:id="@+id/regionInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Region"/>
 
     <EditText
         android:id="@+id/zipCodeInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cityInput"
         android:layout_marginTop="16dp"
-        android:hint="Zip Code"/>
+        android:hint="Postal Code"/>
 
+    <EditText
+        android:id="@+id/countryInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Country"/>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Home Phone"
+        android:inputType="number"
+        android:id="@+id/homephoneInput"
+        android:layout_marginTop="16dp" />
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mobile Phone"
+        android:inputType="number"
+        android:id="@+id/mobilephoneInput"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Work Phone"
+        android:inputType="number"
+        android:id="@+id/workphoneInput"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:id="@+id/tandcRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/acceptRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agree to Terms and Conditions"/>
+    </RadioGroup>
 
 
     <Button
         android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel" />
+        android:text="C a n c e l"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
 
 
     <Button
         android:id="@+id/regBtn"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
-        android:layout_width="match_parent"
+         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="R e g i s t e r"
         android:textAllCaps="false"
@@ -114,3 +199,5 @@
         />
 
 </LinearLayout>
+
+</ScrollView>

@@ -22,7 +22,7 @@ public class AppPreference {
     //Setting login status
     public void setLoginStatus(boolean status){
         // Using a default value of false if the status is not provided
-        boolean defaultStatus = false;
+        boolean defaultStatus = true;
         editor.putBoolean(String.valueOf(R.string.s_pref_login_status), status);
         editor.commit();
     }

@@ -5,7 +5,8 @@ public class Constant {
     /** Constants values are here */
     public static class baseUrl{
       //  public final static String BASE_URL = "http://digitalbank322871.mock-eu.blazemeter.com/";
-      public final static String BASE_URL = "http://dbankdemo.com/";
+       public final static String BASE_URL = "http://dbankdemo.com/";
+
         public final static String MOCK_URL = "http://digitalbank322871.mock-eu.blazemeter.com/";
 
         public final static String IMAGE_BASE_URL = "";

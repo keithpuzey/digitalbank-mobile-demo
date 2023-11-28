@@ -1,37 +1,54 @@
 package xyz.digitalbank.demo.Fragments;
 
-import android.app.DatePickerDialog;
+
 import android.os.Bundle;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 
-import androidx.fragment.app.Fragment;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.Model.User;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.ServiceApi;
+import android.widget.ArrayAdapter;
 
+import android.widget.DatePicker;
+import android.widget.Spinner;
+import android.widget.Toast;
+import java.text.SimpleDateFormat;
+import android.app.DatePickerDialog;
 import java.util.Calendar;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import com.google.gson.JsonObject;
+import xyz.digitalbank.demo.Services.RetrofitClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+import xyz.digitalbank.demo.Model.UserRequest;
+import java.util.Locale;
+import android.widget.RadioButton;
+
 
 public class RegistrationFragment extends Fragment {
 
-    private EditText nameInput, emailInput, phoneInput, passwordInput;
+    private EditText FnameInput, LnameInput,  emailInput,  passwordInput ;
+
+    private RadioButton maleRadioButton, femaleRadioButton;
+
+
     private Spinner titleSpinner;
-    private EditText dobInput, ssnInput, addressInput, cityInput, zipCodeInput;
+    private EditText dobInput, ssnInput, addressInput, zipCodeInput , countryInput , localityInput , regionInput , homephoneInput, mobilephoneInput, workphoneInput ;
     private Button regBtn, cancelBtn;
+
+    private static final String ROLE = "USER";
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -42,24 +59,35 @@ public class RegistrationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
-        nameInput = view.findViewById(R.id.nameInput);
-        emailInput = view.findViewById(R.id.emailInput);
-        phoneInput = view.findViewById(R.id.phoneInput);
-        passwordInput = view.findViewById(R.id.passwordInput);
         titleSpinner = view.findViewById(R.id.titleSpinner);
+        FnameInput = view.findViewById(R.id.FnameInput);
+        LnameInput = view.findViewById(R.id.LnameInput);
+        maleRadioButton = view.findViewById(R.id.maleRadioButton);
+        femaleRadioButton = view.findViewById(R.id.femaleRadioButton);
         dobInput = view.findViewById(R.id.dobInput);
         ssnInput = view.findViewById(R.id.ssnInput);
+        emailInput = view.findViewById(R.id.emailInput);
+        passwordInput = view.findViewById(R.id.passwordInput);
         addressInput = view.findViewById(R.id.addressInput);
-        cityInput = view.findViewById(R.id.cityInput);
+        localityInput = view.findViewById(R.id.localityInput);
+        regionInput = view.findViewById(R.id.regionInput);
         zipCodeInput = view.findViewById(R.id.zipCodeInput);
+        countryInput = view.findViewById(R.id.countryInput);
+        homephoneInput = view.findViewById(R.id.homephoneInput);
+        mobilephoneInput = view.findViewById(R.id.mobilephoneInput);
+        workphoneInput = view.findViewById(R.id.workphoneInput);
         regBtn = view.findViewById(R.id.regBtn);
         cancelBtn = view.findViewById(R.id.cancelBtn);
 
         // Populate title dropdown
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                requireActivity(), R.array.title_array, android.R.layout.simple_spinner_item);
+                getActivity(), R.array.title_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         titleSpinner.setAdapter(adapter);
+
+        // Initialize the titleSpinner and dobInput
+        titleSpinner = view.findViewById(R.id.titleSpinner);
+        dobInput = view.findViewById(R.id.dobInput);
 
         // Set up the date picker when the dobInput is clicked
         dobInput.setOnClickListener(new View.OnClickListener() {
@@ -73,8 +101,7 @@ public class RegistrationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 registerUser();
-                Log.e("reg button", "clicked");
-            }
+             }
         });
 
         // Set onClickListener for cancel button
@@ -85,43 +112,197 @@ public class RegistrationFragment extends Fragment {
                 Log.e("cancel button", "clicked");
             }
         });
-
         return view;
     }
 
-    private void showDatePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                requireActivity(),
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        // Handle the selected date
-                        String selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
-                        dobInput.setText(selectedDate);
-                    }
-                },
-                year, month, day);
+        private void showDatePicker() {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        datePickerDialog.show();
-    }
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    requireActivity(),
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(android.widget.DatePicker view, int year, int month, int dayOfMonth) {
+                            // Handle the selected date
+                            // Format the date as DD/MM/YYYY
+                            String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, month + 1, year);
+                            dobInput.setText(formattedDate);
+                        }
+                    },
+                    year, month, day);
 
-    private void registerUser() {
-        String name = nameInput.getText().toString();
-        String email = emailInput.getText().toString();
-        String phone = phoneInput.getText().toString();
-        String password = passwordInput.getText().toString();
+            datePickerDialog.show();
+        }
+
+    public void registerUser() {
         String title = titleSpinner.getSelectedItem().toString();
+        String Fname = FnameInput.getText().toString();
+        String Lname = LnameInput.getText().toString();
+        String gender;
+        if (maleRadioButton.isChecked()) {
+            gender = "M";
+        } else if (femaleRadioButton.isChecked()) {
+            gender = "F";
+        } else {
+            // Handle the case where neither radio button is checked (optional)
+            gender = ""; // or set a default value
+        }
+//         String gender = reggender.getText().toString();
         String dob = dobInput.getText().toString();
         String ssn = ssnInput.getText().toString();
+        String formattedSSN = formatSSN(ssn);
+        String email = emailInput.getText().toString();
+        String password = passwordInput.getText().toString();
         String address = addressInput.getText().toString();
-        String city = cityInput.getText().toString();
+        String locality = localityInput.getText().toString();
+        String region = regionInput.getText().toString();
         String zipCode = zipCodeInput.getText().toString();
+        String country = countryInput.getText().toString();
+        String homephone = homephoneInput.getText().toString();
+        String mobilephone = mobilephoneInput.getText().toString();
+        String workphone = workphoneInput.getText().toString();
 
-        // Rest of your registration logic...
+        if (TextUtils.isEmpty(Fname)) {
+            MainActivity.appPreference.showToast("Your First name is required.");
+        } else if (TextUtils.isEmpty(Lname)) {
+            MainActivity.appPreference.showToast("Your Last name is required.");
+        } else if (TextUtils.isEmpty(email)) {
+            MainActivity.appPreference.showToast("Your email is required.");
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            MainActivity.appPreference.showToast("Invalid email");
+        } else if (TextUtils.isEmpty(password)) {
+            MainActivity.appPreference.showToast("Password required");
+        } else if (password.length() < 8) {
+            MainActivity.appPreference.showToast("Create a password at least 8 characters long.");
+        } else {
+            registerApiCall(title, Fname, Lname, gender , dob, formattedSSN, email, password, address, locality, region, zipCode, country, homephone, mobilephone, workphone );
+        }
+    }
+
+    private String formatSSN(String ssn) {
+        // Remove any non-digit characters from the original SSN
+        String cleanedSSN = ssn.replaceAll("\\D", "");
+
+        // Ensure the SSN is 9 digits long
+        if (cleanedSSN.length() == 9) {
+            // Format the SSN as "xxx-xx-xxxx"
+            return String.format("%s-%s-%s",
+                    cleanedSSN.substring(0, 3),
+                    cleanedSSN.substring(3, 5),
+                    cleanedSSN.substring(5));
+        } else {
+            // Return the original SSN if it doesn't have 9 digits
+            return ssn;
+        }
+    }
+
+
+    private void registerApiCall(String title, String Fname, String Lname, String gender, String dob, String ssn, String email, String password, String address, String locality, String region, String zipCode, String country, String homephone, String mobilephone, String workphone) {
+        // Get the username and password for the initial authentication API call
+        String username = "admin@demo.io";
+        String adminpassword = "Demo123!";
+
+        // Make the initial authentication API call to get the authToken
+        RetrofitClient.getServiceApi().authenticateUser(username, adminpassword)
+                .enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                        if (response.isSuccessful()) {
+
+                        //  Log.d("API", "Request successful: " + call.request().url());
+                        //    Log.d("API", "Response: " + response.body());
+
+                            // Authentication successful, get the authToken
+                            String authToken = "Bearer " + response.body().get("authToken").getAsString();
+                          //  Log.d("API", "Token: " + authToken);
+
+                            // Make the Registration  API call with the authToken
+
+                            registerUserDetailsApiCall(authToken, title, Fname, Lname, gender, dob, ssn, email, password, address, locality, region, zipCode, country, homephone, mobilephone, workphone );
+
+                        } else {
+                        //    Log.e("API", "Authentication Request failed: " + call.request().url());
+                        //    Log.e("API", "Error: " + response.message());
+                            // Authentication failed, handle the error
+                            MainActivity.appPreference.showToast("Authentication failed");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<JsonObject> call, Throwable t) {
+
+                        Log.e("API", "Request failed: " + call.request().url());
+                        Log.e("API", "Error: " + t.getMessage());
+                        // Handle the failure of the authentication API call
+                        MainActivity.appPreference.showToast("Authentication failed");
+                    }
+                });
+    }
+
+    private void registerUserDetailsApiCall(String authToken, String title, String Fname, String Lname, String gender, String dob, String ssn, String email,
+                                            String password, String address, String locality, String region, String zipCode, String country, String homephone, String mobilephone, String workphone ) {
+
+
+        UserRequest userRequest = new UserRequest();
+        userRequest.setTitle(title);
+        userRequest.setFirstName(Fname);
+        userRequest.setLastName(Lname);
+        userRequest.setGender(gender);
+        userRequest.setDob(dob);
+        userRequest.setSsn(ssn);
+        userRequest.setEmailAddress(email);
+        userRequest.setPassword(password);
+        userRequest.setAddress(address);
+        userRequest.setLocality(locality);
+        userRequest.setRegion(region);
+        userRequest.setzipcode(zipCode);
+        userRequest.setCountry(country);
+        userRequest.setHomePhone(homephone);
+        userRequest.setMobilePhone(mobilephone);
+        userRequest.setWorkPhone(workphone);
+
+
+       //  Log.e("API", "User Registration Token : " + authToken);
+       //  Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString() );
+
+        // Make the second API call to register the user details
+        RetrofitClient.getServiceApi().registerUser(authToken,  "application/json", ROLE, userRequest   )
+                .enqueue(new Callback<Void>() {
+
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+
+                        Log.d("API", "Registration URL: " + call.request().url());
+                     //  Log.d("API", "Token: " + authToken);
+                        Log.d("API ", "Registered Body: " + userRequest.toJsonString());
+                        Log.d("API", "Response: " + response.body());
+
+                        if (response.isSuccessful()) {
+
+                            MainActivity.appPreference.showToast("Registration successful");
+                            // Navigate back to the login fragment
+                            ((MainActivity) requireActivity()).showLoginFragment();
+
+                        } else {
+                            // Registration failed
+
+                            MainActivity.appPreference.showToast("Registration failed");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Log.e("API", "Failure: " + t.getMessage());
+                        Log.e("API", "Failure Unsuccessful response Code: " );
+                        Log.d("API", "Failure Unsuccessful Body: " );
+
+                        // Handle the failure of the registration API call
+                        MainActivity.appPreference.showToast("Registration failed");
+                    }
+                });
     }
 }

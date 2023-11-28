@@ -99,6 +99,16 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
+    public void showLoginFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new LoginFragment())
+                .commit();
+
+        // Hide bottomNavigationView after logout
+        bottomNavigationView.setVisibility(View.GONE);
+    }
+
     @Override
     public void logout() {
         appPreference.setLoginStatus(false);

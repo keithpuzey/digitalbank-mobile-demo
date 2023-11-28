@@ -23,6 +23,7 @@ import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
+import xyz.digitalbank.demo.Extras.AppPreference;
 
 
 public class LoginFragment extends Fragment {
@@ -43,6 +44,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+
 
         // Initialize the ServiceApi instance
         serviceApi = RetrofitClient.getRetrofitInstance().create(ServiceApi.class);
@@ -99,13 +101,8 @@ public class LoginFragment extends Fragment {
                     if (response.body() != null) {
                         Log.d("Response", "Response: " + response.body());
 
-
-
                         MainActivity.appPreference.setLoginStatus(true);
-                        loginFromActivityListener.login(response.body().getauthToken());
-                        // Now you can use the authToken variable wherever needed
-                        // For example, setting it to a TextView named authTokenTextView
-
+                        loginFromActivityListener.login(response.body().getAuthToken());
 
                     } else {
                         // Login failed

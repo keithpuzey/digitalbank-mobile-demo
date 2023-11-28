@@ -22,7 +22,8 @@
             app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@color/design_default_color_background"
             app:itemTextColor="#FEFEFE"
-            app:menu="@menu/bottom_navigation_menu" />
+            app:menu="@menu/bottom_navigation_menu"
+            android:visibility="gone" />
 
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

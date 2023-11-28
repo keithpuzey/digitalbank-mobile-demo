@@ -1,7 +1,8 @@
 <resources>
     <array name="title_array">
-        <item>Mr</item>
-        <item>Mrs</item>
-        <item>Other</item>
+        <item>Mr.</item>
+        <item>Mrs.</item>
+        <item>Ms.</item>
     </array>
+
 </resources>
