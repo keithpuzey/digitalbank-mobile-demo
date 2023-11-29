@@ -35,6 +35,23 @@ import org.json.JSONObject;
 import xyz.digitalbank.demo.Model.UserRequest;
 import java.util.Locale;
 import android.widget.RadioButton;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import xyz.digitalbank.demo.Model.UserResponse;
+import com.google.gson.Gson;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AlertDialog;
+import org.json.JSONArray;
+import java.io.IOException;
+
+
+
 
 
 public class RegistrationFragment extends Fragment {
@@ -52,6 +69,27 @@ public class RegistrationFragment extends Fragment {
 
     public RegistrationFragment() {
         // Required empty public constructor
+    }
+
+
+    private void switchToProfileFragment() {
+        // Create an instance of the ProfileFragment
+        ProfileFragment profileFragment = new ProfileFragment();
+
+        // Get the FragmentManager
+        FragmentManager fragmentManager = getParentFragmentManager();
+
+        // Start a FragmentTransaction
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Replace the current fragment with the ProfileFragment
+        fragmentTransaction.replace(R.id.fragment_container, profileFragment);
+
+        // Add the transaction to the back stack (optional, allows for back navigation)
+        fragmentTransaction.addToBackStack(null);
+
+        // Commit the transaction
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -76,8 +114,10 @@ public class RegistrationFragment extends Fragment {
         homephoneInput = view.findViewById(R.id.homephoneInput);
         mobilephoneInput = view.findViewById(R.id.mobilephoneInput);
         workphoneInput = view.findViewById(R.id.workphoneInput);
-        regBtn = view.findViewById(R.id.regBtn);
         cancelBtn = view.findViewById(R.id.cancelBtn);
+        CheckBox agreeCheckBox = view.findViewById(R.id.agreeCheckBox);
+        Button regBtn = view.findViewById(R.id.regBtn);
+
 
         // Populate title dropdown
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -97,21 +137,40 @@ public class RegistrationFragment extends Fragment {
             }
         });
 
-        regBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                registerUser();
-             }
-        });
 
-        // Set onClickListener for cancel button
+
+
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Implement cancel functionality here
                 Log.e("cancel button", "clicked");
+
+                // Assuming that MainActivity has a method showLoginFragment() to switch to the login fragment
+                ((MainActivity) requireActivity()).showLoginFragment();
             }
         });
+
+        regBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Log.d("RegistrationFragment", "Register button clicked");
+                    if (agreeCheckBox.isChecked()) {
+                        // The user has agreed to the Terms and Conditions, proceed with registration
+                        Log.d("RegistrationFragment", "Agree checkbox is checked");
+                        registerUser();
+                    } else {
+                        // Display a message indicating that the user needs to agree to the Terms and Conditions
+                        Log.d("RegistrationFragment", "Agree checkbox is not checked");
+                        MainActivity.appPreference.showToast("Please agree to the Terms and Conditions.");
+                    }
+                } catch (Exception e) {
+                    Log.e("RegistrationFragment", "Exception in onClick: " + e.getMessage());
+                }
+            }
+        });
+
         return view;
     }
 
@@ -178,6 +237,24 @@ public class RegistrationFragment extends Fragment {
             MainActivity.appPreference.showToast("Password required");
         } else if (password.length() < 8) {
             MainActivity.appPreference.showToast("Create a password at least 8 characters long.");
+        } else if (TextUtils.isEmpty(dob)) {
+            MainActivity.appPreference.showToast("Your Date Of Birth is Required");
+        } else if (TextUtils.isEmpty(address)) {
+            MainActivity.appPreference.showToast("Your Address is Required");
+        } else if (TextUtils.isEmpty(locality)) {
+            MainActivity.appPreference.showToast("Your Locality is Required");
+        } else if (TextUtils.isEmpty(region)) {
+            MainActivity.appPreference.showToast("Your Region is Required");
+        } else if (TextUtils.isEmpty(zipCode)) {
+            MainActivity.appPreference.showToast("Your Post Code is Required");
+        } else if (TextUtils.isEmpty(country)) {
+            MainActivity.appPreference.showToast("Your Country is Required");
+        } else if (TextUtils.isEmpty(homephone)) {
+            MainActivity.appPreference.showToast("Your Home Phone is Required");
+        } else if (TextUtils.isEmpty(mobilephone)) {
+            MainActivity.appPreference.showToast("Your Mobile Phone is Required");
+        } else if (TextUtils.isEmpty(workphone) ) {
+            MainActivity.appPreference.showToast("Your Work Phone is Required");
         } else {
             registerApiCall(title, Fname, Lname, gender , dob, formattedSSN, email, password, address, locality, region, zipCode, country, homephone, mobilephone, workphone );
         }
@@ -213,20 +290,20 @@ public class RegistrationFragment extends Fragment {
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.isSuccessful()) {
 
-                        //  Log.d("API", "Request successful: " + call.request().url());
-                        //    Log.d("API", "Response: " + response.body());
+                          Log.d("API", "Request successful: " + call.request().url());
+                            Log.d("API", "Response: " + response.body());
 
                             // Authentication successful, get the authToken
                             String authToken = "Bearer " + response.body().get("authToken").getAsString();
-                          //  Log.d("API", "Token: " + authToken);
+                            Log.d("API", "Token: " + authToken);
 
                             // Make the Registration  API call with the authToken
 
                             registerUserDetailsApiCall(authToken, title, Fname, Lname, gender, dob, ssn, email, password, address, locality, region, zipCode, country, homephone, mobilephone, workphone );
 
                         } else {
-                        //    Log.e("API", "Authentication Request failed: " + call.request().url());
-                        //    Log.e("API", "Error: " + response.message());
+                            Log.e("API", "Authentication Request failed: " + call.request().url());
+                            Log.e("API", "Error: " + response.message());
                             // Authentication failed, handle the error
                             MainActivity.appPreference.showToast("Authentication failed");
                         }
@@ -266,42 +343,170 @@ public class RegistrationFragment extends Fragment {
         userRequest.setWorkPhone(workphone);
 
 
-       //  Log.e("API", "User Registration Token : " + authToken);
-       //  Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString() );
+         Log.e("API", "User Registration Token : " + authToken);
+         Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString() );
 
         // Make the second API call to register the user details
-        RetrofitClient.getServiceApi().registerUser(authToken,  "application/json", ROLE, userRequest   )
+        RetrofitClient.getServiceApi().registerUser(authToken,  "application/json", ROLE, userRequest)
                 .enqueue(new Callback<Void>() {
 
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
-
-                        Log.d("API", "Registration URL: " + call.request().url());
-                     //  Log.d("API", "Token: " + authToken);
-                        Log.d("API ", "Registered Body: " + userRequest.toJsonString());
-                        Log.d("API", "Response: " + response.body());
-
                         if (response.isSuccessful()) {
 
+                            //  API call to find user by email and get user ID
+                            RetrofitClient.getServiceApi().findUserId(authToken, email)
+                                    .enqueue(new Callback<UserResponse>() {
+                                        @Override
+                                        public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                                            if (response.isSuccessful()) {
+
+
+                                                // Log success information
+                                                Log.d("API", "Request successful: " + call.request().url());
+                                                Log.d("API", "Response Code: " + response.code());
+
+
+                                                // Log response body as JSON string
+                                                UserResponse userResponse = response.body();
+                                                if (userResponse != null) {
+                                                    int userId = userResponse.getId();
+                                                    String responseBodyJson = new Gson().toJson(userResponse);
+                                                    Log.d("API", "Response Body: " + responseBodyJson);
+                                                    Log.d("API", "ID Value = : " + userId );
+
+                                                    createUserData(authToken, userId);
+
+                                                } else {
+                                                    Log.d("API", "Response Body is null");
+                                                }
+
+
+                                            } else {
+                                                // Log error information
+                                                Log.e("API", "Request failed: " + call.request().url());
+                                                Log.e("API", "Error Code: " + response.code());
+                                                Log.e("API", "Error Body: " + response.errorBody().toString());
+                                                MainActivity.appPreference.showToast("User not found");
+
+                                                // Handle the error
+                                            }
+                                        }
+
+
+                                        @Override
+                                        public void onFailure(Call<UserResponse> call, Throwable t) {
+                                            // Handle failure
+                                            MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+                                        }
+                                    });
+
                             MainActivity.appPreference.showToast("Registration successful");
-                            // Navigate back to the login fragment
+
+                            MainActivity.appPreference.setLoginStatus(true);
+
                             ((MainActivity) requireActivity()).showLoginFragment();
 
                         } else {
                             // Registration failed
-
-                            MainActivity.appPreference.showToast("Registration failed");
+                            handleRegistrationError(response);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
                         Log.e("API", "Failure: " + t.getMessage());
-                        Log.e("API", "Failure Unsuccessful response Code: " );
-                        Log.d("API", "Failure Unsuccessful Body: " );
-
                         // Handle the failure of the registration API call
+
                         MainActivity.appPreference.showToast("Registration failed");
+                    }
+                });
+    }
+
+    private void showErrorDialog(String errorMessage) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Error");
+        builder.setMessage(errorMessage);
+        builder.setPositiveButton("OK", null);
+        builder.create().show();
+    }
+    private void handleRegistrationError(Response<?> response) {
+        try {
+            // Extract the error message from the response body
+            String errorBodyString = response.errorBody().string();
+
+            try {
+                // Try parsing the error body as a JSON array
+                JSONArray jsonArray = new JSONArray(errorBodyString);
+
+                // Extract the first element as the error message
+                String errorMessage = jsonArray.optString(0);
+
+                // Display the error message in an AlertDialog
+                showErrorDialog(errorMessage);
+                return;
+            } catch (JSONException e) {
+                // Ignore and proceed to the next step
+            }
+
+            try {
+                // Try parsing the error body as a JSON object
+                JSONObject jsonObject = new JSONObject(errorBodyString);
+
+                // Check if the JSON object contains a "message" key
+                if (jsonObject.has("message")) {
+                    // Extract the "message" value as the error message
+                    String errorMessage = jsonObject.getString("message");
+
+                    // Display the error message in an AlertDialog
+                    showErrorDialog(errorMessage);
+                } else {
+                    // Display a generic error message if "message" key is not present
+                    MainActivity.appPreference.showToast("Registration failed");
+                }
+            } catch (JSONException e) {
+                // Display a generic error message if parsing as JSON object fails
+                MainActivity.appPreference.showToast("Registration failed");
+            }
+        } catch (IOException e) {
+            Log.e("API", "Error handling registration error: " + e.getMessage());
+            // Display a generic error message if there's an issue reading the error body
+            MainActivity.appPreference.showToast("Registration failed");
+        }
+    }
+
+
+    private void createUserData(String authToken, int userId) {
+        // API call to create user data using the obtained ID
+        RetrofitClient.getServiceApi().createData(userId, authToken )
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+
+                            Log.d("API", "Data Creation Code: " + response.code());
+                            Log.d("API", "Data Creation Code: " + response.code());
+                            Log.d("API", "Data Creation Body " + response.body());
+
+                            MainActivity.appPreference.showToast("Data creation successful");
+                            // Handle success
+                        } else {
+                            // Handle the case where data creation failed
+                            Log.d("API", "ID Value = : " + userId );
+                            Log.d("API", "Token Value = : " + authToken );
+                            Log.e("API", "Request failed: " + call.request().url());
+
+                            Log.d("API", "Data Creation Failed Code: " + response.code());
+                            Log.d("API", "Data Creation Failed Body " + response.body());
+
+                            MainActivity.appPreference.showToast("Data creation failed");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        // Handle failure
+                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
     }

@@ -23,6 +23,13 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     public static AppPreference appPreference;
     private ServiceApi serviceApi;
 
+    private String email;
+
+    // Add a method to set the email
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,13 +94,20 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     }
 
     @Override
-    public void login(String authToken) {
+    public void login(String authToken, String Email ) {
         appPreference.setauthToken(authToken);
+        setEmail(email);
+        ProfileFragment profileFragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("email", Email);
+        profileFragment.setArguments(bundle);
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, new ProfileFragment())
+                .replace(R.id.fragment_container, profileFragment) // Use the created instance
                 .commit();
+
+        profileFragment.updateProfileDetails();
 
         // Make bottomNavigationView visible after login
         bottomNavigationView.setVisibility(View.VISIBLE);
@@ -109,6 +123,23 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         bottomNavigationView.setVisibility(View.GONE);
     }
 
+    // Add this method to set the email in ProfileFragment
+    public void setEmailInProfileFragment(String email) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if (currentFragment instanceof ProfileFragment) {
+            ProfileFragment profileFragment = (ProfileFragment) currentFragment;
+            profileFragment.setEmail(email);
+        } else {
+            // Handle the case where the current fragment is not a ProfileFragment
+            // You might want to log or display an error message
+        }
+    }
+
+    // Add a method to get the email
+    public String getEmail() {
+        return email;
+    }
     @Override
     public void logout() {
         appPreference.setLoginStatus(false);

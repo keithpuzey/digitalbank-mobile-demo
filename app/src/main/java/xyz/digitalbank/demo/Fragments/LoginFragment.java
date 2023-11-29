@@ -31,10 +31,11 @@ public class LoginFragment extends Fragment {
     private MyInterface loginFromActivityListener;
     private TextView registerTV;
 
-    private EditText emailInput, passwordInput;
+    public EditText emailInput, passwordInput;
     private Button loginBtn;
     private ServiceApi serviceApi;
 
+    public String email ;
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -91,8 +92,8 @@ public class LoginFragment extends Fragment {
             MainActivity.appPreference.showToast("Invalid email");
         } else if (TextUtils.isEmpty(Password)) {
             MainActivity.appPreference.showToast("Password required");
-        } else if (Password.length() < 6) {
-            MainActivity.appPreference.showToast("Password may be at least 6 characters long.");
+        } else if (Password.length() < 8) {
+            MainActivity.appPreference.showToast("Password may be at least 8 characters long.");
         } else {
             Call<User> userCall = serviceApi.doLogin(Email, Password);
             userCall.enqueue(new Callback<User>() {
@@ -101,8 +102,11 @@ public class LoginFragment extends Fragment {
                     if (response.body() != null) {
                         Log.d("Response", "Response: " + response.body());
 
+                        ((MainActivity) requireActivity()).setEmail(Email);
+
                         MainActivity.appPreference.setLoginStatus(true);
-                        loginFromActivityListener.login(response.body().getAuthToken());
+                        loginFromActivityListener.login(response.body().getAuthToken(), Email );
+
 
                     } else {
                         // Login failed

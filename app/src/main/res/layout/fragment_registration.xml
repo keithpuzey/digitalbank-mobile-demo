@@ -8,14 +8,14 @@
     android:padding="10dp"
     android:layout_margin="10dp">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.RegistrationFragment"
     android:padding="10dp"
     android:layout_margin="10dp"
     android:orientation="vertical">
+
 
     <TextView
         android:layout_marginTop="30dp"
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:hint="First Name"
         android:id="@+id/FnameInput"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="30dp"
         />
 
     <EditText
@@ -48,13 +48,15 @@
         android:layout_height="wrap_content"
         android:hint="Last Name"
         android:id="@+id/LnameInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="26dp" />
 
     <RadioGroup
         android:id="@+id/genderRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
 
         <RadioButton
             android:id="@+id/maleRadioButton"
@@ -81,9 +83,11 @@
         android:id="@+id/ssnInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Social Security Number"
+        android:hint="Social Security Number  xxxxxxxxx"
         android:inputType="number"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:digits="0123456789"
+        android:maxLength="9" />/>
 
     <EditText
         android:layout_width="match_parent"
@@ -109,18 +113,18 @@
         android:hint="Address"/>
 
     <EditText
+        android:id="@+id/regionInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Region" />
+
+    <EditText
         android:id="@+id/localityInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Locality"/>
-
-    <EditText
-        android:id="@+id/regionInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="Region"/>
 
     <EditText
         android:id="@+id/zipCodeInput"
@@ -129,74 +133,75 @@
         android:layout_marginTop="16dp"
         android:hint="Postal Code"/>
 
+
     <EditText
         android:id="@+id/countryInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Country"/>
-
+        android:hint="Country" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Home Phone"
+        android:hint="Home Phone i.e ### ### ####"
         android:inputType="number"
         android:id="@+id/homephoneInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:digits="0123456789"
+        android:maxLength="10" />
 
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Mobile Phone"
+        android:hint="Mobile Phone i.e ### ### ####"
         android:inputType="number"
         android:id="@+id/mobilephoneInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:digits="0123456789"
+        android:maxLength="10" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Work Phone"
+        android:hint="Work Phone i.e ### ### #### "
         android:inputType="number"
         android:id="@+id/workphoneInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:digits="0123456789"
+        android:maxLength="10" />
 
-    <RadioGroup
-        android:id="@+id/tandcRadioGroup"
+    <CheckBox
+        android:id="@+id/agreeCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="Agree to Terms and Conditions"
+        android:layout_marginTop="16dp" />
 
-        <RadioButton
-            android:id="@+id/acceptRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Agree to Terms and Conditions"/>
-    </RadioGroup>
+
+    <Button
+        android:id="@+id/regBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:background="@color/colorPrimary"
+        android:enabled="true" />
 
 
     <Button
         android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="C a n c e l"
+        android:text="Cancel"
         android:textAllCaps="false"
         android:textColor="#fff"
         android:textSize="16sp"
-        android:layout_marginTop="16dp" />
-
-
-    <Button
-        android:id="@+id/regBtn"
-         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="R e g i s t e r"
-        android:textAllCaps="false"
-        android:textColor="#fff"
-        android:textSize="16sp"
-        android:background="@color/colorPrimary"
-        />
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="200dp" />
 
 </LinearLayout>
 

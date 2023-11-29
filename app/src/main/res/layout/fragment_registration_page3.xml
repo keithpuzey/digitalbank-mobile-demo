@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:layout_margin="10dp">
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.RegistrationFragment"
+    android:padding="10dp"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create a new account"
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
+        android:gravity="center_horizontal"/>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Home Phone"
+        android:inputType="number"
+        android:id="@+id/homephoneInput"
+        android:layout_marginTop="16dp" />
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mobile Phone"
+        android:inputType="number"
+        android:id="@+id/mobilephoneInput"
+        android:layout_marginTop="16dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Work Phone"
+        android:inputType="number"
+        android:id="@+id/workphoneInput"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:id="@+id/tandcRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/acceptRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agree to Terms and Conditions"/>
+    </RadioGroup>
+
+
+    <Button
+        android:id="@+id/regBtn"
+         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="R e g i s t e r"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:background="@color/colorPrimary"
+        />
+
+</LinearLayout>
+
+</ScrollView>

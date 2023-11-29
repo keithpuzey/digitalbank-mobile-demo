@@ -8,7 +8,12 @@ import retrofit2.http.Body;
 import retrofit2.http.Header;
 import xyz.digitalbank.demo.Model.User;
 import com.google.gson.JsonObject;
+
+import xyz.digitalbank.demo.Model.UserProfileResponse;
 import xyz.digitalbank.demo.Model.UserRequest;
+import xyz.digitalbank.demo.Model.UserResponse;
+import retrofit2.http.Path;
+
 
 public interface ServiceApi {
 
@@ -21,7 +26,6 @@ public interface ServiceApi {
     @POST("bank/api/v1/auth")
     Call<JsonObject> authenticateUser(@Query("username") String username, @Query("password") String adminpassword);
 
-
     @POST("/bank/api/v1/user")
     Call<Void> registerUser(
             @Header("Authorization") String authToken,
@@ -29,4 +33,21 @@ public interface ServiceApi {
             @Query("role") String ROLE,
             @Body UserRequest userRequest
     );
-}
+    @GET("/bank/api/v1/user/find")
+    Call<UserResponse> findUserId(
+            @Header("Authorization") String authToken,
+            @Query("username") String email
+    );
+
+    @POST("/bank/api/v1/user/{id}/data/create")
+    Call<Void> createData(
+            @Path("id") int userId,
+            @Header("Authorization") String authToken
+    );
+
+    @GET("/bank/api/v1/user/{id}/profile")
+    Call<UserProfileResponse> getUserProfile(
+            @Path("id") int loggedinuserId,
+            @Header("Authorization") String authToken
+        );
+    }
