@@ -20,11 +20,19 @@ import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Model.UserProfileResponse;
 import xyz.digitalbank.demo.Model.UserResponse;
+import xyz.digitalbank.demo.Model.UserAccountResponse;
 import com.google.gson.JsonObject;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import java.util.List;
+import android.widget.Spinner;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+
 
 public class ProfileFragment extends Fragment {
     public TextView name, email, title;
@@ -120,7 +128,9 @@ public class ProfileFragment extends Fragment {
 
                                                 // Directly assign the id to the int variable
                                                 loggedinuserId = userResponse.getId();
+                                                Log.d("API", "Logged in user ID = : " + loggedinuserId );
 
+                                                ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
                                                 // Call the API to get user profile details using the obtained user ID
                                                 getUserProfile(authToken, loggedinuserId);
                                             } else {
@@ -160,6 +170,12 @@ public class ProfileFragment extends Fragment {
                             UserProfileResponse userProfileResponse = response.body();
                             // Update UI to display user profile details
                             displayUserProfile(userProfileResponse);
+                            // Set the loggedinuserId in MainActivity
+                            ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
+                            // Call the API to get user accounts using the obtained user ID
+
+                            getUserAccounts(authToken, loggedinuserId);
+
                         } else {
                             // Handle the case where getUserProfile API failed
                             MainActivity.appPreference.showToast("Failed to retrieve user profile");
@@ -172,6 +188,73 @@ public class ProfileFragment extends Fragment {
                         MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
+    }
+
+
+    private void getUserAccounts(String authToken, int loggedinuserId) {
+        // Call the API to get user accounts using the obtained user ID
+
+        RetrofitClient.getServiceApi().getUserAccounts(loggedinuserId, authToken)
+                .enqueue(new Callback<List<UserAccountResponse>>() {
+                    @Override
+                    public void onResponse(Call<List<UserAccountResponse>> call, Response<List<UserAccountResponse>> response) {
+                        if (response.isSuccessful()) {
+                            // Process the list of UserAccountResponse
+                            List<UserAccountResponse> userAccounts = response.body();
+                            displayUserAccounts(userAccounts);
+                        } else {
+                            // Handle the case where the API call was not successful
+                            MainActivity.appPreference.showToast("Failed to retrieve user accounts");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<UserAccountResponse>> call, Throwable t) {
+                        // Handle failure of getUserAccounts API
+                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+                    }
+                });
+    }
+    private void displayUserAccounts(List<UserAccountResponse> userAccounts) {
+        // Assuming you have a reference to the Spinner in your fragment
+        Spinner accountSpinner = getView().findViewById(R.id.accountSpinner);
+
+        // Create a list of strings to hold account names
+        List<String> accountNames = new ArrayList<>();
+        for (UserAccountResponse account : userAccounts) {
+            accountNames.add(account.getName());
+        }
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, accountNames);
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        accountSpinner.setAdapter(adapter);
+
+        // Set a listener to handle item selection if needed
+        accountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // Handle item selection if needed
+                String selectedAccountName = accountNames.get(position);
+                // Do something with the selected account name
+                // For example, you can display additional details or perform actions based on the selected account
+                // You can access the corresponding UserAccountResponse using the position
+                UserAccountResponse selectedAccount = userAccounts.get(position);
+                // Log or display details of the selected account
+                Log.d("UserAccount", "Selected Account Name: " + selectedAccount.getName());
+                Log.d("UserAccount", "Selected Account Number: " + selectedAccount.getAccountNumber());
+                // Add more details as needed
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle nothing selected if needed
+            }
+        });
     }
 
     private void displayUserProfile(UserProfileResponse userProfileResponse) {

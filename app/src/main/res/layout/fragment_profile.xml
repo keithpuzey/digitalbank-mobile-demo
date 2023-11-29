@@ -29,7 +29,15 @@
         android:textSize="15sp"
         android:layout_below="@id/name"/>
 
-     <com.google.android.material.bottomnavigation.BottomNavigationView
+    <Spinner
+        android:id="@+id/accountSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"/>
+
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

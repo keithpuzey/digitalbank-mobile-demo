@@ -12,8 +12,9 @@ import com.google.gson.JsonObject;
 import xyz.digitalbank.demo.Model.UserProfileResponse;
 import xyz.digitalbank.demo.Model.UserRequest;
 import xyz.digitalbank.demo.Model.UserResponse;
+import xyz.digitalbank.demo.Model.UserAccountResponse;
 import retrofit2.http.Path;
-
+import java.util.List;
 
 public interface ServiceApi {
 
@@ -50,4 +51,10 @@ public interface ServiceApi {
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
         );
-    }
+
+    @GET("/bank/api/v1/user/{id}/account")
+    Call<List<UserAccountResponse>> getUserAccounts(
+            @Path("id") int loggedinuserId,
+            @Header("Authorization") String authToken
+    );
+}

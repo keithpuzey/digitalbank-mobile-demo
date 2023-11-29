@@ -23,17 +23,29 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     public static AppPreference appPreference;
     private ServiceApi serviceApi;
 
-    private String email;
+    private String email ;
+    private int loggedinuserId ;
 
     // Add a method to set the email
     public void setEmail(String email) {
         this.email = email;
     }
 
+    // Add this method to set the loggedinuserId
+    public void setLoggedinuserId(int userId) {
+        loggedinuserId = userId;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new LoginFragment())
+                    .commit();
+        }
 
         appPreference = new AppPreference(this);
         serviceApi = RetrofitClient.getRetrofitInstance().create(ServiceApi.class);
@@ -135,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
             // You might want to log or display an error message
         }
     }
+
+
 
     // Add a method to get the email
     public String getEmail() {
