@@ -32,6 +32,12 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import xyz.digitalbank.demo.Model.TransactionResponse;
+import xyz.digitalbank.demo.Activity.AccountInfo;
+import com.google.gson.Gson;
+
 
 
 public class ProfileFragment extends Fragment {
@@ -39,7 +45,12 @@ public class ProfileFragment extends Fragment {
     private MyInterface logoutListener;
     public int loggedinuserId;
 
+    private List<UserAccountResponse> userAccounts;
+
     public String Email ;
+    private String authToken;
+    public int accountId ;
+    private Spinner accountSpinner;
 
 
     public ProfileFragment() {
@@ -55,6 +66,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Retrieve authToken from SharedPreferences
+        authToken = MainActivity.appPreference.getauthToken();  // Use the member variable instead of redeclaring
+
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -80,18 +95,43 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
+        accountSpinner = view.findViewById(R.id.accountSpinner);
         name = view.findViewById(R.id.name);
-        // Keep only the greeting message
+        TableLayout tableLayout = view.findViewById(R.id.tableLayout);
+
+        // Set a listener to handle item selection if needed
+        accountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // Handle item selection
+                UserAccountResponse selectedAccount = userAccounts.get(position);
+                int selectedAccountId = selectedAccount.getId();
+                Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId );
+                // Call the method to get and display account transactions for the selected account
+                getAndDisplayAccountTransactions(authToken , selectedAccountId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle nothing selected if needed
+            }
+        });
+
+
+        // Get Account Details
         updateProfileDetails(  );
+     //   int accountId = 398885 ;
+
+
+        getAndDisplayAccountTransactions( authToken , accountId);
 
         String displayName = MainActivity.appPreference.getDisplayName();
-        String greetingMessage = "Logged into Digital Bank as user " + displayName;
+        String greetingMessage = "Loading ";
         name.setText(greetingMessage);
 
         email = view.findViewById(R.id.email);
         // Display only the authentication token
-        String authToken = MainActivity.appPreference.getauthToken();
+
         String authTokenMessage = "Authentication Token: " + loggedinuserId ;
         email.setText(authTokenMessage);
 
@@ -110,10 +150,12 @@ public class ProfileFragment extends Fragment {
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.isSuccessful()) {
                             // Authentication successful, get the authToken
-                            String authToken = "Bearer " + response.body().get("authToken").getAsString();
+                            String authToken = "Bearer " +  response.body().get("authToken").getAsString();
 
                             // Save the authToken to your app preferences or wherever you need it
                             MainActivity.appPreference.setauthToken(authToken);
+
+
 
                             // Call findUserId API to get the user ID
                             String email = ((MainActivity) requireActivity()).getEmail();
@@ -219,35 +261,44 @@ public class ProfileFragment extends Fragment {
         // Assuming you have a reference to the Spinner in your fragment
         Spinner accountSpinner = getView().findViewById(R.id.accountSpinner);
 
-        // Create a list of strings to hold account names
-        List<String> accountNames = new ArrayList<>();
+        // Create a list of AccountInfo to hold account names, numbers, IDs, and current balances
+        List<AccountInfo> accountInfoList = new ArrayList<>();
+
         for (UserAccountResponse account : userAccounts) {
-            accountNames.add(account.getName());
+            // Extract information from UserAccountResponse
+            int accountId = account.getId();
+            String accountName = account.getName();
+            String currentBalance = String.valueOf(account.getCurrentBalance());
+
+            // Create an AccountInfo object and add it to the list
+            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance);
+
+            accountInfoList.add(accountInfo);
+
+            // Display other account details as needed
+            Log.d("UserAccount", "Account Name: " + accountName);
+            Log.d("UserAccount", "Account ID: " + accountId);
+            Log.d("UserAccount", "Current Balance: " + currentBalance);
         }
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, accountNames);
-
-        // Specify the layout to use when the list of choices appears
+        // Create an ArrayAdapter with AccountInfo objects
+        ArrayAdapter<AccountInfo> adapter = new ArrayAdapter<>(requireContext(), R.layout.custom_spinner_item, accountInfoList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
         accountSpinner.setAdapter(adapter);
 
-        // Set a listener to handle item selection if needed
+        // Set a listener to handle item selection
         accountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                // Handle item selection if needed
-                String selectedAccountName = accountNames.get(position);
-                // Do something with the selected account name
-                // For example, you can display additional details or perform actions based on the selected account
-                // You can access the corresponding UserAccountResponse using the position
-                UserAccountResponse selectedAccount = userAccounts.get(position);
-                // Log or display details of the selected account
-                Log.d("UserAccount", "Selected Account Name: " + selectedAccount.getName());
-                Log.d("UserAccount", "Selected Account Number: " + selectedAccount.getAccountNumber());
-                // Add more details as needed
+                // Handle item selection
+                AccountInfo selectedAccount = accountInfoList.get(position);
+                int selectedAccountId = selectedAccount.getId();
+
+                Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId);
+                // Call the method to get and display account transactions for the selected account
+                getAndDisplayAccountTransactions( ("Bearer " + authToken) , selectedAccountId);
             }
 
             @Override
@@ -266,6 +317,129 @@ public class ProfileFragment extends Fragment {
         name.setText(fullName);
         email.setText("Email: " + userProfileResponse.getEmailAddress());
 
+    }
+
+    private void getAndDisplayAccountTransactions(String authToken, int accountId) {
+        RetrofitClient.getServiceApi().getAccountTransactions(accountId, authToken)
+                .enqueue(new Callback<List<TransactionResponse>>() {
+                    @Override
+                    public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                        Log.d("API", "Transaction Account ID = : " + accountId);
+                        Log.d("API", "Transaction Request URL: " + call.request().url());
+                        Log.d("API", "Transaction Code: " + response.code());
+                        Log.d("API", "Transaction Response: " + response.body());
+                        Log.d("API", "Transaction Token: " + authToken);
+
+                        if (response.isSuccessful()) {
+                            List<TransactionResponse> accountTransactions = response.body();
+                            // Clear existing transactions before displaying new ones
+                            clearAndDisplayAccountTransactions(accountTransactions);
+                        } else {
+                            // Handle the case where the API call was not successful
+                            MainActivity.appPreference.showToast("Failed to retrieve account transactions");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                        // Handle failure of getAccountTransactions API
+                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+                    }
+                });
+    }
+
+    private void displayAccountTransactions(List<TransactionResponse> accountTransactions) {
+        // Assuming you have a reference to the TableLayout in your fragment
+        TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
+
+        // Clear existing rows in the TableLayout
+        tableLayout.removeAllViews();
+
+        // Loop through the transactions and add new rows to the TableLayout
+        int count = Math.min(accountTransactions.size(), 15);
+        for (int i = accountTransactions.size() - count; i < accountTransactions.size(); i++) {
+            TransactionResponse transaction = accountTransactions.get(i);
+
+            // Create a new TableRow
+            TableRow row = new TableRow(requireContext());
+
+            // Create TextViews to display the transaction details
+            TextView descriptionTextView = new TextView(requireContext());
+            descriptionTextView.setText(transaction.getDescription());
+
+            // Use TableRow.LayoutParams for setting layout parameters
+            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            );
+            descriptionTextView.setLayoutParams(layoutParams);
+
+            TextView amountTextView = new TextView(requireContext());
+            amountTextView.setText(String.valueOf(transaction.getAmount()));
+            amountTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            amountTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            TextView runningBalanceTextView = new TextView(requireContext());
+            runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
+            runningBalanceTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            runningBalanceTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            // Add TextViews to the TableRow
+            row.addView(descriptionTextView);
+            row.addView(amountTextView);
+            row.addView(runningBalanceTextView);
+
+            // Add TableRow to the TableLayout
+            tableLayout.addView(row);
+        }
+    }
+
+    private void clearAndDisplayAccountTransactions(List<TransactionResponse> accountTransactions) {
+        // Assuming you have a reference to the TableLayout in your fragment
+        TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
+
+        // Clear existing rows in the TableLayout
+        tableLayout.removeAllViews();
+
+        // Determine the starting index based on the size of the transactions list
+        int startIndex = Math.max(0, accountTransactions.size() - 15);
+
+        // Loop through the transactions and add new rows to the TableLayout
+        for (int i = startIndex; i < accountTransactions.size(); i++) {
+            TransactionResponse transaction = accountTransactions.get(i);
+
+            // Create a new TableRow
+            TableRow row = new TableRow(requireContext());
+
+            // Create TextViews to display the transaction details
+            TextView descriptionTextView = new TextView(requireContext());
+            descriptionTextView.setText(transaction.getDescription());
+
+            // Use TableRow.LayoutParams for setting layout parameters
+            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            );
+            descriptionTextView.setLayoutParams(layoutParams);
+
+            TextView amountTextView = new TextView(requireContext());
+            amountTextView.setText(String.valueOf(transaction.getAmount()));
+            amountTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            amountTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            TextView runningBalanceTextView = new TextView(requireContext());
+            runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
+            runningBalanceTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            runningBalanceTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            // Add TextViews to the TableRow
+            row.addView(descriptionTextView);
+            row.addView(amountTextView);
+            row.addView(runningBalanceTextView);
+
+            // Add TableRow to the TableLayout
+            tableLayout.addView(row);
+        }
     }
 
 

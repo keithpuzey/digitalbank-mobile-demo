@@ -15,6 +15,8 @@ import xyz.digitalbank.demo.Model.UserResponse;
 import xyz.digitalbank.demo.Model.UserAccountResponse;
 import retrofit2.http.Path;
 import java.util.List;
+import xyz.digitalbank.demo.Model.TransactionResponse;
+
 
 public interface ServiceApi {
 
@@ -57,4 +59,12 @@ public interface ServiceApi {
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
     );
+
+    @GET("/bank/api/v1/account/{accountid}/transaction")
+    Call<List<TransactionResponse>> getAccountTransactions(
+            @Path("accountid") int accountId,
+            @Header("Authorization") String authToken
+    );
+
+
 }

@@ -13,6 +13,11 @@ public class AppPreference {
     private SharedPreferences.Editor editor;
     private Context context;
 
+    private static final String KEY_AUTH_TOKEN = "auth_Token";
+    private static final String DEFAULT_AUTH_TOKEN = "";
+
+
+
     public AppPreference(Context context){
         this.context = context;
         sharedPreferences = context.getSharedPreferences(String.valueOf(R.string.s_pref_file), Context.MODE_PRIVATE);
@@ -55,14 +60,15 @@ public class AppPreference {
     }
     public void setauthToken(String authToken) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("authToken", authToken);
+        editor.putString(KEY_AUTH_TOKEN, authToken);
         editor.apply();
     }
      public String getCreDate(){
         return sharedPreferences.getString(String.valueOf(R.string.s_pref_date), "date");
     }
-    public String getauthToken(){
-        return sharedPreferences.getString(String.valueOf(R.string.s_pref_authToken), "authToken");
+    public String getauthToken() {
+        // Retrieve the authToken from SharedPreferences
+        return sharedPreferences.getString(KEY_AUTH_TOKEN, DEFAULT_AUTH_TOKEN);
     }
 
     // For TOAST Message for response
