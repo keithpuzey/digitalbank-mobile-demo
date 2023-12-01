@@ -66,34 +66,37 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        Log.d("ProfileFragment", "onCreateView");
         // Retrieve authToken from SharedPreferences
-        authToken = MainActivity.appPreference.getauthToken();  // Use the member variable instead of redeclaring
+        authToken = MainActivity.appPreference.getauthToken();
 
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            // Handle clicks on the icons here
-            switch (item.getItemId()) {
-                case R.id.action_check_accounts:
-                    // Switch to the ProfileFragment
-                    switchToProfileFragment();
-                    return true;
-                case R.id.action_transfer:
-                    // Handle transfer icon click
-                    return true;
-                case R.id.action_atm_search:
-                    startActivity(new Intent(getActivity(), atm_search.class));
-                    return true;
-                case R.id.action_logout:
-                    if (logoutListener != null) {
-                        logoutListener.logout();
-                    }
-                    return true;
-                default:
-                    return false;
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_check_accounts) {
+                // Switch to the ProfileFragment
+                switchToProfileFragment();
+                return true;
+            } else if (itemId == R.id.action_transfer) {
+                // Handle the TransferFragment click
+                // Add your logic here
+                return true;
+            } else if (itemId == R.id.action_atm_search) {
+                // Start the atm_search activity
+                startActivity(new Intent(getActivity(), atm_search.class));
+                return true;
+            } else if (itemId == R.id.action_logout) {
+                // Handle the logout click
+                if (logoutListener != null) {
+                    logoutListener.logout();
+                }
+                return true;
+            } else {
+                return false;
             }
         });
+
 
         accountSpinner = view.findViewById(R.id.accountSpinner);
         name = view.findViewById(R.id.name);
@@ -130,10 +133,8 @@ public class ProfileFragment extends Fragment {
         name.setText(greetingMessage);
 
         email = view.findViewById(R.id.email);
-        // Display only the authentication token
 
-        String authTokenMessage = "Authentication Token: " + loggedinuserId ;
-        email.setText(authTokenMessage);
+     //   email.setText(authTokenMessage);
 
         return view;
     }
@@ -170,6 +171,8 @@ public class ProfileFragment extends Fragment {
 
                                                 // Directly assign the id to the int variable
                                                 loggedinuserId = userResponse.getId();
+                                                // Save the authToken to your app preferences or wherever you need it
+
                                                 Log.d("API", "Logged in user ID = : " + loggedinuserId );
 
                                                 ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
@@ -298,7 +301,9 @@ public class ProfileFragment extends Fragment {
 
                 Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId);
                 // Call the method to get and display account transactions for the selected account
-                getAndDisplayAccountTransactions( ("Bearer " + authToken) , selectedAccountId);
+                authToken = MainActivity.appPreference.getauthToken();
+
+                getAndDisplayAccountTransactions( authToken , selectedAccountId);
             }
 
             @Override
@@ -466,6 +471,16 @@ public class ProfileFragment extends Fragment {
             requireActivity().finish();
         }
     }
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("ProfileFragment", "onCreate");
+    }
+    public void onResume() {
+        super.onResume();
+        Log.d("ProfileFragment", "onResume");
+    }
+
 
     @Override
     public void onAttach(@NonNull Context context) {

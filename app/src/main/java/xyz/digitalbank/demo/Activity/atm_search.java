@@ -76,14 +76,14 @@ public class atm_search extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_atm_search:
-                // Handle ATM search icon click
-                getLocationAndMakeRequest();
-                return true;
-            // Add other cases if needed
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_atm_search) {
+            // Handle ATM search icon click
+            getLocationAndMakeRequest();
+            return true;
+        } else {
+            // Handle other menu items if needed
+            return super.onOptionsItemSelected(item);
         }
     }
 

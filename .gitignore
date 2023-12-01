@@ -7,6 +7,7 @@
 
 # Java class files
 *.class
+configFile.json
 
 # Generated files
 bin/

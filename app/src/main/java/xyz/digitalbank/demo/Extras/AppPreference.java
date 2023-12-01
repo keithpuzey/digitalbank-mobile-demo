@@ -24,6 +24,7 @@ public class AppPreference {
         editor = sharedPreferences.edit();
     }
 
+
     //Setting login status
     public void setLoginStatus(boolean status){
         // Using a default value of false if the status is not provided

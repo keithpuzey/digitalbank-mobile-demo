@@ -293,8 +293,15 @@ public class RegistrationFragment extends Fragment {
                           Log.d("API", "Request successful: " + call.request().url());
                             Log.d("API", "Response: " + response.body());
 
-                            // Authentication successful, get the authToken
-                            String authToken = "Bearer " + response.body().get("authToken").getAsString();
+ //                           // Authentication successful, get the authToken
+ //                           String authToken = "Bearer " + response.body().get("authToken").getAsString();
+                            // String authToken = response.body().get("authToken").getAsString();
+
+                            String authToken = "Bearer " +  response.body().get("authToken").getAsString();
+
+                            // Save the authToken to your app preferences or wherever you need it
+                            MainActivity.appPreference.setauthToken(authToken);
+
                             Log.d("API", "Token: " + authToken);
 
                             // Make the Registration  API call with the authToken
