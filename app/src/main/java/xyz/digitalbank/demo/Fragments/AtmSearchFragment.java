@@ -39,12 +39,13 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.Toast;
 import xyz.digitalbank.demo.Constants.Constant;
-
+import androidx.core.content.ContextCompat;
 
 
 public class AtmSearchFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
+
     private View view;
 
     @Override
@@ -86,104 +87,116 @@ public class AtmSearchFragment extends Fragment {
         // Get the location manager
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        // Check if GPS and network location providers are enabled
-        if (locationManager != null &&
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        // Check if permissions are granted
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-            // Request location updates
-            locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    0,
-                    0,
-                    new LocationListener() {
-                        @Override
-                        public void onLocationChanged(Location location) {
-                            // Location obtained, make network request
-                            // Log the location information
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+            // Check if GPS and network location providers are enabled
+            if (locationManager != null &&
+                    locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
+                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 
-                            // Perform network request on a separate thread
-                            new Thread(() -> {
-                                try {
-                                    URL url = new URL(apiUrl);
-                                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                    connection.setRequestMethod("GET");
+                // Request location updates
+                locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        0,
+                        0,
+                        new LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location) {
+                                // Location obtained, make network request
+                                // Log the location information
+                                double latitude = location.getLatitude();
+                                double longitude = location.getLongitude();
+                                String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
-                                    // Read the response
-                                    InputStream inputStream = connection.getInputStream();
-                                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                                    StringBuilder response = new StringBuilder();
-                                    String line;
-                                    while ((line = bufferedReader.readLine()) != null) {
-                                        response.append(line);
-                                    }
-                                    Log.d("NetworkResponse", "Response: " + response.toString());
-
+                                // Perform network request on a separate thread
+                                new Thread(() -> {
                                     try {
-                                        JSONObject jsonResponse = new JSONObject(response.toString());
+                                        URL url = new URL(apiUrl);
+                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                        connection.setRequestMethod("GET");
 
-                                        // Extract the "address" object from the JSON response
-                                        JSONObject addressObject = jsonResponse.optJSONObject("address");
+                                        // Read the response
+                                        InputStream inputStream = connection.getInputStream();
+                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                                        StringBuilder response = new StringBuilder();
+                                        String line;
+                                        while ((line = bufferedReader.readLine()) != null) {
+                                            response.append(line);
+                                        }
+                                        Log.d("NetworkResponse", "Response: " + response.toString());
 
-                                        // Extract relevant information
-                                        String country = addressObject.optString("country", "");
-                                        String postcode = addressObject.optString("postcode", "");
-                                        String state = addressObject.optString("state", "");
-                                        String county = addressObject.optString("county", "");
-                                        String address = addressObject.optString("address", "");
-                                        String road = addressObject.optString("road", "");
+                                        try {
+                                            JSONObject jsonResponse = new JSONObject(response.toString());
 
-                                        // Build a formatted string with the extracted information
-                                        String formattedInfo = "Country: " + country + "\n" +
-                                                "Postcode: " + postcode + "\n" +
-                                                "State: " + state + "\n" +
-                                                "County: " + county + "\n" +
-                                                "Address: " + address + "\n" +
-                                                "Road: " + road;
+                                            // Extract the "address" object from the JSON response
+                                            JSONObject addressObject = jsonResponse.optJSONObject("address");
 
-                                        Log.d("FormattedInfo", formattedInfo);
+                                            // Extract relevant information
+                                            String country = addressObject.optString("country", "");
+                                            String postcode = addressObject.optString("postcode", "");
+                                            String state = addressObject.optString("state", "");
+                                            String county = addressObject.optString("county", "");
+                                            String address = addressObject.optString("address", "");
+                                            String road = addressObject.optString("road", "");
 
-                                        // Display the formatted information on the screen
-                                        requireActivity().runOnUiThread(() -> {
-                                            TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                            responseTextView.setText(formattedInfo);
-                                        });
+                                            // Build a formatted string with the extracted information
+                                            String formattedInfo = "Country: " + country + "\n" +
+                                                    "Postcode: " + postcode + "\n" +
+                                                    "State: " + state + "\n" +
+                                                    "County: " + county + "\n" +
+                                                    "Address: " + address + "\n" +
+                                                    "Road: " + road;
 
-                                    } catch (JSONException e) {
-                                        e.printStackTrace(); // Handle the exception in an appropriate way
+                                            Log.d("FormattedInfo", formattedInfo);
+
+                                            // Display the formatted information on the screen
+                                            requireActivity().runOnUiThread(() -> {
+                                                TextView responseTextView = view.findViewById(R.id.responseTextView);
+                                                responseTextView.setText(formattedInfo);
+                                            });
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace(); // Handle the exception in an appropriate way
+                                        }
+
+                                        // Close connections
+                                        bufferedReader.close();
+                                        inputStream.close();
+                                        connection.disconnect();
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
+                                }).start();
 
-                                    // Close connections
-                                    bufferedReader.close();
-                                    inputStream.close();
-                                    connection.disconnect();
+                                // Remove location updates to conserve battery
+                                locationManager.removeUpdates(this);
+                            }
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }).start();
+                            @Override
+                            public void onStatusChanged(String provider, int status, Bundle extras) {
+                            }
 
-                            // Remove location updates to conserve battery
-                            locationManager.removeUpdates(this);
-                        }
+                            @Override
+                            public void onProviderEnabled(String provider) {
+                            }
 
-                        @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-                        }
-
-                        @Override
-                        public void onProviderEnabled(String provider) {
-                        }
-
-                        @Override
-                        public void onProviderDisabled(String provider) {
-                        }
-                    });
+                            @Override
+                            public void onProviderDisabled(String provider) {
+                            }
+                        });
+            } else {
+                // Handle case when providers are not enabled
+            }
+        } else {
+            // Request location permissions
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
+
 
     private void getIpAddress() {
         // URL for the IP address API
@@ -431,13 +444,13 @@ public class AtmSearchFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed to get location
+                // Permission granted, call your location-related method again
                 getLocationAndMakeRequest();
             } else {
-                // Permission denied, handle accordingly (e.g., show a message to the user)
+                // Permission denied, handle accordingly
+                // You may want to inform the user or provide an alternative flow
             }
         }
     }

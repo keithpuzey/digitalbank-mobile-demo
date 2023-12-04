@@ -192,14 +192,14 @@ public class ProfileFragment extends Fragment {
                                     });
                         } else {
                             // Handle the case where authentication API failed
-                            MainActivity.appPreference.showToast("Authentication failed");
+      //                      MainActivity.appPreference.showToast("Authentication failed");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
                         // Handle failure of authentication API
-                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+      //                  MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
     }
@@ -223,14 +223,14 @@ public class ProfileFragment extends Fragment {
 
                         } else {
                             // Handle the case where getUserProfile API failed
-                            MainActivity.appPreference.showToast("Failed to retrieve user profile");
+         //                   MainActivity.appPreference.showToast("Failed to retrieve user profile");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<UserProfileResponse> call, Throwable t) {
                         // Handle failure of getUserProfile API
-                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+      //                  MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
     }
@@ -249,7 +249,7 @@ public class ProfileFragment extends Fragment {
                             displayUserAccounts(userAccounts);
                         } else {
                             // Handle the case where the API call was not successful
-                            MainActivity.appPreference.showToast("Failed to retrieve user accounts");
+       //                     MainActivity.appPreference.showToast("Failed to retrieve user accounts");
                         }
                     }
 
@@ -341,14 +341,14 @@ public class ProfileFragment extends Fragment {
                             clearAndDisplayAccountTransactions(accountTransactions);
                         } else {
                             // Handle the case where the API call was not successful
-                            MainActivity.appPreference.showToast("Failed to retrieve account transactions");
+    //                        MainActivity.appPreference.showToast("Failed to retrieve account transactions");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
                         // Handle failure of getAccountTransactions API
-                        MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
+     //                   MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
     }

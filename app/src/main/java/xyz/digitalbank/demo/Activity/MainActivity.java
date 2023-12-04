@@ -79,13 +79,18 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         });
 
 
+        Log.d("MainActivity", "savedInstanceState before if statement : " + savedInstanceState);
+
         if (savedInstanceState == null) {
+            Log.d("MainActivity", "Login status inside If statement: " + appPreference.getLoginStatus());
+
             if (appPreference.getLoginStatus()) {
                 Log.d("MainActivity", "Replacing with ProfileFragment");
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ProfileFragment())
                         .commit();
             } else {
+
                 Log.d("MainActivity", "Replacing with LoginFragment");
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new LoginFragment())

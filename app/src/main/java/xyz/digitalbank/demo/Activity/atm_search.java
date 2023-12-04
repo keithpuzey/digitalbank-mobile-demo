@@ -32,6 +32,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 
+
+
 public class atm_search extends AppCompatActivity {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
@@ -92,9 +94,12 @@ public class atm_search extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // Check if GPS and network location providers are enabled
-        if (locationManager != null &&
+           if (locationManager != null &&
                 locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            // Check if location permission is granted
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             // Request location updates
             locationManager.requestLocationUpdates(
@@ -187,8 +192,20 @@ public class atm_search extends AppCompatActivity {
                         public void onProviderDisabled(String provider) {
                         }
                     });
-        }
+            } else {
+                // Location permission not granted, request it
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_LOCATION_PERMISSION);
+            }
+           } else {
+               // GPS or network provider not enabled, handle accordingly
+               // ... (handle the case where providers are not enabled)
+           }
     }
+
+
+
 
     private void getIpAddress() {
         // URL for the IP address API
