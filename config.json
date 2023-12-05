@@ -12,8 +12,6 @@
   "projectVersion": "v1.0",
   "tags": [
     "espresso", "plugin"],
-  "apkPath": "app/build/outputs/apk/debug/Digital-Bank-1.0.apk",
-  "testApkPath": "app/build/outputs/apk/debug/Digital-Bank-1.0.apk",
 
   "installationDetails" : {"preCleanUp" : "true"},
   "postExecution" : {"uninstall" : "true" },
