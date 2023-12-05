@@ -12,7 +12,6 @@
   "projectVersion": "v1.0",
   "tags": [
     "espresso", "plugin"],
-
   "installationDetails" : {"preCleanUp" : "true"},
   "postExecution" : {"uninstall" : "true" },
   "debug": true,
