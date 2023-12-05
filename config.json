@@ -17,5 +17,7 @@
   "debug": true,
   "failBuildOnFailure": false,
   "takeScreenshotOnTestFailure": true,
+  "androidX" : true,
+  "useTestApkOnly" : true,
   "shard": false
 }
