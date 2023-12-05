@@ -24,6 +24,8 @@ import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Extras.AppPreference;
+import android.widget.ImageView;
+import android.content.Intent;
 
 
 public class LoginFragment extends Fragment {
@@ -68,8 +70,28 @@ public class LoginFragment extends Fragment {
                 loginFromActivityListener.register();
             }
         });
+
+        ImageView cogIcon = view.findViewById(R.id.cogIcon);
+        cogIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open the new page for editing constants
+                openConstantsPage();
+            }
+        });
+
         return view;
     }
+
+    private void openConstantsPage() {
+        // Here, you should navigate to the new page for editing constants.
+        // You can use Intent to start a new activity or FragmentTransaction to replace the current fragment.
+
+        // For example, if using Intent:
+        Intent intent = new Intent(getActivity(), ConstantsEditActivity.class);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onAttach(Context context) {
