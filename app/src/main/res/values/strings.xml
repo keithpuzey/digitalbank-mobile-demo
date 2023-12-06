@@ -10,14 +10,18 @@
     <string name="s_pref_date">sh_preference_date</string>
     <string name="s_pref_authToken">sh_preference_authToken</string>
 
+    <string name="select_account">Select Account</string>
+    <string name="enter_amount">Enter Amount</string>
+    <string name="submit">Submit</string>
 
 
-        <string-array name="title_options">
-            <item>Mr</item>
-            <item>Mrs</item>
-            <item>Other</item>
-        </string-array>
 
-        <string name="select_title">Select Title</string>
+    <string-array name="title_options">
+        <item>Mr</item>
+        <item>Mrs</item>
+        <item>Other</item>
+    </string-array>
+
+    <string name="select_title">Select Title</string>
 
 </resources>
