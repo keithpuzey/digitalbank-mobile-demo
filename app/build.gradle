@@ -19,13 +19,22 @@ android {
     compileOptions {
          coreLibraryDesugaringEnabled = false
     }
-
+    signingConfigs {
+        release {
+            storeFile file("my-release-key.jks")
+            storePassword "password"
+            keyAlias "my-alias"
+            keyPassword "password"
+        }
+    }
     buildTypes {
         debug {
             minifyEnabled false
+            signingConfig signingConfigs.release
         }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,7 +46,11 @@ android {
         }
     }
     namespace 'xyz.digitalbank.demo'
+    flavorDimensions "default"
+
+
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
