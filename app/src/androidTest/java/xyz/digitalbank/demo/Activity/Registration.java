@@ -77,7 +77,7 @@ public class Registration {
                                         withClassName(is("android.widget.ScrollView")),
                                         0),
                                 2)));
-        appCompatEditText.perform(scrollTo(), replaceText("demo"), closeSoftKeyboard());
+        appCompatEditText.perform(scrollTo(), replaceText("Demo"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.LnameInput),
@@ -86,7 +86,7 @@ public class Registration {
                                         withClassName(is("android.widget.ScrollView")),
                                         0),
                                 3)));
-        appCompatEditText2.perform(scrollTo(), replaceText("user"), closeSoftKeyboard());
+        appCompatEditText2.perform(scrollTo(), replaceText("Use"), closeSoftKeyboard());
 
         ViewInteraction appCompatRadioButton = onView(
                 allOf(withId(R.id.maleRadioButton), withText("Male"),
@@ -99,22 +99,32 @@ public class Registration {
         appCompatRadioButton.perform(scrollTo(), click());
 
         ViewInteraction appCompatEditText3 = onView(
-                allOf(withId(R.id.dobInput),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                5)));
-        appCompatEditText3.perform(scrollTo(), click());
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(android.R.id.button1), withText("OK"),
+                allOf(withId(R.id.LnameInput), withText("Use"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.ScrollView")),
                                         0),
                                 3)));
-        appCompatButton.perform(scrollTo(), click());
+        appCompatEditText3.perform(scrollTo(), replaceText("User"));
+
+        ViewInteraction appCompatEditText4 = onView(
+                allOf(withId(R.id.LnameInput), withText("User"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                3),
+                        isDisplayed()));
+        appCompatEditText4.perform(closeSoftKeyboard());
+
+        ViewInteraction appCompatEditText5 = onView(
+                allOf(withId(R.id.ssnInput),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                6)));
+        appCompatEditText5.perform(scrollTo(), replaceText("545436456"), closeSoftKeyboard());
     }
 
     private static Matcher<View> childAtPosition(
