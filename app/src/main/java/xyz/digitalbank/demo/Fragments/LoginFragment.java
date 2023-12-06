@@ -1,45 +1,54 @@
 package xyz.digitalbank.demo.Fragments;
 
-
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xyz.digitalbank.demo.Fragments.ConstantsEditActivity;
 import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.Model.User;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
-import xyz.digitalbank.demo.Extras.AppPreference;
-import android.widget.ImageView;
-import android.content.Intent;
-
 
 public class LoginFragment extends Fragment {
 
-    private MyInterface loginFromActivityListener;
+    private MyInterface myInterface;
     private TextView registerTV;
-
-    public EditText emailInput, passwordInput;
+    private EditText emailInput, passwordInput;
     private Button loginBtn;
     private ServiceApi serviceApi;
 
-    public String email ;
     public LoginFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // Check if the hosting activity implements MyInterface
+        if (context instanceof MyInterface) {
+            myInterface = (MyInterface) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MyInterface");
+        }
     }
 
     @Override
@@ -47,7 +56,6 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-
 
         // Initialize the ServiceApi instance
         serviceApi = RetrofitClient.getRetrofitInstance().create(ServiceApi.class);
@@ -67,7 +75,7 @@ public class LoginFragment extends Fragment {
         registerTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loginFromActivityListener.register();
+                myInterface.register(); // Corrected method name
             }
         });
 
@@ -92,21 +100,9 @@ public class LoginFragment extends Fragment {
         startActivity(intent);
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            loginFromActivityListener = (MyInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement MyInterface");
-        }
-    }
-
     private void loginUser() {
         String Email = emailInput.getText().toString();
         String Password = passwordInput.getText().toString();
-
 
         if (TextUtils.isEmpty(Email)) {
             MainActivity.appPreference.showToast("Your email is required.");
@@ -115,7 +111,7 @@ public class LoginFragment extends Fragment {
         } else if (TextUtils.isEmpty(Password)) {
             MainActivity.appPreference.showToast("Password required");
         } else if (Password.length() < 8) {
-            MainActivity.appPreference.showToast("Password may be at least 8 characters long.");
+            MainActivity.appPreference.showToast("Password must be at least 8 characters long.");
         } else {
             Call<User> userCall = serviceApi.doLogin(Email, Password);
             userCall.enqueue(new Callback<User>() {
@@ -127,9 +123,7 @@ public class LoginFragment extends Fragment {
                         ((MainActivity) requireActivity()).setEmail(Email);
 
                         MainActivity.appPreference.setLoginStatus(true);
-                        loginFromActivityListener.login(response.body().getAuthToken(), Email );
-
-
+                        myInterface.login(response.body().getAuthToken(), Email);
                     } else {
                         // Login failed
                         MainActivity.appPreference.showToast("Error. Login Failed");

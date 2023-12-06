@@ -108,7 +108,7 @@ public class AtmSearchFragment extends Fragment {
                                 // Log the location information
                                 double latitude = location.getLatitude();
                                 double longitude = location.getLongitude();
-                                String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                                String apiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
                                 // Perform network request on a separate thread
                                 new Thread(() -> {
@@ -154,7 +154,8 @@ public class AtmSearchFragment extends Fragment {
                                             // Display the formatted information on the screen
                                             requireActivity().runOnUiThread(() -> {
                                                 TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                                responseTextView.setText(formattedInfo);
+                                                responseTextView.setText("Results of Location Based on GPS" + ":\n" + formattedInfo);
+
                                             });
 
                                         } catch (JSONException e) {
@@ -252,7 +253,7 @@ public class AtmSearchFragment extends Fragment {
 
     private void getDetailsForIpAddress(String ipAddress) {
         // URL for the second API
-        String secondApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/ip?ip=" + ipAddress;
+        String secondApiUrl = Constant.baseUrl.MOCK_URL + "ip?ip=" + ipAddress;
 
         // Perform the second network request on a separate thread
         new Thread(() -> {
@@ -281,7 +282,8 @@ public class AtmSearchFragment extends Fragment {
                     String lon = jsonResponse.optString("lon", "");
 
                     // Build a formatted string with the extracted information
-                    String formattedInfo = "Country: " + country + "\n" +
+                    String formattedInfo =
+                            "Country: " + country + "\n" +
                             "Postcode: " + postcode + "\n" +
                             "State: " + state + "\n" +
                             "lat: " + lat + "\n" +
@@ -295,7 +297,7 @@ public class AtmSearchFragment extends Fragment {
                     // Display the second API response including the IP address
                     requireActivity().runOnUiThread(() -> {
                         TextView responseTextView = view.findViewById(R.id.responseTextView);
-                        responseTextView.setText("Response for IP Address " + ipAddress + ":\n" + formattedInfo);
+                        responseTextView.setText("Results of Location Based on Network Address" + ipAddress + ":\n" + formattedInfo);
                     });
 
                     // Close connections
@@ -304,7 +306,7 @@ public class AtmSearchFragment extends Fragment {
                     connection.disconnect();
 
                     // Third request to another API using the latitude and longitude
-                    String gpsApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + lat + "&lon=" + lon;
+                    String gpsApiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat=" + lat + "&lon=" + lon;
                     Log.d("Coordinates", "Debug: " + gpsApiUrl);
                     new Thread(() -> {
                         try {
@@ -337,7 +339,8 @@ public class AtmSearchFragment extends Fragment {
                                 String gpsroad = gpsaddressObject.optString("road", "");
 
                                 // Build a formatted string with the extracted information
-                                String gpsformattedInfo = "Country: " + gpscountry + "\n" +
+                                String gpsformattedInfo =
+                                        "Country: " + gpscountry + "\n" +
                                         "Postcode: " + gpspostcode + "\n" +
                                         "State: " + gpsstate + "\n" +
                                         "County: " + gpscounty + "\n" +
@@ -349,7 +352,7 @@ public class AtmSearchFragment extends Fragment {
                                 // Display the second API response including the IP address
                                 requireActivity().runOnUiThread(() -> {
                                     TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                    responseTextView.setText("Response for IP / GPS Location " + ipAddress + ":\n" + gpsformattedInfo);
+                                    responseTextView.setText("Location Based on Network Location " + ipAddress + ":\n" + gpsformattedInfo);
                                 });
 
                             } catch (JSONException e) {
@@ -403,7 +406,7 @@ public class AtmSearchFragment extends Fragment {
 
     private void performCustomRequest(String userInput) {
         // Construct the URL with the user input
-        String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/zip?zipcode=" + userInput;
+        String apiUrl = Constant.baseUrl.MOCK_URL + "zip?zipcode=" + userInput;
 
         // Perform network request on a separate thread
         new Thread(() -> {

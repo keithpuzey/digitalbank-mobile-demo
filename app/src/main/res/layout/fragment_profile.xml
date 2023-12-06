@@ -36,16 +36,40 @@
         android:layout_below="@id/email"
         android:layout_marginTop="16dp"/>
 
-    <TableLayout
-        android:id="@+id/tableLayout"
+    <LinearLayout
+        android:id="@+id/tableHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_below="@id/accountSpinner"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="30dp">
 
-</TableLayout>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Description"
+            android:textStyle="bold"/>
 
-<com.google.android.material.bottomnavigation.BottomNavigationView
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Amount"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Running Balance"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
 android:id="@+id/bottomNavigationView"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
@@ -53,11 +77,19 @@ android:layout_alignParentBottom="true"
 android:background="?android:attr/windowBackground"
 app:menu="@menu/bottom_navigation_menu" />
 
-<FrameLayout
-android:id="@+id/profile_fragment_container"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:layout_above="@id/bottomNavigationView"
-android:layout_below="@id/email"/>
+    <FrameLayout
+    android:id="@+id/profile_fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@id/bottomNavigationView"
+    android:layout_below="@id/email">
+
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"></TableLayout>
+    </FrameLayout>
+
 
 </RelativeLayout>

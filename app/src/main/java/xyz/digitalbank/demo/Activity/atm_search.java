@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import org.json.JSONException;
 import org.json.JSONObject;
-import xyz.digitalbank.demo.R;
+
 import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +30,8 @@ import android.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.Toast;
+import xyz.digitalbank.demo.Constants.Constant;
+
 
 
 
@@ -113,7 +115,7 @@ public class atm_search extends AppCompatActivity {
                             // Log the location information
                             double latitude = location.getLatitude();
                             double longitude = location.getLongitude();
-                            String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                            String apiUrl = Constant.baseUrl.MOCK_URL +"gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
                             // Perform network request on a separate thread
                             new Thread(() -> {
@@ -261,7 +263,7 @@ public class atm_search extends AppCompatActivity {
 
     private void getDetailsForIpAddress(String ipAddress) {
         // URL for the second API
-        String secondApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/ip?ip=" + ipAddress;
+        String secondApiUrl = Constant.baseUrl.MOCK_URL + "ip?ip=" + ipAddress;
 
         // Perform the second network request on a separate thread
         new Thread(() -> {
@@ -314,7 +316,7 @@ public class atm_search extends AppCompatActivity {
                     connection.disconnect();
 
                     // Third request to another API using the latitude and longitude
-                    String gpsApiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/gps?type=atm&lat="+lat+"&lon="+ lon;
+                    String gpsApiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat="+lat+"&lon="+ lon;
                     Log.d("Coordinates", "Debug: " + gpsApiUrl );
                     new Thread(() -> {
                         try {
@@ -420,7 +422,7 @@ public class atm_search extends AppCompatActivity {
 
         private void performCustomRequest(String userInput) {
             // Construct the URL with the user input
-            String apiUrl = "http://digitalbank322871.mock-eu.blazemeter.com/zip?zipcode=" + userInput;
+            String apiUrl = Constant.baseUrl.MOCK_URL + "zip?zipcode=" + userInput;
 
             // Perform network request on a separate thread
             new Thread(() -> {

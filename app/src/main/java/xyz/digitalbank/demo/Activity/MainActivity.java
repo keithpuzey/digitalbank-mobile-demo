@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     public String getEmail() {
         return email;
     }
-    @Override
+
     public void logout() {
         appPreference.setLoginStatus(false);
         appPreference.setDisplayName("Name");

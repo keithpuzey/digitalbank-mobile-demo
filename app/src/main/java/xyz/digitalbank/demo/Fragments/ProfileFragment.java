@@ -37,6 +37,11 @@ import android.widget.TableRow;
 import xyz.digitalbank.demo.Model.TransactionResponse;
 import xyz.digitalbank.demo.Activity.AccountInfo;
 import com.google.gson.Gson;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.graphics.Color;
+
+
 
 
 
@@ -400,42 +405,47 @@ public class ProfileFragment extends Fragment {
     }
 
     private void clearAndDisplayAccountTransactions(List<TransactionResponse> accountTransactions) {
-        // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
+        LinearLayout tableHeader = getView().findViewById(R.id.tableHeader);
 
         // Clear existing rows in the TableLayout
         tableLayout.removeAllViews();
 
-        // Determine the starting index based on the size of the transactions list
-        int startIndex = Math.max(0, accountTransactions.size() - 15);
+
+        ViewGroup parent = (ViewGroup) tableHeader.getParent();
+        if (parent != null) {
+            parent.removeView(tableHeader);
+        }
+
+       // Add Table Header
+        tableLayout.addView(tableHeader);
 
         // Loop through the transactions and add new rows to the TableLayout
-        for (int i = startIndex; i < accountTransactions.size(); i++) {
-            TransactionResponse transaction = accountTransactions.get(i);
-
+        for (TransactionResponse transaction : accountTransactions) {
             // Create a new TableRow
             TableRow row = new TableRow(requireContext());
 
             // Create TextViews to display the transaction details
             TextView descriptionTextView = new TextView(requireContext());
             descriptionTextView.setText(transaction.getDescription());
-
-            // Use TableRow.LayoutParams for setting layout parameters
-            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    TableRow.LayoutParams.WRAP_CONTENT
-            );
-            descriptionTextView.setLayoutParams(layoutParams);
+            setTextViewAttributes(descriptionTextView);
 
             TextView amountTextView = new TextView(requireContext());
-            amountTextView.setText(String.valueOf(transaction.getAmount()));
-            amountTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
-            amountTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            String amountValue = String.valueOf(transaction.getAmount());
+            amountTextView.setText(amountValue);
+            // Set text color to red if the amount starts with "-"
+            if (amountValue.startsWith("-")) {
+                amountTextView.setTextColor(Color.RED);
+            }
+            setTextViewAttributes(amountTextView);
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
-            runningBalanceTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
-            runningBalanceTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            // Set text color to red if the running balance starts with "-"
+            if (String.valueOf(transaction.getRunningBalance()).startsWith("-")) {
+                runningBalanceTextView.setTextColor(Color.RED);
+            }
+            setTextViewAttributes(runningBalanceTextView);
 
             // Add TextViews to the TableRow
             row.addView(descriptionTextView);
@@ -445,6 +455,16 @@ public class ProfileFragment extends Fragment {
             // Add TableRow to the TableLayout
             tableLayout.addView(row);
         }
+    }
+
+    private void setTextViewAttributes(TextView textView) {
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                0,
+                TableRow.LayoutParams.WRAP_CONTENT,
+                1.0f
+        );
+        textView.setLayoutParams(layoutParams);
+        textView.setGravity(Gravity.CENTER);
     }
 
 

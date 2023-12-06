@@ -1,39 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <!-- activity_constants_edit.xml -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Add your UI elements here, such as TextViews, EditTexts, Buttons, etc. -->
     <TextView
         android:id="@+id/textViewConstant1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Constant 1:" />
-
+        android:layout_marginTop="32dp"
+        android:text="Digital Bank URL:" />
 
     <EditText
-        android:id="@+id/editTextConstant1"
-        android:layout_width="match_parent"
+        android:id="@+id/editTextBaseUrl"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewConstant1"
-        android:layout_marginTop="124dp"
-        android:hint="Enter value for Constant 1" />
+        android:layout_marginTop="16dp"
+        android:text="BASE_URL: YourBaseURLHere" />
+
+    <TextView
+        android:id="@+id/textViewConstant2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextBaseUrl"
+        android:layout_marginTop="16dp"
+        android:text="Mock URL:" />
+
+    <EditText
+        android:id="@+id/editTextMockUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewConstant2"
+        android:layout_marginTop="16dp"
+        android:text="MOCK_URL: YourMockURLHere" />
 
     <Button
         android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/editTextMockUrl"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="200dp"
         android:text="Cancel"
         android:textAllCaps="false"
         android:textColor="#fff"
         android:textSize="16sp" />
 
-    <!-- Add more UI elements as needed -->
 
 
 </RelativeLayout>

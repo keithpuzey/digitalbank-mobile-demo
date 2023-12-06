@@ -1,53 +1,97 @@
 package xyz.digitalbank.demo.Fragments;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.Spinner;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Model.UserRequest;
-import xyz.digitalbank.demo.Model.UserResponse;
+import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.RetrofitClient;
+import xyz.digitalbank.demo.Services.MyInterface;
 
-public class ConstantsEditActivity extends AppCompatActivity {
+public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener, MyInterface {
+
     private Button cancelBtn;
+    private EditText editTextBaseUrl, editTextMockUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constants_edit);
 
-         // Implement the layout and functionality for editing constants here
+        // Initialize UI elements
+        editTextBaseUrl = findViewById(R.id.editTextBaseUrl);
+        editTextMockUrl = findViewById(R.id.editTextMockUrl);
+        cancelBtn = findViewById(R.id.cancelBtn);
+
+
+        // Set current constant values in EditText fields
+        editTextBaseUrl.setText(Constant.baseUrl.BASE_URL);
+        editTextMockUrl.setText(Constant.baseUrl.MOCK_URL);
+
+        // Set click listeners for buttons
+        cancelBtn.setOnClickListener(this);
+
+
+        // Implement the layout and functionality for editing constants here
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.cancelBtn) {
+            // Handle cancel button click
+            navigateToLoginFragment();
+        }
+    }
+
+    private void updateConstants() {
+        // Get the new values from EditText fields
+        String newBaseUrl = editTextBaseUrl.getText().toString();
+        String newMockUrl = editTextMockUrl.getText().toString();
+
+        // Update the constant values
+        Constant.baseUrl.BASE_URL = newBaseUrl;
+        Constant.baseUrl.MOCK_URL = newMockUrl;
+
+        // Optionally, you may want to save these new values to preferences or elsewhere
+
+        // Now, you can navigate back to the login fragment
+        navigateToLoginFragment();
+    }
+
+    private void navigateToLoginFragment() {
+        // Create a new instance of the LoginFragment
+        LoginFragment loginFragment = new LoginFragment();
+
+        // Get the FragmentManager and start a transaction
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // Replace the current fragment with the LoginFragment
+        transaction.replace(R.id.fragment_container, loginFragment);
+
+        // Add the transaction to the back stack so the user can navigate back
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void login(String authToken, String Email) {
+        // Dummy implementation or leave it empty
+    }
+
+    @Override
+    public void register() {
+        // Dummy implementation or leave it empty
+    }
+
+    public void logout() {
+        // Add any necessary implementation or leave it empty if not needed
     }
 }
