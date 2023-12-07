@@ -35,14 +35,12 @@ import android.widget.AdapterView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import xyz.digitalbank.demo.Model.TransactionResponse;
-import xyz.digitalbank.demo.Activity.AccountInfo;
+import xyz.digitalbank.demo.Model.AccountInfo;
+
 import com.google.gson.Gson;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.graphics.Color;
-
-
-
 
 
 public class ProfileFragment extends Fragment {
@@ -273,12 +271,15 @@ public class ProfileFragment extends Fragment {
         List<AccountInfo> accountInfoList = new ArrayList<>();
 
         for (UserAccountResponse account : userAccounts) {
-            // Extract information from UserAccountResponse
+// Extract information from UserAccountResponse
             int accountId = account.getId();
             String accountName = account.getName();
-            String currentBalance = String.valueOf(account.getCurrentBalance());
+            String currentBalanceStr = String.valueOf(account.getCurrentBalance());
 
-            // Create an AccountInfo object and add it to the list
+// Convert currentBalance to double
+            double currentBalance = Double.parseDouble(currentBalanceStr);
+
+// Create an AccountInfo object and add it to the list
             AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance);
 
             accountInfoList.add(accountInfo);
@@ -290,7 +291,12 @@ public class ProfileFragment extends Fragment {
         }
 
         // Create an ArrayAdapter with AccountInfo objects
-        ArrayAdapter<AccountInfo> adapter = new ArrayAdapter<>(requireContext(), R.layout.custom_spinner_item, accountInfoList);
+        ArrayAdapter<AccountInfo> adapter = new ArrayAdapter<AccountInfo>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                accountInfoList
+        );
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner

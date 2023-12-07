@@ -8,12 +8,12 @@
     <item
         android:id="@+id/action_transfer"
         android:icon="@android:drawable/ic_menu_send"
-        android:title="Transfer" />
+        android:title="Deposit" />
 
     <item
         android:id="@+id/action_atm_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="ATM NearMe" />
+        android:title="ATM's NearMe" />
 
     <item
         android:id="@+id/action_logout"

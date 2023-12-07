@@ -1,13 +1,11 @@
-
-
 package xyz.digitalbank.demo.Model;
 
 public class AccountInfo {
     private int id;
     private String name;
-    private String currentBalance;
+    private double currentBalance;
 
-    public AccountInfo(int id, String name, String currentBalance) {
+    public AccountInfo(int id, String name, double currentBalance) {
         this.id = id;
         this.name = name;
         this.currentBalance = currentBalance;
@@ -17,11 +15,13 @@ public class AccountInfo {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return name + " - " + currentBalance;
     }
 
-    public String getCurrentBalance() {
-        return currentBalance;
+    // Override the toString method to return the display name
+    @Override
+    public String toString() {
+        return getDisplayName();
     }
 }

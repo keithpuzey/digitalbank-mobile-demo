@@ -25,7 +25,7 @@
         android:layout_marginBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter Login Details"
+        android:text="Digital Bank Login"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:gravity="center_horizontal"/>
@@ -33,7 +33,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
+        android:hint="Enter User Name"
         android:inputType="textEmailAddress"
         android:layout_marginTop="20dp"
         android:id="@+id/emailInput"/>
@@ -42,7 +42,7 @@
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
+        android:hint="Enter Password"
         android:inputType="textPassword"
         android:id="@+id/passwordInput"/>
 
@@ -64,7 +64,23 @@
         android:layout_marginBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="New here? Register"
+        android:text="Don't have account? Sign Up Here?"
         android:gravity="center_horizontal"/>
+
+    <FrameLayout
+        android:layout_width="96dp"
+        android:layout_height="97dp"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/biometricBtn"
+            android:layout_width="match_parent"
+            android:layout_height="83dp"
+            android:background="@drawable/ic_fingerprint"
+            android:contentDescription="Biometric Login"
+            android:textColor="#fff"
+            android:textSize="16sp" />
+    </FrameLayout>
 
 </LinearLayout>

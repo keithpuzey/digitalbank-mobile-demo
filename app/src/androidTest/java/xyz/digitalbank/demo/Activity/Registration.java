@@ -33,6 +33,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import xyz.digitalbank.demo.R;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import xyz.digitalbank.demo.R;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -42,8 +52,56 @@ public class Registration {
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
+    private void performApiCall() {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("YOUR_API_URL")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e("API Call", "Failed to make API call");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String jsonResponse = response.body().string();
+                    Log.d("API Response", jsonResponse);
+
+                    // TODO: Save jsonResponse or process it further
+                } else {
+                    Log.e("API Response", "Unsuccessful response");
+                }
+            }
+        });
+    }
+
+    private void saveJsonResponseAsCsv() {
+        // TODO: Implement logic to save JSON response as a CSV file
+        // For example, you can use a FileWriter to write the data to a file
+        try {
+            File csvFile = new File("regdata.csv");
+            FileWriter writer = new FileWriter(csvFile);
+            // TODO: Write data to the CSV file
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     @Test
     public void registration() {
+
+        // Step 1: Perform API call to get JSON response
+        performApiCall();
+
+        // Step 2: Save JSON response as a CSV file
+        saveJsonResponseAsCsv();
+
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.registerTV), withText("New here? Register"),
                         childAtPosition(

@@ -6,13 +6,32 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Header: Account for Deposit -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Account for Deposit"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="16dp" />
+
     <!-- Account Spinner -->
     <Spinner
-        android:id="@+id/transferAccountSpinner"
+        android:id="@+id/accountSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:prompt="@string/select_account" />
+
+    <!-- Header: Deposit Amount -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Deposit Amount"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
     <!-- Amount EditText -->
     <EditText
@@ -22,6 +41,35 @@
         android:layout_marginBottom="16dp"
         android:hint="@string/enter_amount"
         android:inputType="numberDecimal" />
+
+
+    <!-- Clickable Icon for Deposit Cheque -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="90dp"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:layout_width="84dp"
+            android:layout_height="67dp"
+            android:gravity="center"
+            android:src="@drawable/ic_camera" />
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deposit Cheque"
+            android:clickable="true"
+            android:gravity="center"
+            android:textColor="@color/colorPrimary" />
+
+    </LinearLayout>
+
 
     <!-- Submit Button -->
     <Button

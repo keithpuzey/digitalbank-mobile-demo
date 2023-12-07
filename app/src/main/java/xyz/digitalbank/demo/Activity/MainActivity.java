@@ -146,6 +146,13 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         bottomNavigationView.setVisibility(View.GONE);
     }
 
+
+    public int getLoggedinuserId() {
+        return loggedinuserId;
+    }
+
+
+
     // Add this method to set the email in ProfileFragment
     public void setEmailInProfileFragment(String email) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);

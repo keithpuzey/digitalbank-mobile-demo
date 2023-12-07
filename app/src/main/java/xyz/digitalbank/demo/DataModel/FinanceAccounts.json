@@ -1,0 +1,60 @@
+{
+	"data": {
+		"type": "datamodel",
+		"attributes": {
+			"model": {
+				"id": "3b5f10fd-1923-9eaa-5c8d-2ae45937d972",
+				"kind": "tdm",
+				"type": "object",
+				"title": "Finance Details",
+				"entities": {
+					"default": {
+						"type": "object",
+						"title": "Test Parameters",
+						"repeat": 100,
+						"targets": {
+							"default": {
+								"type": "csv",
+								"file": "blazedata-test.csv"
+							}
+						},
+						"properties": {
+							"FirstName": {
+								"type": "string"
+							},
+							"LastName": {
+								"type": "string"
+							},
+							"email": {
+								"type": "string"
+							},
+							"ExpDate": {
+								"type": "string"
+							},
+							"ExpiryDate": {
+								"type": "string"
+							},
+							"CreditCard": {
+								"type": "string"
+							}
+						},
+						"datasources": [
+						],
+						"requirements": {
+							"FirstName": "randFromSeedlist(\"firstnames\")",
+							"LastName": "randFromSeedlist(\"lastnames\")",
+							"email": "${FirstName}+\".\"+${LastName}+\"@gmail.com\"",
+							"ExpDate": "mid(${ExpiryDate},6,2)+\"\/\"+mid(${ExpiryDate},3,2)",
+							"ExpiryDate": "addMonths(now(),+randRange(1,12))",
+							"CreditCard": "randCreditCard(\"VISA\")"
+						}
+					}
+				}
+			},
+			"context": {
+				"csvs": [
+				]
+			}
+		}
+	}
+}

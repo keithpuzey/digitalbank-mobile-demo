@@ -1,7 +1,9 @@
 package xyz.digitalbank.demo.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,29 +13,49 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import xyz.digitalbank.demo.Fragments.ConstantsEditActivity;
 import xyz.digitalbank.demo.Activity.MainActivity;
+import xyz.digitalbank.demo.Fragments.ConstantsEditActivity;
 import xyz.digitalbank.demo.Model.User;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
+import java.util.concurrent.Executor;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import android.widget.ImageButton;
+import android.widget.Toast;
+import java.io.IOException;
+
+
+
+
+
+
+
+@RequiresApi(api = Build.VERSION_CODES.P)
 
 public class LoginFragment extends Fragment {
 
     private MyInterface myInterface;
     private TextView registerTV;
     private EditText emailInput, passwordInput;
-    private Button loginBtn;
+    private Button loginBtn ;
+    private ImageButton biometricBtn ;
     private ServiceApi serviceApi;
+    private static final int REQUEST_BIOMETRIC_PERMISSION = 1;
+
 
     public LoginFragment() {
         // Required empty public constructor
@@ -67,9 +89,12 @@ public class LoginFragment extends Fragment {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("LoginFragment", "Login button clicked");
                 loginUser();
             }
         });
+        biometricBtn = view.findViewById(R.id.biometricBtn);
+
 
         registerTV = view.findViewById(R.id.registerTV);
         registerTV.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +103,19 @@ public class LoginFragment extends Fragment {
                 myInterface.register(); // Corrected method name
             }
         });
+
+
+
+        biometricBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle biometric authentication
+                if (isBiometricPromptEnabled()) {
+                    checkBiometricPermission();
+                }
+            }
+        });
+
 
         ImageView cogIcon = view.findViewById(R.id.cogIcon);
         cogIcon.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +128,6 @@ public class LoginFragment extends Fragment {
 
         return view;
     }
-
     private void openConstantsPage() {
         // Here, you should navigate to the new page for editing constants.
         // You can use Intent to start a new activity or FragmentTransaction to replace the current fragment.
@@ -99,6 +136,93 @@ public class LoginFragment extends Fragment {
         Intent intent = new Intent(getActivity(), ConstantsEditActivity.class);
         startActivity(intent);
     }
+
+    private boolean isBiometricPromptEnabled() {
+        // Check if biometric authentication is available on the device
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && ContextCompat.checkSelfPermission(requireContext(),
+                android.Manifest.permission.USE_BIOMETRIC) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void checkBiometricPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                android.Manifest.permission.USE_BIOMETRIC) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{android.Manifest.permission.USE_BIOMETRIC},
+                    REQUEST_BIOMETRIC_PERMISSION);
+        } else {
+            showBiometricPrompt();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_BIOMETRIC_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, show biometric prompt
+                showBiometricPrompt();
+            } else {
+                // Permission not granted, show a Toast
+                showToast("Biometric authentication is not available.");
+            }
+        }
+    }
+
+    private void showToast(String message) {
+        Context context = getContext();
+        if (context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void showBiometricPrompt() {
+        Executor executor = ContextCompat.getMainExecutor(requireContext());
+        BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor,
+                new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                        super.onAuthenticationError(errorCode, errString);
+
+                        if (errorCode == BiometricPrompt.ERROR_NO_BIOMETRICS) {
+                            showToast("No fingerprints enrolled. Please enroll a fingerprint in your device settings.");
+                        } else {
+                            Log.e("Biometric", "Authentication error: " + errString);
+                        }
+                    }
+
+                    @Override
+                    public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                        super.onAuthenticationSucceeded(result);
+                        Log.d("Biometric", "Authentication succeeded");
+                        // Handle successful authentication
+                        loginUserWithBiometric();
+                    }
+
+                    @Override
+                    public void onAuthenticationFailed() {
+                        super.onAuthenticationFailed();
+                        Log.e("Biometric", "Authentication failed");
+                    }
+                });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric Login")
+                .setNegativeButtonText("Cancel")
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    private void loginUserWithBiometric() {
+
+        showToast("BioMetric Login Is not Currently Implemented.");
+        // Implement biometric login logic here
+        // This could involve making a network call or checking local credentials
+        // If successful, call myInterface.login() with the appropriate parameters
+    }
+
+
 
     private void loginUser() {
         String Email = emailInput.getText().toString();
@@ -123,6 +247,8 @@ public class LoginFragment extends Fragment {
                         ((MainActivity) requireActivity()).setEmail(Email);
 
                         MainActivity.appPreference.setLoginStatus(true);
+                        Log.d("Login", " Login API Being Called");
+
                         myInterface.login(response.body().getAuthToken(), Email);
                     } else {
                         // Login failed
@@ -135,6 +261,14 @@ public class LoginFragment extends Fragment {
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
                     // Handle failure
+                    Log.e("Login", "Error during login API call", t);
+
+                    if (t instanceof IOException) {
+                        // This exception is thrown for network-related issues
+                        showToast("Server is not available. Please check your internet connection.");
+                    } else {
+                        showToast("Error during login. Please try again.");
+                    }
                 }
             });
         }
