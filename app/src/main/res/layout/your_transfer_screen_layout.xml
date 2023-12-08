@@ -13,7 +13,7 @@
         android:text="Account for Deposit"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="16dp" />
 
     <!-- Account Spinner -->
@@ -42,7 +42,50 @@
         android:hint="@string/enter_amount"
         android:inputType="numberDecimal" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
+    <!-- Description EditText -->
+    <EditText
+        android:id="@+id/descriptionEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Enter description" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transaction Type"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <RadioGroup
+        android:id="@+id/transactionTypeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/creditRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Credit"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/debitRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Debit" />
+
+    </RadioGroup>
     <!-- Clickable Icon for Deposit Cheque -->
     <LinearLayout
         android:layout_width="wrap_content"
@@ -53,12 +96,10 @@
 
 
         <ImageView
-            android:layout_width="84dp"
+            android:layout_width="match_parent"
             android:layout_height="67dp"
             android:gravity="center"
             android:src="@drawable/ic_camera" />
-
-
 
         <TextView
             android:layout_width="wrap_content"
@@ -68,14 +109,15 @@
             android:gravity="center"
             android:textColor="@color/colorPrimary" />
 
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:text="@string/submit" />
+
     </LinearLayout>
 
 
     <!-- Submit Button -->
-    <Button
-        android:id="@+id/submitButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/submit" />
 
 </LinearLayout>

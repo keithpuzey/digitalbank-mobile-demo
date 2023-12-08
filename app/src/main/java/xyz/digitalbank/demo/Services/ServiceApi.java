@@ -16,7 +16,7 @@ import xyz.digitalbank.demo.Model.UserAccountResponse;
 import retrofit2.http.Path;
 import java.util.List;
 import xyz.digitalbank.demo.Model.TransactionResponse;
-
+import xyz.digitalbank.demo.Model.DepositRequest;
 
 public interface ServiceApi {
 
@@ -36,6 +36,17 @@ public interface ServiceApi {
             @Query("role") String ROLE,
             @Body UserRequest userRequest
     );
+
+    @POST("/bank/api/v1/account/{toAccountId}/transaction")
+    Call<Void> transferFunds(
+            @Path("toAccountId") int toAccountId,
+            @Query("action") String action,
+            @Header("Authorization") String authToken,
+            @Header("Content-Type") String contentType,
+            @Body DepositRequest depositRequest
+    );
+
+
     @GET("/bank/api/v1/user/find")
     Call<UserResponse> findUserId(
             @Header("Authorization") String authToken,
@@ -65,6 +76,4 @@ public interface ServiceApi {
             @Path("accountid") int accountId,
             @Header("Authorization") String authToken
     );
-
-
 }
