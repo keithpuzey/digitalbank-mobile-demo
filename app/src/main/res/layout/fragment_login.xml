@@ -68,15 +68,15 @@
         android:gravity="center_horizontal"/>
 
     <FrameLayout
-        android:layout_width="96dp"
-        android:layout_height="97dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:layout_gravity="center"
         android:gravity="center">
 
         <ImageButton
             android:id="@+id/biometricBtn"
             android:layout_width="match_parent"
-            android:layout_height="83dp"
+            android:layout_height="match_parent"
             android:background="@drawable/ic_fingerprint"
             android:contentDescription="Biometric Login"
             android:textColor="#fff"

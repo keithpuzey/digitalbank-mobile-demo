@@ -70,20 +70,21 @@
         android:id="@+id/transactionTypeRadioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:orientation="horizontal">
 
         <RadioButton
             android:id="@+id/creditRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Credit"
-            android:checked="true" />
+            android:text="Credit"  />
 
         <RadioButton
             android:id="@+id/debitRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Debit" />
+            android:text="Debit"
+            android:checked="true" />
 
     </RadioGroup>
     <!-- Clickable Icon for Deposit Cheque -->
@@ -96,17 +97,18 @@
 
 
         <ImageView
+            android:id="@+id/cameraIcon"
             android:layout_width="match_parent"
             android:layout_height="67dp"
             android:gravity="center"
             android:src="@drawable/ic_camera" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Deposit Cheque"
             android:clickable="true"
             android:gravity="center"
+            android:text="Deposit Cheque"
             android:textColor="@color/colorPrimary" />
 
         <Button
@@ -117,7 +119,5 @@
 
     </LinearLayout>
 
-
-    <!-- Submit Button -->
 
 </LinearLayout>

@@ -40,10 +40,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.RadioButton;
-
-
-
-
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+import android.Manifest;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+import android.provider.MediaStore;
+import androidx.core.app.ActivityCompat;
+import android.app.Activity;
 
 public class TransferFragment extends Fragment {
 
@@ -66,10 +71,18 @@ public class TransferFragment extends Fragment {
     private RadioButton debitRadioButton;
     private Button submitButton;
 
+    private EditText descriptionEditText;
+
 
     public TransferFragment() {
         // Required empty public constructor
     }
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CAMERA_PERMISSION = 2; // Use any integer value you prefer
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -122,10 +135,54 @@ public class TransferFragment extends Fragment {
             }
         });
 
+        ImageView cameraIcon = transferScreen.findViewById(R.id.cameraIcon);
+        cameraIcon.setOnClickListener(v -> {
+            // Check if the camera permission is granted
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                // Open the camera
+                dispatchTakePictureIntent();
+            } else {
+                // Request camera permission
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            }
+        });
+
+
         transferContainer.addView(transferScreen);
 
         return view;
     }
+
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(requireContext().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            // TODO: Process the captured image and extract information
+            // For OCR (Optical Character Recognition), you can use a library like Tesseract.
+
+            // TODO: Populate description and amount fields with extracted information
+            String extractedText = performOCR(imageBitmap);
+            descriptionEditText.setText(extractedText);
+        }
+    }
+
+    // Example OCR method (requires Tesseract library)
+    private String performOCR(Bitmap bitmap) {
+        // TODO: Implement OCR logic here
+        return "Extracted Text";
+    }
+
 
     private void setupAccountSpinner(Spinner accountSpinner) {
         Log.d("TransferFragment", "Entering setupAccountSpinner");
