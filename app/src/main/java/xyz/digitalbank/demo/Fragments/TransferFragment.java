@@ -71,7 +71,9 @@ public class TransferFragment extends Fragment {
     private RadioButton debitRadioButton;
     private Button submitButton;
 
+
     private EditText descriptionEditText;
+
 
 
     public TransferFragment() {
@@ -95,7 +97,7 @@ public class TransferFragment extends Fragment {
         // Get references to UI elements in your transfer screen layout
         accountSpinner = transferScreen.findViewById(R.id.accountSpinner);
         EditText amountEditText = transferScreen.findViewById(R.id.amountEditText);
-        EditText descriptionEditText = transferScreen.findViewById(R.id.descriptionEditText);
+        descriptionEditText = transferScreen.findViewById(R.id.descriptionEditText);
         transactionTypeRadioGroup = transferScreen.findViewById(R.id.transactionTypeRadioGroup);
         creditRadioButton = transferScreen.findViewById(R.id.creditRadioButton);
         debitRadioButton = transferScreen.findViewById(R.id.debitRadioButton);
@@ -170,9 +172,9 @@ public class TransferFragment extends Fragment {
 
             // TODO: Process the captured image and extract information
             // For OCR (Optical Character Recognition), you can use a library like Tesseract.
-
-            // TODO: Populate description and amount fields with extracted information
             String extractedText = performOCR(imageBitmap);
+
+            // Populate description field with extracted information
             descriptionEditText.setText(extractedText);
         }
     }
@@ -182,7 +184,6 @@ public class TransferFragment extends Fragment {
         // TODO: Implement OCR logic here
         return "Extracted Text";
     }
-
 
     private void setupAccountSpinner(Spinner accountSpinner) {
         Log.d("TransferFragment", "Entering setupAccountSpinner");
