@@ -31,16 +31,26 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Before;
+
 
 import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Activity.TestDataGenerator;
+
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class RegisterCSV {
+public class RegisterCSVtest {
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
+
+//    @Before
+//    public void setUp() {
+        // Call TestDataGenerator to generate test data before the Espresso test
+//        TestDataGenerator.generateTestData();
+//    }
 
     @Test
     public void registerCSV() {

@@ -36,7 +36,7 @@ import xyz.digitalbank.demo.R;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class Registration {
+public class Registrationtest {
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =

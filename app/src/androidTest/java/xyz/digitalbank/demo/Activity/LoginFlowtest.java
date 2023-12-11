@@ -32,7 +32,7 @@ import xyz.digitalbank.demo.R;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class LoginFlow {
+public class LoginFlowtest {
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
