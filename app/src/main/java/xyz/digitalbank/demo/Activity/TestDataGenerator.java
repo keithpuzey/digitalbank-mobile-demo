@@ -2,18 +2,22 @@ package xyz.digitalbank.demo.Activity;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.Arrays;
 
-
 public class TestDataGenerator {
 
     private static String generateSessionId() {
         return UUID.randomUUID().toString();
     }
+
+    private static URL url;
+    private static HttpURLConnection connection;
+    private static int responseCode;
 
     private static void writeToCsvFile(String csvFilePath, String[] fieldNames, Object[][] data) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(csvFilePath))) {
@@ -32,7 +36,7 @@ public class TestDataGenerator {
         }
     }
 
-    public static void generateTestData() {
+    public static void generateTestData() throws IOException  {
         String apiKeyId = System.getenv("BLAZEMETER_API_KEY_ID");
         String apiKeySecret = System.getenv("BLAZEMETER_API_KEY_SECRET");
         String csvFileName = "generated_data.csv";
@@ -50,100 +54,69 @@ public class TestDataGenerator {
         String acceptHeader = "*/*";
         String acceptEncodingHeader = "gzip, deflate, br";
 
-        // API endpoint URL to get the signed URL
-        String signUrl = "https://a.blazemeter.com/api/v4/folders/" + workspaceId + "/s3/sign?fileName=" + csvFileName;
+        // Make the API request to generate test data
+        String generateTestDataUrl = "https://tdm.blazemeter.com/api/v1/workspaces/" + workspaceId + "/testdata/publish";
+        String[] fieldNames = {"field1", "field2", "field3"};  // Replace with your field names
+        Object[][] testData = {{"value1", "value2", "value3"}, {"value4", "value5", "value6"}};  // Replace with your test data
 
-        // Make the API request to get the signed URL
+        // Request data for the API call
+        String sessionId = generateSessionId();
+        String model = modelId;
+
+        // Make the API request to generate test data
         try {
-            URL url = new URL(signUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            url = new URL(generateTestDataUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", authorizationHeader);
             connection.setRequestProperty("Content-Type", contentTypeHeader);
             connection.setRequestProperty("Cache-Control", cacheControlHeader);
             connection.setRequestProperty("Accept", acceptHeader);
             connection.setRequestProperty("Accept-Encoding", acceptEncodingHeader);
 
+            // Set request body
+            String requestBody = String.format("{\"type\": \"generic-from-ar\", \"sessionId\": \"%s\", \"model\": \"%s\"}", sessionId, model);
+            connection.setDoOutput(true);
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
             // Check if the request was successful
-            int responseCode = connection.getResponseCode();
-            if (responseCode != 200) {
-                System.out.println("Error: Failed to get signed URL. Response Code: " + responseCode);
+            responseCode = connection.getResponseCode();
+            if (responseCode != 201) {
+                System.out.println("Error: Failed to generate test data. Response Code: " + responseCode);
                 System.exit(1);
             }
 
-            // Load the JSON response
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
+            // Load JSON data from the API response
+            try (BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder responseData = new StringBuilder();
+                String responseLine;
+                while ((responseLine = responseReader.readLine()) != null) {
+                    responseData.append(responseLine);
                 }
 
-                // Extract the signed URL from the JSON response
-                String signedUrl = response.toString();
+                // Parse the JSON response
+                // (You may need to adjust this part based on the actual structure of the response)
+                // JSONObject data = new JSONObject(responseData.toString());
+                // JSONArray generatedData = data.getJSONObject("result").getJSONObject("data").getJSONObject("data").getJSONObject("entities").getJSONObject("userlogin").getJSONArray("generatedData");
 
-                // Make the API request to generate test data
-                String generateTestDataUrl = "https://tdm.blazemeter.com/api/v1/workspaces/" + workspaceId + "/testdata/publish";
-                String[] fieldNames = {"field1", "field2", "field3"};  // Replace with your field names
-                Object[][] testData = {{"value1", "value2", "value3"}, {"value4", "value5", "value6"}};  // Replace with your test data
-
-                // Request data for the API call
-                String sessionId = generateSessionId();
-                String model = modelId;
-
-                // Make the API request to generate test data
-                url = new URL(generateTestDataUrl);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Authorization", authorizationHeader);
-                connection.setRequestProperty("Content-Type", contentTypeHeader);
-                connection.setRequestProperty("Cache-Control", cacheControlHeader);
-                connection.setRequestProperty("Accept", acceptHeader);
-                connection.setRequestProperty("Accept-Encoding", acceptEncodingHeader);
-
-                // Set request body
-                String requestBody = String.format("{\"type\": \"generic-from-ar\", \"sessionId\": \"%s\", \"model\": \"%s\"}", sessionId, model);
-                connection.setDoOutput(true);
-                try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
-                }
-
-                // Check if the request was successful
-                responseCode = connection.getResponseCode();
-                if (responseCode != 201) {
-                    System.out.println("Error: Failed to generate test data. Response Code: " + responseCode);
-                    System.exit(1);
-                }
-
-                // Load JSON data from the API response
-                try (BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    StringBuilder responseData = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = responseReader.readLine()) != null) {
-                        responseData.append(responseLine);
-                    }
-
-                    // Parse the JSON response
-                    // (You may need to adjust this part based on the actual structure of the response)
-                    // JSONObject data = new JSONObject(responseData.toString());
-                    // JSONArray generatedData = data.getJSONObject("result").getJSONObject("data").getJSONObject("data").getJSONObject("entities").getJSONObject("userlogin").getJSONArray("generatedData");
-
-                    // Write 'generatedData' to the CSV file
-                    // (You may need to adjust this part based on the actual structure of the response)
-                    // writeToCsvFile(csvFileName, generatedData);
-                }
-
-                System.out.println("CSV file '" + csvFileName + "' successfully created.");
-
-            } catch (IOException e) {
-                System.out.println("Error reading signed URL response: " + e.getMessage());
-                System.exit(1);
+                // Write 'generatedData' to the CSV file
+                // (You may need to adjust this part based on the actual structure of the response)
+                // writeToCsvFile(csvFileName, generatedData);
             }
 
-        } catch (IOException e) {
-            System.out.println("Error making signed URL request: " + e.getMessage());
+            System.out.println("CSV file '" + csvFileName + "' successfully created.");
+
+
+        } catch (MalformedURLException e) {
+            System.out.println("Malformed URL making API request: " + e.getMessage());
             System.exit(1);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 }

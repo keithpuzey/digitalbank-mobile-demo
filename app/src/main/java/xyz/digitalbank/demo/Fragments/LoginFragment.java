@@ -38,16 +38,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import java.io.IOException;
 
-
-
-
-
-
-
 @RequiresApi(api = Build.VERSION_CODES.P)
 
 public class LoginFragment extends Fragment {
-
     private MyInterface myInterface;
     private TextView registerTV;
     private EditText emailInput, passwordInput;
@@ -55,8 +48,6 @@ public class LoginFragment extends Fragment {
     private ImageButton biometricBtn ;
     private ServiceApi serviceApi;
     private static final int REQUEST_BIOMETRIC_PERMISSION = 1;
-
-
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -121,6 +112,9 @@ public class LoginFragment extends Fragment {
         cogIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String dataPath = getActivity().getFilesDir().getAbsolutePath();
+
+                Log.d("TesseractOCR", "Data Path: " + dataPath);
                 // Open the new page for editing constants
                 openConstantsPage();
             }
@@ -190,14 +184,20 @@ public class LoginFragment extends Fragment {
                             Log.e("Biometric", "Authentication error: " + errString);
                         }
                     }
-
                     @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
                         Log.d("Biometric", "Authentication succeeded");
-                        // Handle successful authentication
-                        loginUserWithBiometric();
+
+                        try {
+                            // Handle successful authentication
+                            loginUserWithBiometric();
+                        } catch (Exception e) {
+                            // Log any exceptions that might occur during authentication
+                            Log.e("Biometric", "Exception during authentication: " + e.getMessage(), e);
+                        }
                     }
+
 
                     @Override
                     public void onAuthenticationFailed() {
@@ -207,8 +207,10 @@ public class LoginFragment extends Fragment {
                 });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric Login")
+                .setTitle("Finger Print  Login")
                 .setNegativeButtonText("Cancel")
+                .setDescription("Place your fingerprint on the sensor to log in.")
+                .setNegativeButtonText("Biometric authentication failed. Try again.")
                 .build();
 
         biometricPrompt.authenticate(promptInfo);
@@ -216,10 +218,12 @@ public class LoginFragment extends Fragment {
 
     private void loginUserWithBiometric() {
 
-        showToast("BioMetric Login Is not Currently Implemented.");
-        // Implement biometric login logic here
-        // This could involve making a network call or checking local credentials
-        // If successful, call myInterface.login() with the appropriate parameters
+        emailInput.setText("nsmith@demo.io");
+        passwordInput.setText("Demo123!");
+
+        // Perform login with the predefined user credentials
+        loginUser();
+
     }
 
 

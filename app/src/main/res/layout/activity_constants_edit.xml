@@ -1,50 +1,69 @@
-<!-- activity_constants_edit.xml -->
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textViewConstant1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Digital Bank URL:" />
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="379dp"
+            android:layout_height="433dp">
 
-    <EditText
-        android:id="@+id/editTextBaseUrl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewConstant1"
-        android:layout_marginTop="16dp"
-        android:text="BASE_URL: YourBaseURLHere" />
+        </FrameLayout>
 
-    <TextView
-        android:id="@+id/textViewConstant2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextBaseUrl"
-        android:layout_marginTop="16dp"
-        android:text="Mock URL:" />
+        <TextView
+                    android:id="@+id/textViewConstant1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="Digital Bank URL:" />
 
-    <EditText
-        android:id="@+id/editTextMockUrl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewConstant2"
-        android:layout_marginTop="16dp"
-        android:text="MOCK_URL: YourMockURLHere" />
+                <EditText
+                    android:id="@+id/editTextBaseUrl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textViewConstant1"
+                    android:layout_marginTop="16dp"
+                    android:text="BASE_URL: YourBaseURLHere" />
 
-    <Button
-        android:id="@+id/cancelBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextMockUrl"
-        android:layout_marginTop="16dp"
-        android:text="Cancel"
-        android:textAllCaps="false"
-        android:textColor="#fff"
-        android:textSize="16sp" />
+
+
+                <TextView
+                    android:id="@+id/textViewConstant2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/editTextBaseUrl"
+                    android:layout_marginTop="16dp"
+                    android:text="Mock URL:" />
+
+                <EditText
+                    android:id="@+id/editTextMockUrl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textViewConstant2"
+                    android:layout_marginTop="16dp"
+                    android:text="MOCK_URL: YourMockURLHere" />
+
+                <Button
+                    android:id="@+id/cancelBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/editTextMockUrl"
+                    android:layout_marginTop="16dp"
+                    android:text="Cancel"
+                    android:textAllCaps="false"
+                    android:textColor="#fff"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/saveBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/cancelBtn"
+                    android:layout_marginTop="16dp"
+                    android:text="Save"
+                    android:textAllCaps="false"
+                    android:textColor="#fff"
+                    android:textSize="16sp" />
 
 
 

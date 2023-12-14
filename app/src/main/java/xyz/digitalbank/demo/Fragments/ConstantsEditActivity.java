@@ -3,6 +3,7 @@ package xyz.digitalbank.demo.Fragments;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +16,7 @@ import xyz.digitalbank.demo.Services.MyInterface;
 
 public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener, MyInterface {
 
-    private Button cancelBtn;
+    private Button cancelBtn,  saveBtn;
     private EditText editTextBaseUrl, editTextMockUrl;
 
     @Override
@@ -27,17 +28,19 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         editTextBaseUrl = findViewById(R.id.editTextBaseUrl);
         editTextMockUrl = findViewById(R.id.editTextMockUrl);
         cancelBtn = findViewById(R.id.cancelBtn);
+        saveBtn = findViewById(R.id.saveBtn); // Initialize the save button
 
 
         // Set current constant values in EditText fields
         editTextBaseUrl.setText(Constant.baseUrl.BASE_URL);
         editTextMockUrl.setText(Constant.baseUrl.MOCK_URL);
 
+
         // Set click listeners for buttons
         cancelBtn.setOnClickListener(this);
+        saveBtn.setOnClickListener(this); // Set click listener for the save button
 
 
-        // Implement the layout and functionality for editing constants here
     }
 
     @Override
@@ -45,8 +48,12 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         if (view.getId() == R.id.cancelBtn) {
             // Handle cancel button click
             navigateToLoginFragment();
+        } else if (view.getId() == R.id.saveBtn) {
+            // Handle save button click
+            updateConstants();
         }
     }
+
 
     private void updateConstants() {
         // Get the new values from EditText fields
@@ -59,27 +66,16 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
 
         // Optionally, you may want to save these new values to preferences or elsewhere
 
-        // Now, you can navigate back to the login fragment
-        navigateToLoginFragment();
+        // Finish the activity when save button is clicked
+        finish();
     }
 
     private void navigateToLoginFragment() {
-        // Create a new instance of the LoginFragment
-        LoginFragment loginFragment = new LoginFragment();
 
-        // Get the FragmentManager and start a transaction
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-        // Replace the current fragment with the LoginFragment
-        transaction.replace(R.id.fragment_container, loginFragment);
-
-        // Add the transaction to the back stack so the user can navigate back
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+        finish();
     }
+
+
 
     @Override
     public void login(String authToken, String Email) {

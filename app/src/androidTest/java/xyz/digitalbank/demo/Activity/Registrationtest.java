@@ -33,6 +33,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import xyz.digitalbank.demo.R;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
+
+
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -42,8 +46,14 @@ public class Registrationtest {
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
+
+
     @Test
     public void registration() {
+
+
+
+
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.registerTV), withText("Don't have account? Sign Up Here?"),
                         childAtPosition(

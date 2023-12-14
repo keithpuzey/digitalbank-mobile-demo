@@ -1,5 +1,7 @@
 package xyz.digitalbank.demo.Services;
 
+import static xyz.digitalbank.demo.Constants.Constant.baseUrl.BASE_URL;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.digitalbank.demo.Constants.Constant;
@@ -7,9 +9,10 @@ import xyz.digitalbank.demo.Model.DepositRequest;
 import retrofit2.Callback;
 
 
+
 public class RetrofitClient {
 
-    private static final String BASE_URL = "http://dbankdemo.com/";
+    // private static final String BASE_URL = "http://dbankdemo.com/";
     private static Retrofit retrofit;
 
     private RetrofitClient() {

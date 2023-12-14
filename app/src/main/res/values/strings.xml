@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Digital Bank Demo</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello fragment</string>
     <string name="s_pref_file">xyz.digitalbank.demo.sh_preference_file</string>
     <string name="s_pref_login_status">xyz.digitalbank.sh_preference_login_status</string>

@@ -1,45 +1,46 @@
 package xyz.digitalbank.demo.Fragments;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.fragment.app.Fragment;
-
-import xyz.digitalbank.demo.R;
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
-import xyz.digitalbank.demo.R;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import xyz.digitalbank.demo.R;
-import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import android.widget.EditText;
-import android.app.AlertDialog;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.widget.Toast;
+
 import xyz.digitalbank.demo.Constants.Constant;
-import androidx.core.content.ContextCompat;
+import xyz.digitalbank.demo.R;
+import android.graphics.Color;
+import android.util.TypedValue;
+import android.view.Gravity;
+
 
 
 public class AtmSearchFragment extends Fragment {
@@ -77,8 +78,11 @@ public class AtmSearchFragment extends Fragment {
         // Set an OnClickListener for the Get IP Address button
         getIpButton.setOnClickListener(v -> getIpAddress());
 
-        // Set an OnClickListener for the Custom Request button
+        // Set an OnClickListener for the Zip button
         customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
+        // Clear the responseTextView
+
+
 
         return view;
     }
@@ -142,19 +146,22 @@ public class AtmSearchFragment extends Fragment {
                                             String road = addressObject.optString("road", "");
 
                                             // Build a formatted string with the extracted information
-                                            String formattedInfo = "Country: " + country + "\n" +
-                                                    "Postcode: " + postcode + "\n" +
-                                                    "State: " + state + "\n" +
+                                            String formattedInfo = "Road: " + road + "\n" +
+
                                                     "County: " + county + "\n" +
-                                                    "Address: " + address + "\n" +
-                                                    "Road: " + road;
+                                                    "State: " + state + "\n" +
+                                                    "Postcode: " + postcode + "\n" +
+                                                    "Country: " + country ;
 
                                             Log.d("FormattedInfo", formattedInfo);
 
                                             // Display the formatted information on the screen
                                             requireActivity().runOnUiThread(() -> {
                                                 TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                                responseTextView.setText("Results of Location Based on GPS" + ":\n" + formattedInfo);
+                                                responseTextView.setText("Location Based on GPS :" + "\n" + "\n" + "\n"  + formattedInfo);
+                                                responseTextView.setTextColor(Color.rgb(24,29,47));
+                                                responseTextView.setGravity(Gravity.CENTER);
+                                                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 
                                             });
 
@@ -294,11 +301,6 @@ public class AtmSearchFragment extends Fragment {
                     // Log the second API response
                     Log.d("SecondApiResponse", "Response: " + formattedInfo);
 
-                    // Display the second API response including the IP address
-                    requireActivity().runOnUiThread(() -> {
-                        TextView responseTextView = view.findViewById(R.id.responseTextView);
-                        responseTextView.setText("Results of Location Based on Network Address" + ipAddress + ":\n" + formattedInfo);
-                    });
 
                     // Close connections
                     bufferedReader.close();
@@ -340,19 +342,22 @@ public class AtmSearchFragment extends Fragment {
 
                                 // Build a formatted string with the extracted information
                                 String gpsformattedInfo =
-                                        "Country: " + gpscountry + "\n" +
-                                        "Postcode: " + gpspostcode + "\n" +
-                                        "State: " + gpsstate + "\n" +
+
+                                        "Road: " + gpsroad + "\n" +
                                         "County: " + gpscounty + "\n" +
-                                        "Address: " + gpsaddress + "\n" +
-                                        "Road: " + gpsroad;
+                                        "State: " + gpsstate + "\n" +
+                                        "Postcode: " + gpspostcode + "\n" +
+                                        "Country: " + gpscountry + "\n";
 
                                 Log.d("FormattedInfo", gpsformattedInfo);
 
                                 // Display the second API response including the IP address
                                 requireActivity().runOnUiThread(() -> {
                                     TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                    responseTextView.setText("Location Based on Network Location " + ipAddress + ":\n" + gpsformattedInfo);
+                                    responseTextView.setText("Location Based on Network Location :" + "\n" + ipAddress + "\n"+ "\n"  + gpsformattedInfo);
+                                    responseTextView.setTextColor(Color.rgb(24,29,47));
+                                    responseTextView.setGravity(Gravity.CENTER);
+                                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                                 });
 
                             } catch (JSONException e) {
@@ -380,6 +385,11 @@ public class AtmSearchFragment extends Fragment {
     }
 
     private void showCustomRequestDialog() {
+
+        // Clear the Screen
+        TextView responseTextView = view.findViewById(R.id.responseTextView);
+        responseTextView.setText("");
+
         // Create an AlertDialog with an EditText for user input
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Enter Zip Code");
@@ -410,13 +420,20 @@ public class AtmSearchFragment extends Fragment {
 
         // Perform network request on a separate thread
         new Thread(() -> {
+            int responseCode;  // Declare responseCode variable
+
             try {
                 URL url = new URL(apiUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
-                // Read the response
-                InputStream inputStream = connection.getInputStream();
+// Get the HTTP response code
+                responseCode = connection.getResponseCode();
+                Log.d("ZipCode", "Before if statement : " + responseCode);
+
+// Use getErrorStream() if the response code indicates an error
+                InputStream inputStream = (responseCode >= 400) ? connection.getErrorStream() : connection.getInputStream();
+
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder response = new StringBuilder();
                 String line;
@@ -424,13 +441,75 @@ public class AtmSearchFragment extends Fragment {
                     response.append(line);
                 }
 
-                // Handle the response as needed
-                Log.d("CustomRequest", "Response: " + response.toString());
 
-                // Display the custom request response
+                // Handle the response based on the HTTP response code
                 requireActivity().runOnUiThread(() -> {
                     TextView responseTextView = view.findViewById(R.id.responseTextView);
-                    responseTextView.setText("Nearest ATM:\n" + response.toString());
+
+                    Log.d("ZipCode", "Before if statement : " + responseCode);
+                    if (responseCode >= 200 && responseCode < 300) {
+                        // Successful response
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response.toString());
+                            JSONArray atmsArray = jsonResponse.getJSONArray("atms");
+
+                            // Assuming you want to display details for the first ATM only
+                            if (atmsArray.length() > 0) {
+                                JSONObject atm = atmsArray.getJSONObject(0);
+                                JSONObject atmLocation = atm.getJSONObject("atmLocation");
+
+                                // Extract details
+                                String name = atmLocation.getString("name");
+                                String locationDescription = atmLocation.getString("locationDescription");
+                                String street = atmLocation.getJSONObject("address").getString("street");
+                                String city = atmLocation.getJSONObject("address").getString("city");
+                                String country = atmLocation.getJSONObject("address").getString("country");
+                                String postalCode = atmLocation.getJSONObject("address").getString("postalCode");
+                                String state = atmLocation.getJSONObject("address").getString("state");
+
+                                // Build a formatted string with the extracted information
+                                String zipFormattedInfo =
+                                        "Name: " + name + "\n" +
+                                                "Description: " + locationDescription + "\n" +
+                                                "Street : " + street + "\n" +
+                                                "City: " + city + "\n" +
+                                                "Country: " + country + "\n" +
+                                                "Zip Code: " + postalCode;
+
+                                Log.d("FormattedInfo", zipFormattedInfo);
+
+                                // Display the response on the screen
+                                responseTextView.setText("Location Based on Zip Code :" + "\n" + "\n" + zipFormattedInfo);
+                                responseTextView.setTextColor(Color.rgb(24,29,47));
+                                responseTextView.setGravity(Gravity.CENTER);
+                                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        if (responseCode == 404) {
+                            // Handle the case when the resource is not found (ZIP code not found)
+                            responseTextView.setText("ZIP code not found.");
+                            responseTextView.setTextColor(Color.YELLOW);
+                            responseTextView.setGravity(Gravity.CENTER);
+                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+
+                        } else if (responseCode >= 500) {
+                            // Display the response on the screen
+                            responseTextView.setText("Service Unavailable :" + "\n" + "\n" + " Response Code = " + responseCode + "\n");
+                            // Set text color to red
+                            responseTextView.setTextColor(Color.RED);
+                            responseTextView.setGravity(Gravity.CENTER);
+                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        } else {
+                            // Handle other error responses
+                            responseTextView.setText("Service Error: " + responseCode);
+                            responseTextView.setGravity(Gravity.CENTER);
+                             responseTextView.setTextColor(Color.BLACK);  // Change color as needed
+                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        }
+                    }
                 });
 
                 // Close connections
@@ -443,6 +522,8 @@ public class AtmSearchFragment extends Fragment {
             }
         }).start();
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

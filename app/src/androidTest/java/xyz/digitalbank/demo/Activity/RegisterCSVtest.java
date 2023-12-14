@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.DataInteraction;
+import androidx.test.espresso.IdlingPolicies;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -34,6 +35,9 @@ import org.junit.runner.RunWith;
 import org.junit.Before;
 
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Activity.TestDataGenerator;
 
@@ -46,14 +50,15 @@ public class RegisterCSVtest {
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
-//    @Before
-//    public void setUp() {
+    @Before
+    public void setUp() throws IOException {
         // Call TestDataGenerator to generate test data before the Espresso test
-//        TestDataGenerator.generateTestData();
-//    }
+        TestDataGenerator.generateTestData();
+    }
 
     @Test
     public void registerCSV() {
+
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.registerTV), withText("Don't have account? Sign Up Here?"),
                         childAtPosition(
