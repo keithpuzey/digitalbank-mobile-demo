@@ -29,7 +29,7 @@ public interface ServiceApi {
     @POST("bank/api/v1/auth")
     Call<JsonObject> authenticateUser(@Query("username") String username, @Query("password") String adminpassword);
 
-    @POST("/bank/api/v1/user")
+    @POST("bank/api/v1/user")
     Call<Void> registerUser(
             @Header("Authorization") String authToken,
             @Header("Content-Type") String contentType,
@@ -37,7 +37,7 @@ public interface ServiceApi {
             @Body UserRequest userRequest
     );
 
-    @POST("/bank/api/v1/account/{toAccountId}/transaction")
+    @POST("bank/api/v1/account/{toAccountId}/transaction")
     Call<Void> transferFunds(
             @Path("toAccountId") int toAccountId,
             @Query("action") String action,
@@ -47,31 +47,31 @@ public interface ServiceApi {
     );
 
 
-    @GET("/bank/api/v1/user/find")
+    @GET("bank/api/v1/user/find")
     Call<UserResponse> findUserId(
             @Header("Authorization") String authToken,
             @Query("username") String email
     );
 
-    @POST("/bank/api/v1/user/{id}/data/create")
+    @POST("bank/api/v1/user/{id}/data/create")
     Call<Void> createData(
             @Path("id") int userId,
             @Header("Authorization") String authToken
     );
 
-    @GET("/bank/api/v1/user/{id}/profile")
+    @GET("bank/api/v1/user/{id}/profile")
     Call<UserProfileResponse> getUserProfile(
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
         );
 
-    @GET("/bank/api/v1/user/{id}/account")
+    @GET("bank/api/v1/user/{id}/account")
     Call<List<UserAccountResponse>> getUserAccounts(
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
     );
 
-    @GET("/bank/api/v1/account/{accountid}/transaction")
+    @GET("bank/api/v1/account/{accountid}/transaction")
     Call<List<TransactionResponse>> getAccountTransactions(
             @Path("accountid") int accountId,
             @Header("Authorization") String authToken

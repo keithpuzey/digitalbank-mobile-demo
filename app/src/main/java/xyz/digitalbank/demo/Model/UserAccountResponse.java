@@ -155,8 +155,13 @@ public class UserAccountResponse {
         private int overdraftLimit;
         @SerializedName("overdraftFee")
         private int overdraftFee;
+        public String getName() {
+            return name;
+        }
 
-        // Getters and setters for all fields
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
     public static class OwnershipType {

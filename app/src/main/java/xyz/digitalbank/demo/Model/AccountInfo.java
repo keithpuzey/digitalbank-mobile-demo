@@ -1,14 +1,31 @@
 package xyz.digitalbank.demo.Model;
 
+
+
 public class AccountInfo {
     private int id;
-    private String name;
+    private String accountName;
     private double currentBalance;
+    private String accountTypeName;
 
-    public AccountInfo(int id, String name, double currentBalance) {
+
+    public AccountInfo(int id, String accountName, double currentBalance, String accountTypeName) {
         this.id = id;
-        this.name = name;
+        this.accountName = accountName;
         this.currentBalance = currentBalance;
+        this.accountTypeName = accountTypeName;
+    }
+
+    // Add getters for the new field
+    public String getAccountTypeName() {
+        return accountTypeName;
+    }
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public double getCurrentBalance() {
+        return currentBalance;
     }
 
     public int getId() {
@@ -16,7 +33,7 @@ public class AccountInfo {
     }
 
     public String getDisplayName() {
-        return name + " - " + currentBalance;
+        return accountName + " - " + currentBalance;
     }
 
     // Override the toString method to return the display name

@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.LoginFragment"
-    android:padding="10dp"
     android:layout_margin="15dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".Fragments.LoginFragment">
 
 
     <ImageView
@@ -23,61 +23,60 @@
 
     <ImageView
         android:id="@+id/ic_logo"
-        android:layout_width="356dp"
-        android:layout_height="75dp"
+        android:layout_width="358dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
+        android:layout_marginTop="6dp"
+
+        android:gravity="center_horizontal"
         android:src="@drawable/ic_launcher_foreground" />
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:text="Digital Banking at it's Best"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
-        android:gravity="center_horizontal"/>
+        android:textSize="22sp" />
 
     <EditText
+        android:id="@+id/emailInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:hint="Enter User Name"
-        android:inputType="textEmailAddress"
-        android:layout_marginTop="20dp"
-        android:id="@+id/emailInput"/>
+        android:inputType="textEmailAddress" />
 
     <EditText
-        android:layout_marginTop="20dp"
+        android:id="@+id/passwordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:hint="Enter Password"
-        android:inputType="textPassword"
-        android:id="@+id/passwordInput"/>
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/loginBtn"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorPrimary"
         android:text="L o g i n"
         android:textColor="#fff"
-        android:textSize="16sp"
-        android:background="@color/colorPrimary"
-        />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/registerTV"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Don't have account? Sign Up Here?"
-        android:gravity="center_horizontal"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_horizontal"
+        android:text="Don't have account? Sign Up Here?" />
 
     <FrameLayout
         android:layout_width="75dp"

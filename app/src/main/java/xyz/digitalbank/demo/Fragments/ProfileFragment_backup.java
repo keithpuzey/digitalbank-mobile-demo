@@ -3,53 +3,49 @@ package xyz.digitalbank.demo.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Activity.atm_search;
-import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.MyInterface;
-import xyz.digitalbank.demo.Model.UserProfileResponse;
-import xyz.digitalbank.demo.Model.UserResponse;
-import xyz.digitalbank.demo.Model.UserAccountResponse;
 import com.google.gson.JsonObject;
-import xyz.digitalbank.demo.Services.RetrofitClient;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import java.util.List;
-import android.widget.Spinner;
-import org.json.JSONArray;
-import java.util.ArrayList;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import xyz.digitalbank.demo.Model.TransactionResponse;
+import xyz.digitalbank.demo.Activity.MainActivity;
+import xyz.digitalbank.demo.Activity.atm_search;
 import xyz.digitalbank.demo.Model.AccountInfo;
+import xyz.digitalbank.demo.Model.TransactionResponse;
+import xyz.digitalbank.demo.Model.UserAccountResponse;
+import xyz.digitalbank.demo.Model.UserProfileResponse;
+import xyz.digitalbank.demo.Model.UserResponse;
+import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Services.MyInterface;
+import xyz.digitalbank.demo.Services.RetrofitClient;
 
-import com.google.gson.Gson;
-import android.view.Gravity;
-import android.widget.LinearLayout;
-import android.graphics.Color;
 
-
-public class ProfileFragment extends Fragment {
+public class ProfileFragment_backup extends Fragment {
     public TextView name, email, title;
     private MyInterface logoutListener;
     public int loggedinuserId;
-
-    private List<AccountInfo> accountInfoList = new ArrayList<>();
-
 
     private List<UserAccountResponse> userAccounts;
 
@@ -57,9 +53,9 @@ public class ProfileFragment extends Fragment {
     private String authToken;
     public int accountId ;
     private Spinner accountSpinner;
-    public  AccountInfo selectedAccountInfo;
 
-    public ProfileFragment() {
+
+    public ProfileFragment_backup() {
         // Required empty public constructor
     }
 
@@ -80,16 +76,6 @@ public class ProfileFragment extends Fragment {
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (name != null) {
-                // Get Account Details
-                updateProfileDetails();
-                getAndDisplayAccountTransactions(authToken, accountId);
-                String displayName = MainActivity.appPreference.getDisplayName();
-                String greetingMessage = "Loading ";
-                name.setText(greetingMessage);
-            } else {
-                Log.e("ProfileFragment", "TextView 'name' is null");
-            }
             if (itemId == R.id.action_check_accounts) {
                 // Switch to the ProfileFragment
                 switchToProfileFragment();
@@ -113,37 +99,11 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Check if the view is not null
-        if (view != null) {
-            accountSpinner = view.findViewById(R.id.accountSpinner);
-            name = view.findViewById(R.id.name);
-            TableLayout tableLayout = view.findViewById(R.id.tableLayout);
-            LinearLayout tableHeader = view.findViewById(R.id.tableHeader);
 
-            // Check if the tableHeader is not null before calling clearAndDisplayAccountTransactions
-            if (tableHeader != null) {
-                // Clear existing rows in the TableLayout
-                tableLayout.removeAllViews();
+        accountSpinner = view.findViewById(R.id.accountSpinner);
+        name = view.findViewById(R.id.name);
+        TableLayout tableLayout = view.findViewById(R.id.tableLayout);
 
-                ViewGroup parent = (ViewGroup) tableHeader.getParent();
-                if (parent != null) {
-                    parent.removeView(tableHeader);
-                }
-
-                // Add Table Header
-                tableLayout.addView(tableHeader);
-
-                // ... Other code ...
-
-                // Call the method to get and display account transactions for the selected account
-                authToken = MainActivity.appPreference.getauthToken();
-                getAndDisplayAccountTransactions(authToken, accountId);
-            } else {
-                Log.e("ProfileFragment", "tableHeader is null");
-            }
-        } else {
-            Log.e("ProfileFragment", "View is null");
-        }
         // Set a listener to handle item selection if needed
         accountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -152,11 +112,8 @@ public class ProfileFragment extends Fragment {
                 UserAccountResponse selectedAccount = userAccounts.get(position);
                 int selectedAccountId = selectedAccount.getId();
                 Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId );
-
                 // Call the method to get and display account transactions for the selected account
                 getAndDisplayAccountTransactions(authToken , selectedAccountId);
-                // Update selected account details
-                updateSelectedAccountDetails(accountInfoList.get(position));
             }
 
             @Override
@@ -197,7 +154,7 @@ public class ProfileFragment extends Fragment {
                         if (response.isSuccessful()) {
                             // Authentication successful, get the authToken
                             String authToken = "Bearer " +  response.body().get("authToken").getAsString();
-                            Log.d("API", "Auth Token is = : " + authToken );
+
                             // Save the authToken to your app preferences or wherever you need it
                             MainActivity.appPreference.setauthToken(authToken);
 
@@ -209,12 +166,8 @@ public class ProfileFragment extends Fragment {
 
                             RetrofitClient.getServiceApi().findUserId(authToken, email )
                                     .enqueue(new Callback<UserResponse>() {
-
-
                                         @Override
                                         public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-
-                                            Log.d("API", "Email address is = : " + email );
                                             if (response.isSuccessful()) {
                                                 UserResponse userResponse = response.body();
 
@@ -230,7 +183,6 @@ public class ProfileFragment extends Fragment {
                                             } else {
                                                 // Handle the case where findUserId API failed
                                                 MainActivity.appPreference.showToast("Failed to retrieve user ID");
-                                                Log.d("API", "Email address not found  = : " + email );
                                             }
                                         }
 
@@ -289,7 +241,6 @@ public class ProfileFragment extends Fragment {
     private void getUserAccounts(String authToken, int loggedinuserId) {
         // Call the API to get user accounts using the obtained user ID
 
-
         RetrofitClient.getServiceApi().getUserAccounts(loggedinuserId, authToken)
                 .enqueue(new Callback<List<UserAccountResponse>>() {
                     @Override
@@ -298,10 +249,9 @@ public class ProfileFragment extends Fragment {
                             // Process the list of UserAccountResponse
                             List<UserAccountResponse> userAccounts = response.body();
                             displayUserAccounts(userAccounts);
-
                         } else {
                             // Handle the case where the API call was not successful
-                            // MainActivity.appPreference.showToast("Failed to retrieve user accounts");
+       //                     MainActivity.appPreference.showToast("Failed to retrieve user accounts");
                         }
                     }
 
@@ -313,9 +263,6 @@ public class ProfileFragment extends Fragment {
                 });
     }
     private void displayUserAccounts(List<UserAccountResponse> userAccounts) {
-
-        accountInfoList.clear(); // Clear existing data
-
         // Assuming you have a reference to the Spinner in your fragment
         Spinner accountSpinner = getView().findViewById(R.id.accountSpinner);
 
@@ -323,14 +270,16 @@ public class ProfileFragment extends Fragment {
         List<AccountInfo> accountInfoList = new ArrayList<>();
 
         for (UserAccountResponse account : userAccounts) {
-            // Extract information from UserAccountResponse
+// Extract information from UserAccountResponse
             int accountId = account.getId();
             String accountName = account.getName();
             String currentBalanceStr = String.valueOf(account.getCurrentBalance());
 
-            // Convert currentBalance to double
+// Convert currentBalance to double
             double currentBalance = Double.parseDouble(currentBalanceStr);
 
+
+            // Get the account type name
             String accountTypeName = "";
             if (account.getAccountType() != null) {
                 accountTypeName = account.getAccountType().getName();
@@ -338,22 +287,13 @@ public class ProfileFragment extends Fragment {
 
             // Create an AccountInfo object and add it to the list
             AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, accountTypeName);
+
             accountInfoList.add(accountInfo);
 
             // Display other account details as needed
             Log.d("UserAccount", "Account Name: " + accountName);
             Log.d("UserAccount", "Account ID: " + accountId);
             Log.d("UserAccount", "Current Balance: " + currentBalance);
-            Log.d("User Account", "Account Number: " + account.getAccountNumber());
-            Log.d("User Account", "Current Balance: " + account.getCurrentBalance());
-            Log.d("User Account", "Opening Balance: " + account.getOpeningBalance());
-            Log.d("User Account", "Interest Rate: " + account.getInterestRate());
-            if (account.getAccountType() != null) {
-                Log.d("User Account", "Account Type Name: " + account.getAccountType().getName());
-            }
-
-
-
         }
 
         // Create an ArrayAdapter with AccountInfo objects
@@ -379,7 +319,6 @@ public class ProfileFragment extends Fragment {
                 Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId);
                 // Call the method to get and display account transactions for the selected account
                 authToken = MainActivity.appPreference.getauthToken();
-                updateSelectedAccountDetails(accountInfoList.get(position));
 
                 getAndDisplayAccountTransactions( authToken , selectedAccountId);
             }
@@ -391,60 +330,42 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void updateSelectedAccountDetails(AccountInfo accountInfo) {
-        // Check if 'accountName' TextView is null before setting text
-        TextView accountNameTextView = getView().findViewById(R.id.accountName);
-        if (accountNameTextView != null) {
-            accountNameTextView.setText(accountInfo.getAccountTypeName());
-        } else {
-            Log.e("ProfileFragment", "TextView 'accountName' is null");
-        }
-
-        // Check if 'balance' TextView is null before setting text
-        TextView balanceTextView = getView().findViewById(R.id.balance);
-        if (balanceTextView != null) {
-            balanceTextView.setText("Balance: " + accountInfo.getCurrentBalance());
-        } else {
-            Log.e("ProfileFragment", "TextView 'balance' is null");
-        }
-    }
-
     private void displayUserProfile(UserProfileResponse userProfileResponse) {
         // Update UI to display user profile details
         // For example, you can set text in TextViews or update UI components
         // with the information obtained from userProfileResponse
         // userProfileResponse.getFirstName(), userProfileResponse.getLastName(), etc.
-        // Check if 'name' TextView is null before setting text
-        if (name != null) {
-            String fullName = userProfileResponse.getTitle() + " " + userProfileResponse.getFirstName() + " " + userProfileResponse.getLastName();
-            name.setText(fullName);
-        } else {
-            Log.e("ProfileFragment", "TextView 'name' is null in displayUserProfile");
-        }
+        String fullName = userProfileResponse.getTitle() + " " + userProfileResponse.getFirstName() + " " + userProfileResponse.getLastName();
+        name.setText(fullName);
+        email.setText("Email: " + userProfileResponse.getEmailAddress());
 
-        // Check if 'email' TextView is null before setting text
-        if (email != null) {
-            email.setText("Email: " + userProfileResponse.getEmailAddress());
-        } else {
-            Log.e("ProfileFragment", "TextView 'email' is null in displayUserProfile");
-        }
     }
+
     private void getAndDisplayAccountTransactions(String authToken, int accountId) {
         RetrofitClient.getServiceApi().getAccountTransactions(accountId, authToken)
                 .enqueue(new Callback<List<TransactionResponse>>() {
                     @Override
                     public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                        Log.d("API", "Transaction Account ID = : " + accountId);
+                        Log.d("API", "Transaction Request URL: " + call.request().url());
+                        Log.d("API", "Transaction Code: " + response.code());
+                        Log.d("API", "Transaction Response: " + response.body());
+                        Log.d("API", "Transaction Token: " + authToken);
+
                         if (response.isSuccessful()) {
                             List<TransactionResponse> accountTransactions = response.body();
-                            displayAccountTransactions(accountTransactions);
+                            // Clear existing transactions before displaying new ones
+                            clearAndDisplayAccountTransactions(accountTransactions);
                         } else {
-                            Log.e("API", "Failed to retrieve account transactions. Code: " + response.code());
+                            // Handle the case where the API call was not successful
+    //                        MainActivity.appPreference.showToast("Failed to retrieve account transactions");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
-                        Log.e("API", "API call failed: " + t.getMessage());
+                        // Handle failure of getAccountTransactions API
+     //                   MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                     }
                 });
     }
@@ -457,10 +378,63 @@ public class ProfileFragment extends Fragment {
         tableLayout.removeAllViews();
 
         // Loop through the transactions and add new rows to the TableLayout
-        int count = Math.min(accountTransactions.size(), 40);
+        int count = Math.min(accountTransactions.size(), 15);
         for (int i = accountTransactions.size() - count; i < accountTransactions.size(); i++) {
             TransactionResponse transaction = accountTransactions.get(i);
 
+            // Create a new TableRow
+            TableRow row = new TableRow(requireContext());
+
+            // Create TextViews to display the transaction details
+            TextView descriptionTextView = new TextView(requireContext());
+            descriptionTextView.setText(transaction.getDescription());
+
+            // Use TableRow.LayoutParams for setting layout parameters
+            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            );
+            descriptionTextView.setLayoutParams(layoutParams);
+
+            TextView amountTextView = new TextView(requireContext());
+            amountTextView.setText(String.valueOf(transaction.getAmount()));
+            amountTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            amountTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            TextView runningBalanceTextView = new TextView(requireContext());
+            runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
+            runningBalanceTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light)); // Set text color to red
+            runningBalanceTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            // Add TextViews to the TableRow
+            row.addView(descriptionTextView);
+            row.addView(amountTextView);
+            row.addView(runningBalanceTextView);
+
+            // Add TableRow to the TableLayout
+            tableLayout.addView(row);
+        }
+    }
+
+    private void clearAndDisplayAccountTransactions(List<TransactionResponse> accountTransactions) {
+
+        TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
+        LinearLayout tableHeader = getView().findViewById(R.id.tableHeader);
+
+        // Clear existing rows in the TableLayout
+        tableLayout.removeAllViews();
+
+
+        ViewGroup parent = (ViewGroup) tableHeader.getParent();
+        if (parent != null) {
+            parent.removeView(tableHeader);
+        }
+
+       // Add Table Header
+        tableLayout.addView(tableHeader);
+
+        // Loop through the transactions and add new rows to the TableLayout
+        for (TransactionResponse transaction : accountTransactions) {
             // Create a new TableRow
             TableRow row = new TableRow(requireContext());
 
@@ -472,16 +446,16 @@ public class ProfileFragment extends Fragment {
             TextView amountTextView = new TextView(requireContext());
             String amountValue = String.valueOf(transaction.getAmount());
             amountTextView.setText(amountValue);
-            // Set text color to red if the amount is negative
-            if (transaction.getAmount() < 0) {
+            // Set text color to red if the amount starts with "-"
+            if (amountValue.startsWith("-")) {
                 amountTextView.setTextColor(Color.RED);
             }
             setTextViewAttributes(amountTextView);
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
-            // Set text color to red if the running balance is negative
-            if (transaction.getRunningBalance() < 0) {
+            // Set text color to red if the running balance starts with "-"
+            if (String.valueOf(transaction.getRunningBalance()).startsWith("-")) {
                 runningBalanceTextView.setTextColor(Color.RED);
             }
             setTextViewAttributes(runningBalanceTextView);

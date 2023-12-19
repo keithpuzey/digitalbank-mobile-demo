@@ -77,17 +77,17 @@
             android:id="@+id/creditRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Credit"  />
+            android:text="Credit"
+            android:checked="true" />
 
         <RadioButton
             android:id="@+id/debitRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Debit"
-            android:checked="true" />
+            android:text="Debit"  />
 
     </RadioGroup>
-    <!-- Clickable Icon for Deposit Cheque -->
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,6 +96,20 @@
         android:orientation="vertical">
 
 
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:text="@string/submit" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="Deposit Cheque"
+            android:textColor="@color/colorPrimary" />
         <ImageView
             android:id="@+id/cameraIcon"
             android:layout_width="match_parent"
@@ -103,19 +117,6 @@
             android:gravity="center"
             android:src="@drawable/ic_camera" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:gravity="center"
-            android:text="Deposit Cheque"
-            android:textColor="@color/colorPrimary" />
-
-        <Button
-            android:id="@+id/submitButton"
-            android:layout_width="178dp"
-            android:layout_height="wrap_content"
-            android:text="@string/submit" />
 
     </LinearLayout>
 

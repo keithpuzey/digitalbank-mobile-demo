@@ -18,62 +18,62 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Welcome"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="17sp" />
 
-   <!-- FrameLayout to overlay credit card image and text -->
+    <!-- User Name -->
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="17sp"
+        android:layout_below="@id/welcomeText" />
+
+    <!-- FrameLayout to overlay credit card image and text -->
     <FrameLayout
         android:id="@+id/creditCardContainer"
-        android:layout_width="383dp"
-        android:layout_height="217dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_below="@id/name"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
 
         <!-- Credit Card Image -->
         <ImageView
             android:id="@+id/creditCardImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/baseline_credit_card_24" />
+            android:src="@drawable/baseline_credit_card_24"
+        android:scaleType="centerCrop" />
 
         <!-- Credit Card Text Overlay -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="17sp" />
-
-            <TextView
-                android:id="@+id/ceditcardText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Account Summary"
-                android:textSize="16sp"
-                android:layout_marginTop="80dp" />
+            <!-- Account Name -->
             <TextView
                 android:id="@+id/accountName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:text="Account Name"
+                android:textColor="#FFF"
                 android:textSize="16sp" />
 
+            <!-- Balance -->
             <TextView
                 android:id="@+id/balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-
-                android:textSize="16sp" />
+                android:text="Balance: $1000.00"
+                android:textColor="#FFF"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
     </FrameLayout>
 
@@ -83,7 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="My Accounts"
+        android:text="Select Account"
         android:textSize="16sp"
         android:layout_below="@id/creditCardContainer"
         android:layout_marginTop="16dp" />
@@ -100,20 +100,16 @@
     <FrameLayout
         android:id="@+id/profile_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="217dp"
-        android:layout_below="@id/accountSpinner"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp"
-        android:layout_weight="1">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_below="@id/accountSpinner">
 
         <!-- TableLayout for Transactions -->
         <TableLayout
             android:id="@+id/tableLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profile_fragment_container"
             android:layout_marginTop="16dp"></TableLayout>
-
     </FrameLayout>
 
     <!-- Bottom Navigation View -->
@@ -124,7 +120,5 @@
         android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
         app:menu="@menu/bottom_navigation_menu" />
-
-
 
 </RelativeLayout>

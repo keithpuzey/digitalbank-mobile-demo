@@ -91,9 +91,9 @@ public class TransferFragment extends Fragment {
         String tessDataPath = dataPath + "/tessdata/";
         String fileName = "eng.traineddata";
 
-
-
+        // Log the data paths for debugging
         Log.d("TesseractOCR", "Data Path: " + dataPath);
+        Log.d("TesseractOCR", "TessData Path: " + tessDataPath);
 
 
         File tessDataFolder = new File(tessDataPath);
@@ -189,9 +189,6 @@ public class TransferFragment extends Fragment {
                 // Call the transferFunds API
                 transferFunds(loggedinuserId, authToken, Double.parseDouble(amountStr), selectedAccountId, isCredit, description);
 
-
-
-
             } else {
                 // Handle case where amount is empty
                 // Example: Display an error message
@@ -204,7 +201,9 @@ public class TransferFragment extends Fragment {
             // Check if the camera permission is granted
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 // Open the camera
-                dispatchTakePictureIntent();
+                // dispatchTakePictureIntent();
+                // Display a message indicating that the feature is coming soon
+                Toast.makeText(requireContext(), "This feature is coming soon!", Toast.LENGTH_SHORT).show();
             } else {
                 // Request camera permission
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
@@ -278,6 +277,14 @@ public class TransferFragment extends Fragment {
             this.fileName = fileName;
         }
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Display a toast message indicating that OCR is starting
+            Toast.makeText(context, "OCR is starting...", Toast.LENGTH_SHORT).show();
+        }
+
+
+        @Override
         protected String doInBackground(Bitmap... bitmaps) {
             Log.d("OCR", "Inside doInBackground");
 
@@ -303,13 +310,13 @@ public class TransferFragment extends Fragment {
             tessBaseAPI.end();
             Log.d("OCR", "OCR task completed. Extracted Text: " + extractedText);
 
-
             return extractedText;
-
         }
 
-        @Override
         protected void onPostExecute(String extractedText) {
+            // Display a toast message with the extracted text
+            Toast.makeText(context, "OCR completed. Extracted Text: " + extractedText, Toast.LENGTH_SHORT).show();
+
             // Populate description field with extracted information
             descriptionEditText.setText(extractedText);
 
@@ -317,6 +324,12 @@ public class TransferFragment extends Fragment {
             Log.d("TesseractOCR", "Extracted Text: " + extractedText);
         }
 
+        protected void onCancelled() {
+            // Display a toast message indicating that OCR is canceled
+            Toast.makeText(context, "OCR canceled", Toast.LENGTH_SHORT).show();
+        }
+
+   
         private void initializeTesseract() {
             String tessDataPath = dataPath + "/tessdata/";
             String fileName = "eng.traineddata";
@@ -397,14 +410,17 @@ public class TransferFragment extends Fragment {
     }
 
     private void displayUserAccounts(List<UserAccountResponse> userAccounts, Spinner accountSpinner) {
+        // Clear existing data
+        accountInfoList.clear();
+
         for (UserAccountResponse account : userAccounts) {
             int accountId = account.getId();
             String accountName = account.getName();
             String currentBalanceStr = String.valueOf(account.getCurrentBalance());
             double currentBalance = Double.parseDouble(currentBalanceStr);
 
-            // Create an AccountInfo object and add it to the list
-            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance);
+            // Instantiate AccountInfo and add it to the list
+            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, "SomeDefaultValue");
             accountInfoList.add(accountInfo);
         }
 
@@ -421,6 +437,13 @@ public class TransferFragment extends Fragment {
         // Log the exit point of the method
         Log.d("TransferFragment", "Exiting setupAccountSpinner");
     }
+
+
+
+
+
+
+
 
     private void transferFunds(int userId, String authToken, double amount, int toAccountId, boolean isCredit, String description) {
         // Create a DepositRequest object

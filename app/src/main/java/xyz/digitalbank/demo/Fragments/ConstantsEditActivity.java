@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-
+import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -64,11 +64,22 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         Constant.baseUrl.BASE_URL = newBaseUrl;
         Constant.baseUrl.MOCK_URL = newMockUrl;
 
-        // Optionally, you may want to save these new values to preferences or elsewhere
+        // Save new values to SharedPreferences
+ //       saveConstantsToSharedPreferences(newBaseUrl, newMockUrl);
 
         // Finish the activity when save button is clicked
         finish();
     }
+
+ //   private void saveConstantsToSharedPreferences(String baseUrl, String mockUrl) {
+        // Use SharedPreferences to store the constants persistently
+        // You can get the SharedPreferences instance and save the values here
+        // Example:
+ //       SharedPreferences.Editor editor = getSharedPreferences("Constants", MODE_PRIVATE).edit();
+ //       editor.putString("BASE_URL", baseUrl);
+ //       editor.putString("MOCK_URL", mockUrl);
+ //       editor.apply();
+ //   }
 
     private void navigateToLoginFragment() {
 

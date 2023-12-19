@@ -40,6 +40,8 @@ import xyz.digitalbank.demo.R;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.util.Log;
+import android.view.View;
 
 
 
@@ -65,27 +67,27 @@ public class AtmSearchFragment extends Fragment {
             getLocationAndMakeRequest();
         }
 
-        // Find the "ATM Search" button by its ID
+
+        // Find buttons
         Button atmSearchButton = view.findViewById(R.id.action_atm_search);
-        // Find the "Get IP Address" button by its ID
         Button getIpButton = view.findViewById(R.id.action_get_ip);
-        // Find the "Custom Request" button by its ID
         Button customRequestButton = view.findViewById(R.id.action_custom_request);
 
-        // Set an OnClickListener for the ATM Search button
-        atmSearchButton.setOnClickListener(v -> getLocationAndMakeRequest());
-
-        // Set an OnClickListener for the Get IP Address button
+        // Set click listeners
+        atmSearchButton.setOnClickListener(v -> handleAtmSearchButtonClick());
         getIpButton.setOnClickListener(v -> getIpAddress());
-
-        // Set an OnClickListener for the Zip button
         customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
-        // Clear the responseTextView
-
-
 
         return view;
     }
+
+
+    private void handleAtmSearchButtonClick() {
+        Log.d("ClickAction", "ATM Search Button Clicked!");
+        Log.d("ClickAction", "ATM Search Button Clicked at " + System.currentTimeMillis());
+        getLocationAndMakeRequest();
+    }
+
 
     private void getLocationAndMakeRequest() {
         // Get the location manager
@@ -113,7 +115,7 @@ public class AtmSearchFragment extends Fragment {
                                 double latitude = location.getLatitude();
                                 double longitude = location.getLongitude();
                                 String apiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
-
+                                Log.d("GPS", "URL =  " + apiUrl );
                                 // Perform network request on a separate thread
                                 new Thread(() -> {
                                     try {
@@ -234,6 +236,9 @@ public class AtmSearchFragment extends Fragment {
                     JSONObject jsonResponse = new JSONObject(response.toString());
                     String ipAddress = jsonResponse.optString("ip", "");
 
+
+
+
                     // Display the IP address on the screen
                     requireActivity().runOnUiThread(() -> {
                         TextView ipTextView = view.findViewById(R.id.responseTextView);
@@ -244,7 +249,11 @@ public class AtmSearchFragment extends Fragment {
                     getDetailsForIpAddress(ipAddress);
 
                 } catch (JSONException e) {
-                    e.printStackTrace(); // Handle the exception in an appropriate way
+                    e.printStackTrace(); // Log the error for debugging
+                    requireActivity().runOnUiThread(() -> {
+                        // Handle the exception in an appropriate way (e.g., show a Toast)
+                        Toast.makeText(requireContext(), "Error parsing JSON response", Toast.LENGTH_SHORT).show();
+                    });
                 }
 
                 // Close connections
