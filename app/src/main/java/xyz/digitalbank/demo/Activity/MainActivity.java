@@ -18,6 +18,7 @@ import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Fragments.AtmSearchFragment;
 import xyz.digitalbank.demo.Fragments.TransferFragment;
+import android.content.Context;
 
 
 public class MainActivity extends AppCompatActivity implements MyInterface {
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
 
     private String email ;
     private int loggedinuserId ;
+
+    private Context context;  // Declare a context variable
 
     // Add a method to set the email
     public void setEmail(String email) {
@@ -44,12 +47,14 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize the context variable
+        context = this;
         // Use the static variable instead of defining a local variable
         appPreference = new AppPreference(this);
 
         appPreference.setLoginStatus(false);
 
-        serviceApi = RetrofitClient.getRetrofitInstance().create(ServiceApi.class);
+        serviceApi = RetrofitClient.getRetrofitInstance(this).create(ServiceApi.class);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {

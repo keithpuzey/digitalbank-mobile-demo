@@ -3,16 +3,15 @@ package xyz.digitalbank.demo.Fragments;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.content.SharedPreferences;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
+import xyz.digitalbank.demo.Constants.ConstantsManager;
+import android.util.Log;
 
 public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener, MyInterface {
 
@@ -24,6 +23,10 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constants_edit);
 
+        // Log statement to check if onCreate is called
+        Log.d("ConstantsEditActivity", "onCreate called");
+
+
         // Initialize UI elements
         editTextBaseUrl = findViewById(R.id.editTextBaseUrl);
         editTextMockUrl = findViewById(R.id.editTextMockUrl);
@@ -32,13 +35,16 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
 
 
         // Set current constant values in EditText fields
-        editTextBaseUrl.setText(Constant.baseUrl.BASE_URL);
-        editTextMockUrl.setText(Constant.baseUrl.MOCK_URL);
+      //  editTextBaseUrl.setText(Constant.baseUrl.BASE_URL);
+      //  editTextMockUrl.setText(Constant.baseUrl.MOCK_URL);
 
 
         // Set click listeners for buttons
         cancelBtn.setOnClickListener(this);
         saveBtn.setOnClickListener(this); // Set click listener for the save button
+
+        // Set current constant values in EditText fields
+        loadCurrentConstants(); // Load the values when the activity is created
 
 
     }
@@ -55,31 +61,42 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
     }
 
 
+    private void loadCurrentConstants() {
+        // Load the current values from SharedPreferences and set them to EditText fields
+        String currentBaseUrl = ConstantsManager.getBaseUrl(this);
+        String currentMockUrl = ConstantsManager.getMockUrl(this);
+
+        // Log statements to check values
+        Log.d("ConstantsEditActivity", "Loaded BaseUrl: " + currentBaseUrl);
+        Log.d("ConstantsEditActivity", "Loaded MockUrl: " + currentMockUrl);
+
+        editTextBaseUrl.setText(currentBaseUrl);
+        editTextMockUrl.setText(currentMockUrl);
+    }
+
     private void updateConstants() {
         // Get the new values from EditText fields
         String newBaseUrl = editTextBaseUrl.getText().toString();
         String newMockUrl = editTextMockUrl.getText().toString();
 
-        // Update the constant values
-        Constant.baseUrl.BASE_URL = newBaseUrl;
-        Constant.baseUrl.MOCK_URL = newMockUrl;
+        // Update the constant values using ConstantsManager
+        ConstantsManager.setBaseUrl(this, newBaseUrl);
+        ConstantsManager.setMockUrl(this, newMockUrl);
 
-        // Save new values to SharedPreferences
- //       saveConstantsToSharedPreferences(newBaseUrl, newMockUrl);
+        // Log statements to check values
+        Log.d("ConstantsEditActivity", "Updated BaseUrl: " + newBaseUrl);
+        Log.d("ConstantsEditActivity", "Updated MockUrl: " + newMockUrl);
 
         // Finish the activity when save button is clicked
         finish();
     }
 
- //   private void saveConstantsToSharedPreferences(String baseUrl, String mockUrl) {
-        // Use SharedPreferences to store the constants persistently
-        // You can get the SharedPreferences instance and save the values here
-        // Example:
- //       SharedPreferences.Editor editor = getSharedPreferences("Constants", MODE_PRIVATE).edit();
- //       editor.putString("BASE_URL", baseUrl);
- //       editor.putString("MOCK_URL", mockUrl);
- //       editor.apply();
- //   }
+    protected void onResume() {
+        super.onResume();
+        // Log statement to check if onResume is called
+        Log.d("ConstantsEditActivity", "onResume called");
+    }
+
 
     private void navigateToLoginFragment() {
 

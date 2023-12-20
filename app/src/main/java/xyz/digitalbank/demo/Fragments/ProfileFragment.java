@@ -58,6 +58,7 @@ public class ProfileFragment extends Fragment {
     public int accountId ;
     private Spinner accountSpinner;
     public  AccountInfo selectedAccountInfo;
+    private Context context; // Declare the context variable
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -185,12 +186,16 @@ public class ProfileFragment extends Fragment {
     }
 
     public void updateProfileDetails() {
+        if (!isAdded()) {
+            // Fragment is not attached, handle accordingly
+            return;
+        }
         // Get the username and password for the initial authentication API call
         String username = "admin@demo.io";
         String adminpassword = "Demo123!";
 
         // Make the initial authentication API call to get the authToken
-        RetrofitClient.getServiceApi().authenticateUser(username, adminpassword)
+        RetrofitClient.getServiceApi(requireContext()).authenticateUser(username, adminpassword)
                 .enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -207,7 +212,8 @@ public class ProfileFragment extends Fragment {
                             String email = ((MainActivity) requireActivity()).getEmail();
 
 
-                            RetrofitClient.getServiceApi().findUserId(authToken, email )
+                            RetrofitClient.getServiceApi(requireContext()).findUserId(authToken, email)
+
                                     .enqueue(new Callback<UserResponse>() {
 
 
@@ -257,7 +263,7 @@ public class ProfileFragment extends Fragment {
     private void getUserProfile(String authToken, int loggedinuserId) {
         // Call the API to get user profile details using the obtained user ID
 
-        RetrofitClient.getServiceApi().getUserProfile(loggedinuserId , authToken )
+        RetrofitClient.getServiceApi(requireContext()).getUserProfile(loggedinuserId , authToken )
                 .enqueue(new Callback<UserProfileResponse>() {
                     @Override
                     public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
@@ -290,7 +296,7 @@ public class ProfileFragment extends Fragment {
         // Call the API to get user accounts using the obtained user ID
 
 
-        RetrofitClient.getServiceApi().getUserAccounts(loggedinuserId, authToken)
+        RetrofitClient.getServiceApi(requireContext()).getUserAccounts(loggedinuserId, authToken)
                 .enqueue(new Callback<List<UserAccountResponse>>() {
                     @Override
                     public void onResponse(Call<List<UserAccountResponse>> call, Response<List<UserAccountResponse>> response) {
@@ -430,7 +436,7 @@ public class ProfileFragment extends Fragment {
         }
     }
     private void getAndDisplayAccountTransactions(String authToken, int accountId) {
-        RetrofitClient.getServiceApi().getAccountTransactions(accountId, authToken)
+        RetrofitClient.getServiceApi(requireContext()).getAccountTransactions(accountId, authToken)
                 .enqueue(new Callback<List<TransactionResponse>>() {
                     @Override
                     public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {

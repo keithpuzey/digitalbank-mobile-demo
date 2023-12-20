@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import androidx.fragment.app.Fragment;
+
+import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.Model.UserAccountResponse;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.RetrofitClient;
@@ -52,7 +54,6 @@ import android.content.Context;
 
 
 
-
 public class TransferFragment extends Fragment {
 
     private List<UserAccountResponse> userAccounts = new ArrayList<>();
@@ -81,6 +82,8 @@ public class TransferFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 2; // Use any integer value you prefer
     private TessBaseAPI tessBaseAPI;
     private TesseractOCRAsyncTask ocrAsyncTask;
+    private Context context;  // Declare a context variable
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,7 +151,10 @@ public class TransferFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_transfer, container, false);
+        context = getContext();
 
+        String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
+        Log.e("Login", "BASE URL is = " + BASE_URL);
         FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
 
         View transferScreen = inflater.inflate(R.layout.your_transfer_screen_layout, transferContainer, false);
@@ -263,7 +269,7 @@ public class TransferFragment extends Fragment {
         private String dataPath;
         private String fileName;
 
-        private Context context;
+
 
     public class TesseractOCRAsyncTask extends AsyncTask<Bitmap, Void, String> {
 
@@ -387,7 +393,7 @@ public class TransferFragment extends Fragment {
 
     private void getUserAccounts(String authToken, int loggedinuserId) {
         // Call the API to get user accounts using the obtained user ID
-        RetrofitClient.getServiceApi().getUserAccounts(loggedinuserId, authToken)
+        RetrofitClient.getServiceApi(context).getUserAccounts(loggedinuserId, authToken)
                 .enqueue(new Callback<List<UserAccountResponse>>() {
                     @Override
                     public void onResponse(Call<List<UserAccountResponse>> call, Response<List<UserAccountResponse>> response) {
@@ -464,6 +470,7 @@ public class TransferFragment extends Fragment {
         // Log the contents of the depositRequest
         Log.d("TransferFragment", "transfer Funds Initiated - userId = " + userId + " AuthToken " + authToken + " Body = " + depositRequest.toString());
 
+        Context context = getContext();
         RetrofitClient.transferFunds(toAccountId, authToken, "application/json", depositRequest, isCredit, new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -484,7 +491,7 @@ public class TransferFragment extends Fragment {
                 // Example: Display an error message
                 // MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
             }
-        });
+        }, context);
     }
 
     // Call this method to update the user accounts in the TransferFragment

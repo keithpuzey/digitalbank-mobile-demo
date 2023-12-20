@@ -49,7 +49,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AlertDialog;
 import org.json.JSONArray;
 import java.io.IOException;
-
+import android.content.Context;
 
 
 
@@ -60,6 +60,7 @@ public class RegistrationFragment extends Fragment {
 
     private RadioButton maleRadioButton, femaleRadioButton;
 
+    private Context context;
 
     private Spinner titleSpinner;
     private EditText dobInput, ssnInput, addressInput, zipCodeInput , countryInput , localityInput , regionInput , homephoneInput, mobilephoneInput, workphoneInput ;
@@ -95,7 +96,8 @@ public class RegistrationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Initialize the context variable with the fragment's context
+        context = getContext();
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
         titleSpinner = view.findViewById(R.id.titleSpinner);
         FnameInput = view.findViewById(R.id.FnameInput);
@@ -284,7 +286,7 @@ public class RegistrationFragment extends Fragment {
         String adminpassword = "Demo123!";
 
         // Make the initial authentication API call to get the authToken
-        RetrofitClient.getServiceApi().authenticateUser(username, adminpassword)
+        RetrofitClient.getServiceApi(requireContext()).authenticateUser(username, adminpassword)
                 .enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -354,7 +356,7 @@ public class RegistrationFragment extends Fragment {
          Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString() );
 
         // Make the second API call to register the user details
-        RetrofitClient.getServiceApi().registerUser(authToken,  "application/json", ROLE, userRequest)
+        RetrofitClient.getServiceApi(requireContext()).registerUser(authToken,  "application/json", ROLE, userRequest)
                 .enqueue(new Callback<Void>() {
 
                     @Override
@@ -362,7 +364,7 @@ public class RegistrationFragment extends Fragment {
                         if (response.isSuccessful()) {
 
                             //  API call to find user by email and get user ID
-                            RetrofitClient.getServiceApi().findUserId(authToken, email)
+                            RetrofitClient.getServiceApi(context).findUserId(authToken, email)
                                     .enqueue(new Callback<UserResponse>() {
                                         @Override
                                         public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
@@ -485,7 +487,7 @@ public class RegistrationFragment extends Fragment {
 
     private void createUserData(String authToken, int userId) {
         // API call to create user data using the obtained ID
-        RetrofitClient.getServiceApi().createData(userId, authToken )
+        RetrofitClient.getServiceApi(context).createData(userId, authToken )
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

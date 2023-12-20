@@ -1,8 +1,8 @@
 package xyz.digitalbank.demo.Fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,27 +16,30 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.biometric.BiometricPrompt;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import java.io.IOException;
+import java.util.concurrent.Executor;
+
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Fragments.ConstantsEditActivity;
+import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.Model.User;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
-import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
-import java.util.concurrent.Executor;
-import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import android.widget.ImageButton;
-import android.widget.Toast;
-import java.io.IOException;
+import xyz.digitalbank.demo.Services.ServiceApi;
+
 
 @RequiresApi(api = Build.VERSION_CODES.P)
 
@@ -48,6 +51,7 @@ public class LoginFragment extends Fragment {
     private ImageButton biometricBtn ;
     private ServiceApi serviceApi;
     private static final int REQUEST_BIOMETRIC_PERMISSION = 1;
+    private Context context; // Declare the context variable
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -67,11 +71,14 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        context = getContext();
+        String BASE_URL = ConstantsManager.getBaseUrl(context);
+        Log.e("Login", "BASE URL is = " + BASE_URL);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         // Initialize the ServiceApi instance
-        serviceApi = RetrofitClient.getRetrofitInstance().create(ServiceApi.class);
+        serviceApi = RetrofitClient.getRetrofitInstance(context).create(ServiceApi.class);
 
         // for login
         emailInput = view.findViewById(R.id.emailInput);
@@ -254,6 +261,7 @@ public class LoginFragment extends Fragment {
                         Log.d("Login", " Login API Being Called");
 
                         myInterface.login(response.body().getAuthToken(), Email);
+
                     } else {
                         // Login failed
                         MainActivity.appPreference.showToast("Error. Login Failed");
@@ -261,6 +269,7 @@ public class LoginFragment extends Fragment {
                         passwordInput.setText("");
                     }
                 }
+
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
@@ -270,10 +279,27 @@ public class LoginFragment extends Fragment {
                     if (t instanceof IOException) {
                         // This exception is thrown for network-related issues
                         showToast("Server is not available. Please check your internet connection.");
+                    } else if (t instanceof HttpException) {
+                        // This exception is thrown for HTTP error responses
+                        HttpException httpException = (HttpException) t;
+                        Response<?> response = httpException.response();
+                        if (response != null && response.errorBody() != null) {
+                            try {
+                                String errorBody = response.errorBody().string();
+                                Log.e("Login", "Error response: " + errorBody);
+                                // Handle the errorBody as needed
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            showToast("Error during login. Please try again.");
+                        }
                     } else {
                         showToast("Error during login. Please try again.");
                     }
                 }
+
+
             });
         }
     }

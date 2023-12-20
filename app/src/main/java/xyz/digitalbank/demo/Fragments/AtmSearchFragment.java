@@ -36,12 +36,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import xyz.digitalbank.demo.Constants.Constant;
+import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.util.Log;
 import android.view.View;
+import android.content.Context;
+
 
 
 
@@ -51,10 +54,15 @@ public class AtmSearchFragment extends Fragment {
 
     private View view;
 
+    private Context context;  // Declare a context variable
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.atm_search, container, false);
+        context = getContext();
+        String MOCK_URL = ConstantsManager.getMockUrl(requireContext());
+
 
         // Check and request location permission if not granted
         if (ActivityCompat.checkSelfPermission(requireContext(),
@@ -114,7 +122,7 @@ public class AtmSearchFragment extends Fragment {
                                 // Log the location information
                                 double latitude = location.getLatitude();
                                 double longitude = location.getLongitude();
-                                String apiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                                String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
                                 Log.d("GPS", "URL =  " + apiUrl );
                                 // Perform network request on a separate thread
                                 new Thread(() -> {
@@ -269,7 +277,7 @@ public class AtmSearchFragment extends Fragment {
 
     private void getDetailsForIpAddress(String ipAddress) {
         // URL for the second API
-        String secondApiUrl = Constant.baseUrl.MOCK_URL + "ip?ip=" + ipAddress;
+        String secondApiUrl = ConstantsManager.getMockUrl(requireContext()) + "ip?ip=" + ipAddress;
 
         // Perform the second network request on a separate thread
         new Thread(() -> {
@@ -317,7 +325,7 @@ public class AtmSearchFragment extends Fragment {
                     connection.disconnect();
 
                     // Third request to another API using the latitude and longitude
-                    String gpsApiUrl = Constant.baseUrl.MOCK_URL + "gps?type=atm&lat=" + lat + "&lon=" + lon;
+                    String gpsApiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + lat + "&lon=" + lon;
                     Log.d("Coordinates", "Debug: " + gpsApiUrl);
                     new Thread(() -> {
                         try {
@@ -425,7 +433,7 @@ public class AtmSearchFragment extends Fragment {
 
     private void performCustomRequest(String userInput) {
         // Construct the URL with the user input
-        String apiUrl = Constant.baseUrl.MOCK_URL + "zip?zipcode=" + userInput;
+        String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "zip?zipcode=" + userInput;
 
         // Perform network request on a separate thread
         new Thread(() -> {
