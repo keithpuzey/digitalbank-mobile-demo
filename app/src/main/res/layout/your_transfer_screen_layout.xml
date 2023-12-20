@@ -14,7 +14,8 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Accounts for Deposit" />
 
     <!-- Account Spinner -->
     <Spinner
@@ -22,7 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:prompt="@string/select_account" />
+        android:prompt="@string/select_account"
+        android:contentDescription="Drop down of available accounts" />
 
     <!-- Header: Deposit Amount -->
     <TextView
@@ -31,7 +33,8 @@
         android:text="Deposit Amount"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Amount to be Deposited" />
 
     <!-- Amount EditText -->
     <EditText
@@ -40,7 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="@string/enter_amount"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:contentDescription="Enter amount to deposit" />
 
     <TextView
         android:layout_width="match_parent"
@@ -48,7 +52,8 @@
         android:text="Description"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Description of Deposit"  />
 
     <!-- Description EditText -->
     <EditText
@@ -56,7 +61,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="Enter description" />
+        android:hint="Enter description"
+        android:contentDescription="Enter description of deposit" />
 
     <TextView
         android:layout_width="match_parent"
@@ -78,13 +84,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Credit"
-            android:checked="true" />
+            android:checked="true"
+            android:contentDescription="Select for Credit" />
 
         <RadioButton
             android:id="@+id/debitRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Debit"  />
+            android:text="Debit"
+            android:contentDescription="Select for Debit" />
 
     </RadioGroup>
 
@@ -100,7 +108,8 @@
             android:id="@+id/submitButton"
             android:layout_width="178dp"
             android:layout_height="wrap_content"
-            android:text="@string/submit" />
+            android:text="@string/submit"
+            android:contentDescription="Submit Button" />
 
         <TextView
             android:layout_width="match_parent"
@@ -109,7 +118,8 @@
             android:clickable="true"
             android:gravity="center"
             android:text="Deposit Cheque"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/colorPrimary"
+            android:contentDescription="Cheque Feature coming soon" />
         <ImageView
             android:id="@+id/cameraIcon"
             android:layout_width="match_parent"

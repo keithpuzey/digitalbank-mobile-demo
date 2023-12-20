@@ -25,7 +25,8 @@
         android:text="Create a new account"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
-        android:gravity="center_horizontal"/>
+        android:gravity="center_horizontal"
+        android:contentDescription="Create a new account" />
 
     <Spinner
         android:id="@+id/titleSpinner"
@@ -33,7 +34,8 @@
         android:layout_height="wrap_content"
         android:entries="@array/title_options"
         android:prompt="@string/select_title"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:contentDescription="Select Title"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -41,7 +43,7 @@
         android:hint="First Name"
         android:id="@+id/FnameInput"
         android:layout_marginTop="30dp"
-        />
+        android:contentDescription="Enter First Name" />
 
     <EditText
         android:layout_width="match_parent"
@@ -49,7 +51,8 @@
         android:hint="Last Name"
         android:id="@+id/LnameInput"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="26dp" />
+        android:layout_marginBottom="26dp"
+        android:contentDescription="Enter Last Name" />
 
     <RadioGroup
         android:id="@+id/genderRadioGroup"
@@ -62,13 +65,15 @@
             android:id="@+id/maleRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Male"/>
+            android:text="Male"
+            android:contentDescription="Select Male Gender" />
 
         <RadioButton
             android:id="@+id/femaleRadioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Female"/>
+            android:text="Female"
+            android:contentDescription="Select Female Gender" />
     </RadioGroup>
 
     <EditText
@@ -77,7 +82,8 @@
         android:layout_height="wrap_content"
         android:hint="Date of Birth"
         android:inputType="date"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:contentDescription="Date of Birth" />
 
     <EditText
         android:id="@+id/ssnInput"
@@ -87,7 +93,8 @@
         android:inputType="number"
         android:layout_marginTop="16dp"
         android:digits="0123456789"
-        android:maxLength="9" />/>
+        android:maxLength="9"
+        android:contentDescription="Social Security Number" />
 
     <EditText
         android:layout_width="match_parent"
@@ -95,7 +102,8 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:id="@+id/emailInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:contentDescription="Email Address" />
 
     <EditText
         android:layout_width="match_parent"
@@ -103,21 +111,24 @@
         android:hint="Password"
         android:inputType="textPassword"
         android:id="@+id/passwordInput"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:contentDescription="Enter Password" />
 
     <EditText
         android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Address"/>
+        android:hint="Address"
+        android:contentDescription="Enter Address" />
 
     <EditText
         android:id="@+id/regionInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Region" />
+        android:hint="Region"
+        android:contentDescription="Enter Region" />
 
     <EditText
         android:id="@+id/localityInput"
@@ -131,7 +142,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Postal Code"/>
+        android:hint="Postal Code"
+        android:contentDescription="Enter PostCode" />
 
 
     <EditText
@@ -139,7 +151,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Country" />
+        android:hint="Country"
+        android:contentDescription="Enter Country" />
 
     <EditText
         android:layout_width="match_parent"
@@ -149,7 +162,8 @@
         android:id="@+id/homephoneInput"
         android:layout_marginTop="16dp"
         android:digits="0123456789"
-        android:maxLength="10" />
+        android:maxLength="10"
+        android:contentDescription="Enter Home Phone" />
 
 
     <EditText
@@ -160,7 +174,8 @@
         android:id="@+id/mobilephoneInput"
         android:layout_marginTop="16dp"
         android:digits="0123456789"
-        android:maxLength="10" />
+        android:maxLength="10"
+        android:contentDescription="Enter Mobile Phone" />
 
     <EditText
         android:layout_width="match_parent"
@@ -170,14 +185,16 @@
         android:id="@+id/workphoneInput"
         android:layout_marginTop="16dp"
         android:digits="0123456789"
-        android:maxLength="10" />
+        android:maxLength="10"
+        android:contentDescription="Enter Work Phone" />
 
     <CheckBox
         android:id="@+id/agreeCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Agree to Terms and Conditions"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:contentDescription="Accept Terms and Conditions"/>
 
 
     <Button
@@ -189,7 +206,8 @@
         android:textColor="#fff"
         android:textSize="16sp"
         android:background="@color/colorPrimary"
-        android:enabled="true" />
+        android:enabled="true"
+        android:contentDescription="Register Button" />
 
 
     <Button
@@ -201,7 +219,8 @@
         android:textColor="#fff"
         android:textSize="16sp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="200dp" />
+        android:layout_marginBottom="200dp"
+        android:contentDescription="Cancel Button" />
 
 </LinearLayout>
 

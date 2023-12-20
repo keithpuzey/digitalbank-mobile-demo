@@ -9,21 +9,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:contentDescription="Description field" />
 
     <TextView
         android:id="@+id/amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:contentDescription="Amount field" />
 
     <TextView
         android:id="@+id/runningBalance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:contentDescription="Running Balance" />
 
     <TextView
         android:id="@+id/transactionDate"
@@ -37,5 +40,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:contentDescription="Transaction Date" />
 </LinearLayout>

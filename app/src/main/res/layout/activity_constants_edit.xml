@@ -23,7 +23,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/textViewConstant1"
                     android:layout_marginTop="16dp"
-                    android:text="BASE_URL: YourBaseURLHere" />
+                    android:text="BASE_URL: YourBaseURLHere"
+                    android:contentDescription="Enter Digital Bank URL" />
 
 
 
@@ -41,7 +42,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/textViewConstant2"
                     android:layout_marginTop="16dp"
-                    android:text="MOCK_URL: YourMockURLHere" />
+                    android:text="MOCK_URL: YourMockURLHere"
+                    android:contentDescription="Enter URL for ATM Mock Service " />
 
                 <Button
                     android:id="@+id/cancelBtn"
@@ -52,7 +54,8 @@
                     android:text="Cancel"
                     android:textAllCaps="false"
                     android:textColor="#fff"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:contentDescription="Cancel" />
 
                 <Button
                     android:id="@+id/saveBtn"
@@ -63,8 +66,7 @@
                     android:text="Save"
                     android:textAllCaps="false"
                     android:textColor="#fff"
-                    android:textSize="16sp" />
-
-
+                    android:textSize="16sp"
+                    android:contentDescription="Save" />
 
 </RelativeLayout>

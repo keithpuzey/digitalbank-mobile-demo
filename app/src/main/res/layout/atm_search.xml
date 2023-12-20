@@ -17,7 +17,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="ATM Location - GPS" />
+        android:text="ATM Location - GPS"
+        android:contentDescription="Location by GPS" />
 
     <!-- TextView to display the response -->
 
@@ -28,7 +29,8 @@
         android:layout_below="@id/action_atm_search"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="ATM Location - Network" />
+        android:text="ATM Location - Network"
+        android:contentDescription="Location by IP Address" />
 
     <!-- Button for custom text input -->
     <Button
@@ -38,7 +40,8 @@
         android:layout_below="@id/action_get_ip"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Search by Zip Code" />
+        android:text="Search by Zip Code"
+        android:contentDescription="Search by Zip code" />
 
     <!-- TableLayout for displaying information -->
 

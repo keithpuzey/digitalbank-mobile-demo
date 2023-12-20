@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Welcome"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:contentDescription="Welcome" />
 
    <!-- FrameLayout to overlay credit card image and text -->
     <FrameLayout
@@ -50,7 +51,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:contentDescription="Logged in user Name" />
 
             <TextView
                 android:id="@+id/ceditcardText"
@@ -59,21 +61,23 @@
                 android:gravity="center"
                 android:text="Account Summary"
                 android:textSize="16sp"
-                android:layout_marginTop="80dp" />
+                android:layout_marginTop="80dp"
+                android:contentDescription="Account Summary" />
             <TextView
                 android:id="@+id/accountName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:contentDescription="Selected Account Name" />
 
             <TextView
                 android:id="@+id/balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:contentDescription="Selected Account Balance" />
         </LinearLayout>
     </FrameLayout>
 
@@ -124,7 +128,5 @@
         android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
         app:menu="@menu/bottom_navigation_menu" />
-
-
 
 </RelativeLayout>

@@ -3,20 +3,24 @@
     <item
         android:id="@+id/action_check_accounts"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="My Accounts" />
+        android:title="My Accounts"
+        android:contentDescription="My Accounts" />
 
     <item
         android:id="@+id/action_transfer"
         android:icon="@android:drawable/ic_menu_send"
-        android:title="Deposit" />
+        android:title="Deposit"
+        android:contentDescription="Deposit" />
 
     <item
         android:id="@+id/action_atm_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="ATM's NearMe" />
+        android:title="ATM's NearMe"
+        android:contentDescription="ATM's Near Me" />
 
     <item
         android:id="@+id/action_logout"
         android:icon="@android:drawable/ic_lock_power_off"
-        android:title="Logout" />
+        android:title="Logout"
+        android:contentDescription="Logout" />
 </menu>
