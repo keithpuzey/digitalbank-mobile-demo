@@ -57,6 +57,11 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         serviceApi = RetrofitClient.getRetrofitInstance(this).create(ServiceApi.class);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        // Ensure it stays at the bottom
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomNavigationView.getLayoutParams();
+        layoutParams.gravity = Gravity.BOTTOM;
+
+        
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.action_check_accounts) {
