@@ -5,7 +5,13 @@
         android:icon="@android:drawable/ic_menu_view"
         android:title="My Accounts"
         android:contentDescription="My Accounts" />
+    <item
+        android:id="@+id/action_check_accounts"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Dashboard"
+        android:contentDescription="DashBoard" />
 
+    
     <item
         android:id="@+id/action_transfer"
         android:icon="@android:drawable/ic_menu_send"
