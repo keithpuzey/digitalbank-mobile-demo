@@ -218,14 +218,15 @@ public class AtmSearchFragment extends Fragment {
 
     private void getIpAddress() {
         // URL for the IP address API
-        String ipApiUrl = "https://api.ipify.org/?format=json";
-
+    //    String ipApiUrl = "https://api.ipify.org/?format=json";
+        String ipApiUrl = " https://api.seeip.org/jsonip?";
         // Perform network request on a separate thread
         new Thread(() -> {
             try {
                 URL url = new URL(ipApiUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+                Log.d("IpResponse", "Connection String : " + connection);
 
                 // Read the response
                 InputStream inputStream = connection.getInputStream();
@@ -233,6 +234,7 @@ public class AtmSearchFragment extends Fragment {
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
+                    Log.d("IpResponse", "Process Response : " + bufferedReader.readLine());
                     response.append(line);
                 }
 

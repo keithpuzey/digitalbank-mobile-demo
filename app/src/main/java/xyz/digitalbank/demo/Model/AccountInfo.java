@@ -24,6 +24,8 @@ public class AccountInfo {
         return accountName;
     }
 
+
+
     public double getCurrentBalance() {
         return currentBalance;
     }
@@ -35,8 +37,6 @@ public class AccountInfo {
     public String getDisplayName() {
         return accountName + " - " + currentBalance;
     }
-
-    // Override the toString method to return the display name
     @Override
     public String toString() {
         return getDisplayName();

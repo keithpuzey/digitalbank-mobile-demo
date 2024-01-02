@@ -13,6 +13,7 @@
     <string name="select_account">Select Account</string>
     <string name="enter_amount">Enter Amount</string>
     <string name="submit">Submit</string>
+    <string name="s_pref_loggedin_user_id">loggedin_user_id</string>
 
 
 

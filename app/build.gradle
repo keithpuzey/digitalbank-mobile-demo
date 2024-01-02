@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.opencsv:opencsv:5.6'
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.rmtheis:tess-two:9.1.0'
-
-
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
+    implementation 'com.github.AnyChart:AnyChart-Android:1.1.5'
 
 }

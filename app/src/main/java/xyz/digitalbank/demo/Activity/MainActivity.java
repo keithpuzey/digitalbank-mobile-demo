@@ -3,6 +3,7 @@ package xyz.digitalbank.demo.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import xyz.digitalbank.demo.Extras.AppPreference;
+import xyz.digitalbank.demo.Fragments.DashboardFragment;
 import xyz.digitalbank.demo.Fragments.LoginFragment;
 import xyz.digitalbank.demo.Fragments.ProfileFragment;
 import xyz.digitalbank.demo.Fragments.RegistrationFragment;
@@ -19,6 +20,11 @@ import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Fragments.AtmSearchFragment;
 import xyz.digitalbank.demo.Fragments.TransferFragment;
 import android.content.Context;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
 
 
 public class MainActivity extends AppCompatActivity implements MyInterface {
@@ -57,11 +63,21 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         serviceApi = RetrofitClient.getRetrofitInstance(this).create(ServiceApi.class);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        // Ensure it stays at the bottom
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomNavigationView.getLayoutParams();
-        layoutParams.gravity = Gravity.BOTTOM;
 
-        
+        // Ensure it stays at the bottom
+
+        ViewGroup.LayoutParams layoutParams = bottomNavigationView.getLayoutParams();
+
+        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+            CoordinatorLayout.LayoutParams coordinatorLayoutParams = (CoordinatorLayout.LayoutParams) layoutParams;
+            coordinatorLayoutParams.gravity = Gravity.BOTTOM;
+        } else if (layoutParams instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams frameLayoutParams = (FrameLayout.LayoutParams) layoutParams;
+            frameLayoutParams.gravity = Gravity.BOTTOM;
+        }
+
+
+
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.action_check_accounts) {
@@ -70,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
                             .replace(R.id.fragment_container, new ProfileFragment())
                             .commit();
                 }
+                return true;
+            } else if (itemId == R.id.action_dashboard) {
+                Log.d("MainActivity", "Switching to Dashboard");
+                switchToDashboardFragment();
                 return true;
             } else if (itemId == R.id.action_transfer) {
                 Log.d("MainActivity", "Switching to TransferFragment");
@@ -137,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, profileFragment) // Use the created instance
+                .replace(R.id.fragment_container, profileFragment)
                 .commit();
 
         profileFragment.updateProfileDetails();
@@ -181,6 +201,14 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         Log.d("MainActivity", "Switching to TransferFragment");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new TransferFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void switchToDashboardFragment() {
+        Log.d("MainActivity", "Switching to DashBoardFragment");
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new DashboardFragment())
                 .addToBackStack(null)
                 .commit();
     }

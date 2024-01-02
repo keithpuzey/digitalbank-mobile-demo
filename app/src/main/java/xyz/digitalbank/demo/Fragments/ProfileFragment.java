@@ -41,6 +41,7 @@ import com.google.gson.Gson;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.graphics.Color;
+import xyz.digitalbank.demo.Extras.AppPreference;
 
 
 public class ProfileFragment extends Fragment {
@@ -50,6 +51,7 @@ public class ProfileFragment extends Fragment {
 
     private List<AccountInfo> accountInfoList = new ArrayList<>();
 
+    private AppPreference appPreference;
 
     private List<UserAccountResponse> userAccounts;
 
@@ -74,7 +76,8 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         Log.d("ProfileFragment", "onCreateView");
-        // Retrieve authToken from SharedPreferences
+        appPreference = new AppPreference(requireContext());
+
         authToken = MainActivity.appPreference.getauthToken();
 
 
@@ -94,6 +97,10 @@ public class ProfileFragment extends Fragment {
             if (itemId == R.id.action_check_accounts) {
                 // Switch to the ProfileFragment
                 switchToProfileFragment();
+                return true;
+            } else if (itemId == R.id.action_dashboard) {
+                // Handle the TransferFragment click
+                // Add your logic here
                 return true;
             } else if (itemId == R.id.action_transfer) {
                 // Handle the TransferFragment click
@@ -231,6 +238,8 @@ public class ProfileFragment extends Fragment {
                                                 Log.d("API", "Logged in user ID = : " + loggedinuserId );
 
                                                 ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
+                                                appPreference.setLoggedinuserId(loggedinuserId);
+
                                                 // Call the API to get user profile details using the obtained user ID
                                                 getUserProfile(authToken, loggedinuserId);
                                             } else {
@@ -274,7 +283,6 @@ public class ProfileFragment extends Fragment {
                             // Set the loggedinuserId in MainActivity
                             ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
                             // Call the API to get user accounts using the obtained user ID
-
                             getUserAccounts(authToken, loggedinuserId);
 
                         } else {

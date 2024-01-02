@@ -2,31 +2,32 @@
 
     <item
         android:id="@+id/action_check_accounts"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/outline_home_24"
         android:title="My Accounts"
         android:contentDescription="My Accounts" />
-    <item
-        android:id="@+id/action_check_accounts"
-        android:icon="@android:drawable/ic_menu_view"
-        android:title="Dashboard"
-        android:contentDescription="DashBoard" />
 
-    
+    <item
+        android:id="@+id/action_dashboard"
+        android:icon="@drawable/outline_bar_chart_20"
+        android:title="My Dashboard"
+        android:contentDescription="My DashBoard" />
+
+
     <item
         android:id="@+id/action_transfer"
-        android:icon="@android:drawable/ic_menu_send"
-        android:title="Deposit"
+        android:icon="@drawable/outline_savings_24"
+        android:title="Deposit's"
         android:contentDescription="Deposit" />
 
     <item
         android:id="@+id/action_atm_search"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/outline_travel_explore_24"
         android:title="ATM's NearMe"
         android:contentDescription="ATM's Near Me" />
 
     <item
         android:id="@+id/action_logout"
-        android:icon="@android:drawable/ic_lock_power_off"
+        android:icon="@drawable/outline_logout_24"
         android:title="Logout"
         android:contentDescription="Logout" />
 </menu>

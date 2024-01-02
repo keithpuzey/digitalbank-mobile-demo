@@ -1,0 +1,27 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/account_balance_summary_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Account Balance Summary Chart"
+        android:text="Account Balance Summary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.anychart.AnyChartView
+        android:id="@+id/Any_chart_view"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/account_balance_summary_text">
+
+    </com.anychart.AnyChartView>
+
+
+</RelativeLayout>
+

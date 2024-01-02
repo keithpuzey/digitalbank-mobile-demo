@@ -54,6 +54,17 @@ public class AppPreference {
         return sharedPreferences.getString(String.valueOf(R.string.s_pref_email), "email");
     }
 
+    // For logged-in user ID
+    public void setLoggedinuserId(int userId) {
+        editor.putInt(String.valueOf(R.string.s_pref_loggedin_user_id), userId);
+        editor.apply();
+    }
+
+    public int getLoggedinuserId() {
+        return sharedPreferences.getInt(String.valueOf(R.string.s_pref_loggedin_user_id), -1);
+        // -1 is a default value in case the key is not found
+    }
+
     //For email
     public void setCreDate(String date){
         editor.putString(String.valueOf(R.string.s_pref_date), date);
