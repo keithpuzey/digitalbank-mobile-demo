@@ -27,8 +27,10 @@ import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
 import com.anychart.core.cartesian.series.Column;
+import com.anychart.core.cartesian.series.Bar;
 import com.anychart.AnyChart;
-import java.util.Random;
+import android.widget.ProgressBar;
+
 
 
 public class DashboardFragment extends Fragment {
@@ -39,6 +41,8 @@ public class DashboardFragment extends Fragment {
 
     private String authToken;
     private int loggedinuserId;
+
+    private ProgressBar progressBar;
 
     private AnyChartView anyChartView;
 
@@ -55,9 +59,8 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.your_dashboard_layout, container, false);
 
-// Initialize AnyChartView only once
         anyChartView = view.findViewById(R.id.Any_chart_view);
-
+        progressBar = view.findViewById(R.id.progressBar);
         context = getContext();
 
         // Retrieve authToken from SharedPreferences
@@ -71,16 +74,16 @@ public class DashboardFragment extends Fragment {
 
             String email = MainActivity.appPreference.getDisplayEmail();
 
-        String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
-        Log.e("Login", "BASE URL is = " + BASE_URL);
-    //    FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
+            String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
+            Log.e("Login", "BASE URL is = " + BASE_URL);
+            //    FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
 
 
 
-    //    View transferScreen = inflater.inflate(R.layout.your_dashboard_layout, transferContainer, false);
+            //    View transferScreen = inflater.inflate(R.layout.your_dashboard_layout, transferContainer, false);
 
-        // Call the method to get user accounts and update the chart
-        getUserAccounts(authToken, loggedinuserId);
+            // Call the method to get user accounts and update the chart
+            getUserAccounts(authToken, loggedinuserId);
 
         } else {
             // User is not logged in, handle accordingly
@@ -155,44 +158,35 @@ public class DashboardFragment extends Fragment {
             @Override
             public void run() {
                 // Create a Cartesian chart
-                Cartesian cartesian = AnyChart.column();
+                Cartesian cartesian = AnyChart.bar();
+
+                // Show the ProgressBar
+                progressBar.setVisibility(View.VISIBLE);
 
                 // Create data entries for the chart
                 List<DataEntry> data = new ArrayList<>();
                 for (AccountInfo accountInfo : accountInfoList) {
                     data.add(new ValueDataEntry(accountInfo.getAccountName(), accountInfo.getCurrentBalance()));
-
                 }
+                // Hide the ProgressBar
+                progressBar.setVisibility(View.GONE);
 
                 // Check if anyChartView is not null before setting the chart
                 if (anyChartView != null) {
                     // Add the data entries to the chart
-                    Column column = cartesian.column(data);
+                    Bar bar = cartesian.bar(data);
                     // Customize the tooltip to show the values on top of each column
-                    column.tooltip().format("{%Value}");
-
-                  anyChartView.setChart(cartesian);
-
+                    bar.tooltip().format("{%Value}");
+                    anyChartView.setChart(cartesian);
                     anyChartView.setVisibility(View.VISIBLE);
                     Log.d("DashboardFragment", "AnyChartView visibility after setting chart: " + anyChartView.getVisibility());
                 } else {
                     Log.e("DashboardFragment", "anyChartView is null. Cannot set the chart.");
                 }
 
-
-               anyChartView.setChart(cartesian);
-
-                anyChartView.setVisibility(View.VISIBLE);
-
             }
-
         });
-
     }
 
 
-    // Call this method to update the user accounts in the TransferFragment
-    public void updateUserAccounts(List<UserAccountResponse> accounts) {
-        userAccounts = accounts;
-    }
 }

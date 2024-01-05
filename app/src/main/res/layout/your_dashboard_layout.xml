@@ -1,5 +1,5 @@
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,18 +10,32 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="16dp"
         android:contentDescription="Account Balance Summary Chart"
-        android:text="Account Balance Summary"
+        android:text="  Account Balance Summary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <com.anychart.AnyChartView
-        android:id="@+id/Any_chart_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_below="@id/account_balance_summary_text">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/account_balance_summary_text">
 
-    </com.anychart.AnyChartView>
+
+        <com.anychart.AnyChartView
+            android:id="@+id/Any_chart_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <!-- ProgressBar for loading indicator -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+
+    </FrameLayout>
 
 
 </RelativeLayout>
-

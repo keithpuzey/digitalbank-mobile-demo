@@ -9,8 +9,16 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".atm_search">
 
-    <!-- Button for ATM search -->
-    <Button
+
+    <RelativeLayout
+        android:id="@+id/atm_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp">
+
+    <ImageButton
         android:id="@+id/action_atm_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,32 +26,68 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="ATM Location - GPS"
+        android:src="@drawable/outline_gps_fixed_24"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="Location by GPS" />
+        <!-- TextView below the ImageButton -->
+        <TextView
+            android:id="@+id/atmSearchLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/action_atm_search"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="ATM Location - GPS"
+            android:textColor="?android:attr/textColorPrimary" />
 
-    <!-- TextView to display the response -->
 
-    <Button
+    <ImageButton
         android:id="@+id/action_get_ip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/action_atm_search"
+        android:layout_below="@+id/atmSearchLabel"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="ATM Location - Network"
+        android:src="@drawable/outline_cell_tower_24"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="Location by IP Address" />
 
-    <!-- Button for custom text input -->
-    <Button
+        <!-- TextView below the ImageButton -->
+        <TextView
+            android:id="@+id/atmSearchnetwork"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/action_get_ip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="ATM Location - Network"
+            android:textColor="?android:attr/textColorPrimary" />
+
+
+    <ImageButton
         android:id="@+id/action_custom_request"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/action_get_ip"
+        android:layout_below="@+id/atmSearchnetwork"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Search by Zip Code"
+        android:src="@drawable/outline_search_24"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="Search by Zip code" />
 
-    <!-- TableLayout for displaying information -->
+        <!-- TextView below the ImageButton -->
+        <TextView
+            android:id="@+id/atmSearchzip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/action_custom_request"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="Search by Zip Code"
+            android:textColor="?android:attr/textColorPrimary" />
+    </RelativeLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -53,13 +97,24 @@
     android:background="?android:attr/windowBackground"
     app:menu="@menu/bottom_navigation_menu" />
 
-    <TextView
-        android:id="@+id/responseTextView"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/action_custom_request"
+        android:layout_below="@+id/atm_buttons"
         android:layout_marginTop="32dp"
         android:layout_centerHorizontal="true"
-        android:text="" />
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <TextView
+            android:id="@+id/responseTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:padding="16dp"
+            android:textColor="?android:attr/textColorPrimary" />
+
+    </androidx.cardview.widget.CardView>
+
 
 </RelativeLayout>

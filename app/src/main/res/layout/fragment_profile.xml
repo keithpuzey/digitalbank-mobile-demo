@@ -87,38 +87,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="My Accounts"
+        android:text="Select Account :"
         android:textSize="16sp"
         android:layout_below="@id/creditCardContainer"
         android:layout_marginTop="16dp" />
 
-    <!-- Spinner -->
-    <Spinner
-        android:id="@+id/accountSpinner"
+    <!-- Wrap the Spinner with CardView -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/accountSpinnercard"
+        android:layout_margin="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
         android:layout_below="@id/selectAccountText"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp">
 
-    <!-- Transaction List -->
-    <FrameLayout
-        android:id="@+id/profile_fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="217dp"
-        android:layout_below="@id/accountSpinner"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp"
-        android:layout_weight="1">
-
-        <!-- TableLayout for Transactions -->
-        <TableLayout
-            android:id="@+id/tableLayout"
+        <Spinner
+            android:id="@+id/accountSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profile_fragment_container"
-            android:layout_marginTop="16dp"></TableLayout>
+            android:padding="8dp"/>
+    </androidx.cardview.widget.CardView>
 
-    </FrameLayout>
+    <!-- Transaction List -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profile_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_below="@+id/accountSpinnercard"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+            <!-- TableLayout for Transactions -->
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profile_fragment_container"
+                android:layout_marginTop="16dp"></TableLayout>
+
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+
 
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import xyz.digitalbank.demo.R;
 import androidx.annotation.NonNull;
@@ -58,11 +59,11 @@ public class atm_search extends AppCompatActivity {
         }
 
         // Find the "ATM Search" button by its ID
-        Button atmSearchButton = findViewById(R.id.action_atm_search);
+        ImageButton atmSearchButton = findViewById(R.id.action_atm_search);
         // Find the "Get IP Address" button by its ID
-        Button getIpButton = findViewById(R.id.action_get_ip);
+        ImageButton getIpButton = findViewById(R.id.action_get_ip);
         // Find the "Custom Request" button by its ID
-        Button customRequestButton = findViewById(R.id.action_custom_request);
+        ImageButton customRequestButton = findViewById(R.id.action_custom_request);
 
 
 

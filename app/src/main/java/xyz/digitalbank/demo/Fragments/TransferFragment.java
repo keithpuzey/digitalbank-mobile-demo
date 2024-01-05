@@ -90,7 +90,7 @@ public class TransferFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Initialize TessBaseAPI with your language data
-        String dataPath = requireActivity().getFilesDir().getPath();
+        String dataPath = requireActivity().getFilesDir().getAbsolutePath();
         String tessDataPath = dataPath + "/tessdata/";
         String fileName = "eng.traineddata";
 
@@ -143,6 +143,12 @@ public class TransferFragment extends Fragment {
         }
 
         tessBaseAPI = new TessBaseAPI();
+        if (!tessBaseAPI.init(dataPath, "eng")) {
+            Log.e("TesseractOCR", "Tesseract initialization failed");
+        } else {
+            Log.d("TesseractOCR", "Tesseract initialization successful");
+        }
+
         ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
 
     }
@@ -207,9 +213,7 @@ public class TransferFragment extends Fragment {
             // Check if the camera permission is granted
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 // Open the camera
-                // dispatchTakePictureIntent();
-                // Display a message indicating that the feature is coming soon
-                Toast.makeText(requireContext(), "This feature is coming soon!", Toast.LENGTH_SHORT).show();
+                dispatchTakePictureIntent();
             } else {
                 // Request camera permission
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
@@ -235,8 +239,6 @@ public class TransferFragment extends Fragment {
         Log.e("Camera", "No camera activity found");
             Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show();
 
-            // Handle the case where no camera activity is available
-        // You might want to show a message to the user or take alternative action
     }
     }
 
@@ -254,15 +256,7 @@ public class TransferFragment extends Fragment {
 
     private void performOCR(Bitmap imageBitmap) {
         Log.d("OCR", "Starting OCR task");
-        String fileName = "eng.traineddata";
-        ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
-
-
-        TesseractOCRAsyncTask ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
-
         ocrAsyncTask.execute(imageBitmap);
-        Log.d("OCR", "OCR task executed");
-
     }
 
 
@@ -290,6 +284,7 @@ public class TransferFragment extends Fragment {
         }
 
 
+
         @Override
         protected String doInBackground(Bitmap... bitmaps) {
             Log.d("OCR", "Inside doInBackground");
@@ -302,8 +297,7 @@ public class TransferFragment extends Fragment {
             TessBaseAPI tessBaseAPI = new TessBaseAPI();
             if (!tessBaseAPI.init(context.getFilesDir().getPath(), "eng", TessBaseAPI.OEM_TESSERACT_ONLY)) {
                 Log.e("TesseractOCR", "Tesseract initialization failed");
-            } else {
-                Log.d("TesseractOCR", "Tesseract initialization successful");
+                return null;
             }
 
             // Set the image for OCR
@@ -319,23 +313,31 @@ public class TransferFragment extends Fragment {
             return extractedText;
         }
 
+
         protected void onPostExecute(String extractedText) {
             // Display a toast message with the extracted text
-            Toast.makeText(context, "OCR completed. Extracted Text: " + extractedText, Toast.LENGTH_SHORT).show();
+            if (!isCancelled()) {
+                Toast.makeText(context, "OCR completed. Extracted Text: " + extractedText, Toast.LENGTH_SHORT).show();
 
-            // Populate description field with extracted information
-            descriptionEditText.setText(extractedText);
+                // Populate description field with extracted information
+                descriptionEditText.setText(extractedText);
 
-            // You can perform additional actions here based on the extracted text
-            Log.d("TesseractOCR", "Extracted Text: " + extractedText);
+                // You can perform additional actions here based on the extracted text
+                Log.d("TesseractOCR", "Extracted Text: " + extractedText);
+            } else {
+                // Handle cancellation
+                Log.d("OCR", "OCR task canceled");
+            }
         }
+
+
 
         protected void onCancelled() {
             // Display a toast message indicating that OCR is canceled
             Toast.makeText(context, "OCR canceled", Toast.LENGTH_SHORT).show();
         }
 
-   
+
         private void initializeTesseract() {
             String tessDataPath = dataPath + "/tessdata/";
             String fileName = "eng.traineddata";
@@ -349,7 +351,7 @@ public class TransferFragment extends Fragment {
 
             // Initialize Tesseract with the correct tessDataPath
             tessBaseAPI = new TessBaseAPI();
-            if (!tessBaseAPI.init(dataPath, "eng")) {
+            if (!tessBaseAPI.init(tessDataFolder.getAbsolutePath(), "eng")) {
                 Log.e("TesseractOCR", "Tesseract initialization failed");
             } else {
                 Log.d("TesseractOCR", "Tesseract initialization successful");
@@ -357,23 +359,8 @@ public class TransferFragment extends Fragment {
 
             // Set the tessdata path explicitly
             tessBaseAPI.setDebug(true);
-
-            try {
-                // Initialize Tesseract with the correct trained data file path
-                tessBaseAPI.init(dataPath, "eng");
-                tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_AUTO_OSD);
-                tessBaseAPI.setDebug(true);
-
-                if (!tessBaseAPI.init(dataPath, "eng")) {
-                    Log.e("TesseractOCR", "Tesseract initialization failed");
-                } else {
-                    Log.d("TesseractOCR", "Tesseract initialization successful");
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+
 
     }
 

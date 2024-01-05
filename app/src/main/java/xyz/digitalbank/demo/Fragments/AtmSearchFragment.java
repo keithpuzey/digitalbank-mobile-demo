@@ -44,6 +44,7 @@ import android.view.Gravity;
 import android.util.Log;
 import android.view.View;
 import android.content.Context;
+import android.widget.ImageButton;
 
 
 
@@ -77,9 +78,9 @@ public class AtmSearchFragment extends Fragment {
 
 
         // Find buttons
-        Button atmSearchButton = view.findViewById(R.id.action_atm_search);
-        Button getIpButton = view.findViewById(R.id.action_get_ip);
-        Button customRequestButton = view.findViewById(R.id.action_custom_request);
+        ImageButton atmSearchButton = view.findViewById(R.id.action_atm_search);
+        ImageButton getIpButton = view.findViewById(R.id.action_get_ip);
+        ImageButton customRequestButton = view.findViewById(R.id.action_custom_request);
 
         // Set click listeners
         atmSearchButton.setOnClickListener(v -> handleAtmSearchButtonClick());
