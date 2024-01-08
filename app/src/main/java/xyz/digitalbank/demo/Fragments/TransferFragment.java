@@ -79,10 +79,12 @@ public class TransferFragment extends Fragment {
         // Required empty public constructor
     }
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_CAMERA_PERMISSION = 2; // Use any integer value you prefer
+    private static final int REQUEST_CAMERA_PERMISSION = 2;
     private TessBaseAPI tessBaseAPI;
     private TesseractOCRAsyncTask ocrAsyncTask;
     private Context context;  // Declare a context variable
+
+    private boolean isOCRInitialized = false;
 
 
     @Override
@@ -150,7 +152,8 @@ public class TransferFragment extends Fragment {
         }
 
         ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
-
+        // Initialize TessBaseAPI with your language data only when needed
+        isOCRInitialized = false;
     }
 
 
@@ -213,13 +216,18 @@ public class TransferFragment extends Fragment {
             // Check if the camera permission is granted
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 // Open the camera
-                dispatchTakePictureIntent();
+               //  dispatchTakePictureIntent();
+                // Initialize OCR if not already done
+                //if (!isOCRInitialized) {
+                //    initializeOCR();
+                //    isOCRInitialized = true;
+               // }
+                Toast.makeText(requireContext(), "Feature in Development", Toast.LENGTH_SHORT).show();
             } else {
                 // Request camera permission
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             }
         });
-
 
         transferContainer.addView(transferScreen);
 
@@ -256,7 +264,12 @@ public class TransferFragment extends Fragment {
 
     private void performOCR(Bitmap imageBitmap) {
         Log.d("OCR", "Starting OCR task");
-        ocrAsyncTask.execute(imageBitmap);
+        if (isOCRInitialized) {
+            ocrAsyncTask.execute(imageBitmap);
+        } else {
+            Log.e("OCR", "OCR not initialized");
+            // Handle the case where OCR is not initialized
+        }
     }
 
 
@@ -292,7 +305,7 @@ public class TransferFragment extends Fragment {
             Bitmap imageBitmap = bitmaps[0];
 
             // Initialize Tesseract with the correct tessDataPath using AssetManager
-            initializeTesseract();
+            initializeOCR();
 
             TessBaseAPI tessBaseAPI = new TessBaseAPI();
             if (!tessBaseAPI.init(context.getFilesDir().getPath(), "eng", TessBaseAPI.OEM_TESSERACT_ONLY)) {
@@ -338,7 +351,7 @@ public class TransferFragment extends Fragment {
         }
 
 
-        private void initializeTesseract() {
+        private void initializeOCR() {
             String tessDataPath = dataPath + "/tessdata/";
             String fileName = "eng.traineddata";
             String trainedDataFilePath = tessDataPath + fileName;
@@ -433,7 +446,10 @@ public class TransferFragment extends Fragment {
 
 
 
-
+    private void initializeOCR() {
+        // Initialize TessBaseAPI with the correct tessDataPath using AssetManager
+        // ... (existing code for OCR initialization)
+    }
 
 
 

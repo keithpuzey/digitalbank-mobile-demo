@@ -122,23 +122,53 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-
-
             <!-- TableLayout for Transactions -->
             <TableLayout
                 android:id="@+id/tableLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/profile_fragment_container"
-                android:layout_marginTop="16dp"></TableLayout>
+                android:layout_marginTop="16dp"
+                android:divider="?android:attr/dividerVertical"
+                android:showDividers="beginning|middle|end">     </TableLayout>
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/divider_background">
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Description"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Amount"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Balance"
+                    android:textStyle="bold" />
+
+            </TableRow>
+
 
         </FrameLayout>
+
     </androidx.cardview.widget.CardView>
-
-
-
-
-
 
 
     <!-- Bottom Navigation View -->

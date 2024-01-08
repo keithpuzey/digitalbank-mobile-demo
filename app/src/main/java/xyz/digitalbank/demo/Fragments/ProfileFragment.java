@@ -42,6 +42,8 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.graphics.Color;
 import xyz.digitalbank.demo.Extras.AppPreference;
+import androidx.core.content.ContextCompat;
+
 
 
 public class ProfileFragment extends Fragment {
@@ -467,8 +469,14 @@ public class ProfileFragment extends Fragment {
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
-        // Clear existing rows in the TableLayout
+        // Clear existing rows in the TableLayouttableLayout.setDividerDrawable
         tableLayout.removeAllViews();
+
+        // Set divider drawable for columns
+      //  tableLayout.setDividerDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.table_divider));
+        tableLayout.setDividerDrawable(getResources().getDrawable(R.drawable.table_divider));
+
+
 
         // Loop through the transactions and add new rows to the TableLayout
         int count = Math.min(accountTransactions.size(), 40);
