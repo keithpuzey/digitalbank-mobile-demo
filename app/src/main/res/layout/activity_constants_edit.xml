@@ -69,4 +69,13 @@
                     android:textSize="16sp"
                     android:contentDescription="Save" />
 
+        <EditText
+            android:id="@+id/ConfigDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/saveBtn"
+            android:layout_marginTop="16dp"
+            android:text=" The configuration screen is only required when using a custom Digital Bank host / Mock service. These settings do not normally need to be changed."
+            android:contentDescription="Note:  The configuration screen can be used to use a custom Digital Bank host and or Mock service. These settings do not normally need to be changed." />
+
 </RelativeLayout>

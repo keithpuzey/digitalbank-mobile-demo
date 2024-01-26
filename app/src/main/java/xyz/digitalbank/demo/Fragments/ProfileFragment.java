@@ -469,14 +469,11 @@ public class ProfileFragment extends Fragment {
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
-        // Clear existing rows in the TableLayouttableLayout.setDividerDrawable
+        // Clear existing rows in the TableLayout
         tableLayout.removeAllViews();
 
         // Set divider drawable for columns
-      //  tableLayout.setDividerDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.table_divider));
         tableLayout.setDividerDrawable(getResources().getDrawable(R.drawable.table_divider));
-
-
 
         // Loop through the transactions and add new rows to the TableLayout
         int count = Math.min(accountTransactions.size(), 40);
@@ -489,24 +486,27 @@ public class ProfileFragment extends Fragment {
             // Create TextViews to display the transaction details
             TextView descriptionTextView = new TextView(requireContext());
             descriptionTextView.setText(transaction.getDescription());
-            setTextViewAttributes(descriptionTextView);
+            setTextViewAttributes(descriptionTextView, 60, Gravity.START); // Left-justified
+            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView amountTextView = new TextView(requireContext());
             String amountValue = String.valueOf(transaction.getAmount());
             amountTextView.setText(amountValue);
-            // Set text color to red if the amount is negative
+            // Set text color to green if the amount is negative
             if (transaction.getAmount() < 0) {
-                amountTextView.setTextColor(Color.RED);
+                amountTextView.setTextColor(Color.GREEN);
             }
-            setTextViewAttributes(amountTextView);
+            setTextViewAttributes(amountTextView, 20, Gravity.CENTER);
+            amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
-            // Set text color to red if the running balance is negative
+            // Set text color to green if the running balance is negative
             if (transaction.getRunningBalance() < 0) {
-                runningBalanceTextView.setTextColor(Color.RED);
+                runningBalanceTextView.setTextColor(Color.GREEN);
             }
-            setTextViewAttributes(runningBalanceTextView);
+            setTextViewAttributes(runningBalanceTextView, 20, Gravity.CENTER);
+            runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             // Add TextViews to the TableRow
             row.addView(descriptionTextView);
@@ -518,15 +518,18 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void setTextViewAttributes(TextView textView) {
+
+
+    private void setTextViewAttributes(TextView textView, int weight, int gravity) {
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
                 0,
                 TableRow.LayoutParams.WRAP_CONTENT,
-                1.0f
+                weight
         );
+        layoutParams.gravity = gravity;
         textView.setLayoutParams(layoutParams);
-        textView.setGravity(Gravity.CENTER);
     }
+
 
 
     private void switchToProfileFragment() {
