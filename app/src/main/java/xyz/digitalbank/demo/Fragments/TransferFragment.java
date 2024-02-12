@@ -1,253 +1,208 @@
 package xyz.digitalbank.demo.Fragments;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
+import android.text.TextWatcher;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import android.text.Editable;
 
-import xyz.digitalbank.demo.Constants.ConstantsManager;
-import xyz.digitalbank.demo.Model.UserAccountResponse;
-import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.RetrofitClient;
-import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Model.DepositRequest;
+import com.google.gson.Gson;
+import com.googlecode.tesseract.android.TessBaseAPI;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.Model.AccountInfo;
-import java.util.ArrayList;
-import java.util.List;
-import android.text.TextUtils;
-import android.widget.Toast;
-import android.widget.CheckBox;
-
-import com.google.gson.Gson;
-
-import android.widget.RadioGroup;
-import android.widget.RadioButton;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.widget.ImageView;
-import android.Manifest;
-import androidx.core.content.ContextCompat;
-import android.content.pm.PackageManager;
-import android.provider.MediaStore;
-import androidx.core.app.ActivityCompat;
-import android.app.Activity;
-import com.googlecode.tesseract.android.TessBaseAPI;
-import android.os.AsyncTask;
-import java.io.File;
-import android.content.res.AssetManager;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import android.content.Context;
-
-
-
-
+import xyz.digitalbank.demo.Model.DepositRequest;
+import xyz.digitalbank.demo.Model.UserAccountResponse;
+import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Services.RetrofitClient;
 public class TransferFragment extends Fragment {
+
+    private ArrayAdapter<AccountInfo> adapter;
 
     private List<UserAccountResponse> userAccounts = new ArrayList<>();
 
-    private ArrayAdapter<AccountInfo> adapter;
     private List<AccountInfo> accountInfoList = new ArrayList<>();
-
-    private CheckBox creditDebitCheckBox;
-
+    private Spinner accountSpinner;
+    private EditText descriptionEditText;
     private String authToken;
     private int loggedinuserId;
+    private TessBaseAPI tessBaseAPI;
+    private TesseractOCRAsyncTask ocrAsyncTask;
+    private Context context;
+    private boolean isOCRInitialized = false;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CAMERA_PERMISSION = 2;
 
-    private Spinner accountSpinner;
-
-    private int selectedAccountId;
-
+    private EditText amountEditText;
     private RadioGroup transactionTypeRadioGroup;
     private RadioButton creditRadioButton;
     private RadioButton debitRadioButton;
-    private Button submitButton;
-    private EditText descriptionEditText;
-    public TransferFragment() {
-        // Required empty public constructor
+    private static final String TAG = TransferFragment.class.getSimpleName();
+
+    private boolean isValidAmount(String amountStr) {
+        try {
+            double amount = Double.parseDouble(amountStr);
+            return amount >= 0; // Assuming negative amounts are not allowed
+        } catch (NumberFormatException e) {
+            return false; // Parsing failed, so it's not a valid amount
+        }
     }
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_CAMERA_PERMISSION = 2;
-    private TessBaseAPI tessBaseAPI;
-    private TesseractOCRAsyncTask ocrAsyncTask;
-    private Context context;  // Declare a context variable
-
-    private boolean isOCRInitialized = false;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize TessBaseAPI with your language data
-        String dataPath = requireActivity().getFilesDir().getAbsolutePath();
-        String tessDataPath = dataPath + "/tessdata/";
-        String fileName = "eng.traineddata";
+        context = getContext();
 
-        // Log the data paths for debugging
-        Log.d("TesseractOCR", "Data Path: " + dataPath);
-        Log.d("TesseractOCR", "TessData Path: " + tessDataPath);
-
-
-        File tessDataFolder = new File(tessDataPath);
-        if (!tessDataFolder.exists()) {
-            tessDataFolder.mkdirs();
-        }
-
-        File trainedDataFile = new File(tessDataPath + fileName);
-
-        if (!trainedDataFile.exists()) {
-            try (InputStream in = requireActivity().getAssets().open("tessdata/" + fileName);
-                 OutputStream out = new FileOutputStream(trainedDataFile)) {
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, read);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Log.d("TesseractOCR", "Data Path: " + dataPath);
-        Log.d("TesseractOCR", "TessData Path: " + tessDataPath);
-        Log.d("TesseractOCR", "TrainedData File Path: " + trainedDataFile.getAbsolutePath());
-
-
-        AssetManager assetManager = requireActivity().getAssets();
-        InputStream inputStream = null;
-
-        try {
-            inputStream = assetManager.open("tessdata/eng.traineddata");
-            // Use the inputStream as needed
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        tessBaseAPI = new TessBaseAPI();
-        if (!tessBaseAPI.init(dataPath, "eng")) {
-            Log.e("TesseractOCR", "Tesseract initialization failed");
-        } else {
-            Log.d("TesseractOCR", "Tesseract initialization successful");
-        }
-
-        ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
-        // Initialize TessBaseAPI with your language data only when needed
-        isOCRInitialized = false;
+        // Set Tesseract debug level and redirect logging output
+        setTesseractDebugLevel(3); // Set the desired debug level
+        redirectTesseractLogging();
+        // Initialize OCR asynchronously
+        new InitOCRAsyncTask().execute();
     }
 
+    // Method to set Tesseract debug level
+    private void setTesseractDebugLevel(int level) {
+        try {
+            // Set the environment variable
+            Process process = Runtime.getRuntime().exec("setprop TESSDATA_DEBUG " + level);
+            process.waitFor();
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting Tesseract debug level: " + e.getMessage());
+        }
+    }
+
+    // Method to redirect Tesseract logging output to a file
+    private void redirectTesseractLogging() {
+        try {
+            // Define the log file path
+            File logFile = new File(getContext().getFilesDir(), "tesseract.log");
+
+            // Redirect System.out and System.err to the log file
+            OutputStream outputStream = new FileOutputStream(logFile);
+            System.setOut(new PrintStream(outputStream));
+            System.setErr(new PrintStream(outputStream));
+        } catch (IOException e) {
+            Log.e(TAG, "Error redirecting Tesseract logging: " + e.getMessage());
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_transfer, container, false);
-        context = getContext();
-
-        String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
-        Log.e("Login", "BASE URL is = " + BASE_URL);
-        FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
-
-        View transferScreen = inflater.inflate(R.layout.your_transfer_screen_layout, transferContainer, false);
+        View view = inflater.inflate(R.layout.your_transfer_screen_layout, container, false);
+        amountEditText = view.findViewById(R.id.amountEditText);
+        accountSpinner = view.findViewById(R.id.accountSpinner);
+        descriptionEditText = view.findViewById(R.id.descriptionEditText);
+        Button submitButton = view.findViewById(R.id.submitButton);
+        ImageView cameraIcon = view.findViewById(R.id.cameraIcon);
 
         // Get references to UI elements in your transfer screen layout
-        accountSpinner = transferScreen.findViewById(R.id.accountSpinner);
-        EditText amountEditText = transferScreen.findViewById(R.id.amountEditText);
-        descriptionEditText = transferScreen.findViewById(R.id.descriptionEditText);
-        transactionTypeRadioGroup = transferScreen.findViewById(R.id.transactionTypeRadioGroup);
-        creditRadioButton = transferScreen.findViewById(R.id.creditRadioButton);
-        debitRadioButton = transferScreen.findViewById(R.id.debitRadioButton);
-        submitButton = transferScreen.findViewById(R.id.submitButton);
 
 
+        transactionTypeRadioGroup = view.findViewById(R.id.transactionTypeRadioGroup);
+        creditRadioButton = view.findViewById(R.id.creditRadioButton);
+        debitRadioButton = view.findViewById(R.id.debitRadioButton);
 
-        // Set up the account spinner with account data
+
         setupAccountSpinner(accountSpinner);
 
-        // Set up click listener for the submit button
+        // Add a TextWatcher to validate input in amountEditText
+        amountEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Validate input after text is changed
+                String amountStr = s.toString();
+                if (!isValidAmount(amountStr)) {
+                    // Clear the text and show a message
+                    Toast.makeText(requireContext(), "Please enter a valid amount", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         submitButton.setOnClickListener(v -> {
             // Get selected account, entered amount, and credit/debit selection
             AccountInfo selectedAccount = (AccountInfo) accountSpinner.getSelectedItem();
-            selectedAccountId = selectedAccount.getId();
+            int selectedAccountId = selectedAccount.getId();
             loggedinuserId = ((MainActivity) requireActivity()).getLoggedinuserId();
             authToken = MainActivity.appPreference.getauthToken();
             String amountStr = amountEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
-            // Get the selected transaction type (credit/debit)
             boolean isCredit = creditRadioButton.isChecked();
-            ocrAsyncTask = new TesseractOCRAsyncTask(requireContext(), dataPath, fileName);
-
-
 
             // Validate and parse the amount
             if (!TextUtils.isEmpty(amountStr)) {
                 double amount = Double.parseDouble(amountStr);
-                Log.d("TransferFragment", "Submit Button Clicked - Logged in user  " + loggedinuserId + " Amount = " + amount + " Select Account ID = " + selectedAccount.getId());
-                // Call the transferFunds API
-                transferFunds(loggedinuserId, authToken, Double.parseDouble(amountStr), selectedAccountId, isCredit, description);
-
+                transferFunds(loggedinuserId, authToken, amount, selectedAccountId, isCredit, description);
             } else {
-                // Handle case where amount is empty
-                // Example: Display an error message
                 Toast.makeText(requireContext(), "Please enter a valid amount", Toast.LENGTH_SHORT).show();
             }
         });
 
-        ImageView cameraIcon = transferScreen.findViewById(R.id.cameraIcon);
         cameraIcon.setOnClickListener(v -> {
-            // Check if the camera permission is granted
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                // Open the camera
-               //  dispatchTakePictureIntent();
-                // Initialize OCR if not already done
-                //if (!isOCRInitialized) {
-                //    initializeOCR();
-                //    isOCRInitialized = true;
-               // }
-                Toast.makeText(requireContext(), "Feature in Development", Toast.LENGTH_SHORT).show();
+                dispatchTakePictureIntent();
             } else {
-                // Request camera permission
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             }
         });
-
-        transferContainer.addView(transferScreen);
 
         return view;
     }
 
     private void dispatchTakePictureIntent() {
-        Log.d("Camera", "dispatchTakePictureIntent called");
-
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Log.d("Camera", "resolveActivity: " + takePictureIntent.resolveActivity(requireContext().getPackageManager()));
-
         if (takePictureIntent.resolveActivity(requireContext().getPackageManager()) != null) {
-            Log.d("Camera", "Starting camera activity");
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }    else {
-        Log.e("Camera", "No camera activity found");
+        } else {
             Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show();
-
-    }
+        }
     }
 
     @Override
@@ -256,125 +211,47 @@ public class TransferFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-            // Process the captured image and extract information using Tesseract OCR
             performOCR(imageBitmap);
         }
     }
 
     private void performOCR(Bitmap imageBitmap) {
-        Log.d("OCR", "Starting OCR task");
         if (isOCRInitialized) {
+            ocrAsyncTask = new TesseractOCRAsyncTask(requireContext());
             ocrAsyncTask.execute(imageBitmap);
         } else {
-            Log.e("OCR", "OCR not initialized");
-            // Handle the case where OCR is not initialized
+            Toast.makeText(context, "OCR engine is not initialized", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-        private String dataPath;
-        private String fileName;
-
-
-
-    public class TesseractOCRAsyncTask extends AsyncTask<Bitmap, Void, String> {
-
-        private Context context;
-        private String dataPath;
-        private String fileName;
-
-        public TesseractOCRAsyncTask(Context context, String dataPath, String fileName) {
-            this.context = context;
-            this.dataPath = dataPath;
-            this.fileName = fileName;
+    private void initializeOCR() {
+        tessBaseAPI = new TessBaseAPI();
+        String dataPath = requireActivity().getFilesDir().getAbsolutePath();
+        String lang = "eng";
+        String tessDataPath = dataPath + "/tessdata/";
+        File tessDataFolder = new File(tessDataPath);
+        if (!tessDataFolder.exists()) {
+            tessDataFolder.mkdirs();
         }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Display a toast message indicating that OCR is starting
-            Toast.makeText(context, "OCR is starting...", Toast.LENGTH_SHORT).show();
-        }
+        AssetManager assetManager = context.getAssets();
+        try {
+            InputStream inputStream = assetManager.open("tessdata/eng.traineddata");
+            OutputStream outputStream = new FileOutputStream(new File(context.getFilesDir() + "/tessdata/", "eng.traineddata"));
 
-
-
-        @Override
-        protected String doInBackground(Bitmap... bitmaps) {
-            Log.d("OCR", "Inside doInBackground");
-
-            Bitmap imageBitmap = bitmaps[0];
-
-            // Initialize Tesseract with the correct tessDataPath using AssetManager
-            initializeOCR();
-
-            TessBaseAPI tessBaseAPI = new TessBaseAPI();
-            if (!tessBaseAPI.init(context.getFilesDir().getPath(), "eng", TessBaseAPI.OEM_TESSERACT_ONLY)) {
-                Log.e("TesseractOCR", "Tesseract initialization failed");
-                return null;
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
             }
 
-            // Set the image for OCR
-            tessBaseAPI.setImage(imageBitmap);
-
-            // Get the extracted text
-            String extractedText = tessBaseAPI.getUTF8Text();
-
-            // End OCR and release resources
-            tessBaseAPI.end();
-            Log.d("OCR", "OCR task completed. Extracted Text: " + extractedText);
-
-            return extractedText;
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-
-        protected void onPostExecute(String extractedText) {
-            // Display a toast message with the extracted text
-            if (!isCancelled()) {
-                Toast.makeText(context, "OCR completed. Extracted Text: " + extractedText, Toast.LENGTH_SHORT).show();
-
-                // Populate description field with extracted information
-                descriptionEditText.setText(extractedText);
-
-                // You can perform additional actions here based on the extracted text
-                Log.d("TesseractOCR", "Extracted Text: " + extractedText);
-            } else {
-                // Handle cancellation
-                Log.d("OCR", "OCR task canceled");
-            }
-        }
-
-
-
-        protected void onCancelled() {
-            // Display a toast message indicating that OCR is canceled
-            Toast.makeText(context, "OCR canceled", Toast.LENGTH_SHORT).show();
-        }
-
-
-        private void initializeOCR() {
-            String tessDataPath = dataPath + "/tessdata/";
-            String fileName = "eng.traineddata";
-            String trainedDataFilePath = tessDataPath + fileName;
-
-            // Ensure the tessDataPath exists
-            File tessDataFolder = new File(tessDataPath);
-            if (!tessDataFolder.exists()) {
-                tessDataFolder.mkdirs(); // Create the directory if it doesn't exist
-            }
-
-            // Initialize Tesseract with the correct tessDataPath
-            tessBaseAPI = new TessBaseAPI();
-            if (!tessBaseAPI.init(tessDataFolder.getAbsolutePath(), "eng")) {
-                Log.e("TesseractOCR", "Tesseract initialization failed");
-            } else {
-                Log.d("TesseractOCR", "Tesseract initialization successful");
-            }
-
-            // Set the tessdata path explicitly
-            tessBaseAPI.setDebug(true);
-        }
-
-
+        tessBaseAPI.init(dataPath, lang);
+        isOCRInitialized = true;
     }
 
     private void setupAccountSpinner(Spinner accountSpinner) {
@@ -403,7 +280,7 @@ public class TransferFragment extends Fragment {
                             displayUserAccounts(userAccounts, accountSpinner);
                         } else {
                             // Handle the case where the API call was not successful
-                            // MainActivity.appPreference.showToast("Failed to retrieve user accounts");
+                            MainActivity.appPreference.showToast("Failed to retrieve user accounts");
                         }
                     }
 
@@ -443,16 +320,6 @@ public class TransferFragment extends Fragment {
         // Log the exit point of the method
         Log.d("TransferFragment", "Exiting setupAccountSpinner");
     }
-
-
-
-    private void initializeOCR() {
-        // Initialize TessBaseAPI with the correct tessDataPath using AssetManager
-        // ... (existing code for OCR initialization)
-    }
-
-
-
 
     private void transferFunds(int userId, String authToken, double amount, int toAccountId, boolean isCredit, String description) {
         // Create a DepositRequest object
@@ -500,5 +367,134 @@ public class TransferFragment extends Fragment {
     // Call this method to update the user accounts in the TransferFragment
     public void updateUserAccounts(List<UserAccountResponse> accounts) {
         userAccounts = accounts;
+    }
+
+    private class InitOCRAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Copy traineddata file in background
+            copyTrainedData();
+            // Initialize OCR engine
+            initializeOCR();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(context, "Cheque Reader Ready", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void copyTrainedData() {
+        AssetManager assetManager = context.getAssets();
+        try {
+            InputStream inputStream = assetManager.open("tessdata/eng.traineddata");
+            OutputStream outputStream = new FileOutputStream(new File(context.getFilesDir() + "/tessdata/", "eng.traineddata"));
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class TesseractOCRAsyncTask extends AsyncTask<Bitmap, Void, Pair<String, String>> {
+
+        private Context context;
+
+        public TesseractOCRAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        private void saveBitmapToStorage(Bitmap bitmap, String fileName) {
+            File file = new File(context.getExternalFilesDir(null), fileName);
+            try {
+                FileOutputStream outputStream = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        @Override
+        protected Pair<String, String> doInBackground(Bitmap... bitmaps) {
+            Bitmap imageBitmap = bitmaps[0];
+            // Get image dimensions
+            int width = imageBitmap.getWidth();
+            int height = imageBitmap.getHeight();
+
+            Log.d("OCR", "Height =" + height);
+            Log.d("OCR", "Width =" + width);
+            // Define regions of interest (ROIs)
+            Rect amountROI = new Rect((int) (width * 2 / 3), 0, width, height);
+            Rect descriptionROI = new Rect(0, 0, (int) (width / 3), height);
+
+            // Crop the image to extract text from ROIs
+            Bitmap amountBitmap = Bitmap.createBitmap(imageBitmap, amountROI.left, amountROI.top, amountROI.width(), amountROI.height());
+            Bitmap descriptionBitmap = Bitmap.createBitmap(imageBitmap, descriptionROI.left, descriptionROI.top, descriptionROI.width(), descriptionROI.height());
+
+            // Save the cropped images to the device's storage
+            saveBitmapToStorage(amountBitmap, "amount_bitmap.jpg");
+            saveBitmapToStorage(descriptionBitmap, "description_bitmap.jpg");
+
+
+            // Initialize OCR for amount and description separately
+            TessBaseAPI amountTessBaseAPI = new TessBaseAPI();
+            TessBaseAPI descriptionTessBaseAPI = new TessBaseAPI();
+
+            // Set language for OCR
+            amountTessBaseAPI.init(context.getFilesDir().getAbsolutePath(), "eng");
+            descriptionTessBaseAPI.init(context.getFilesDir().getAbsolutePath(), "eng");
+
+            // Set images for OCR
+            amountTessBaseAPI.setImage(amountBitmap);
+            descriptionTessBaseAPI.setImage(descriptionBitmap);
+
+            // Perform OCR on ROIs
+            String amountText = amountTessBaseAPI.getUTF8Text();
+            String descriptionText = descriptionTessBaseAPI.getUTF8Text();
+
+            // Release resources
+            amountTessBaseAPI.end();
+            descriptionTessBaseAPI.end();
+
+            return new Pair<>(amountText, descriptionText);
+        }
+
+        private boolean isValidAmount(String amountStr) {
+            if (TextUtils.isEmpty(amountStr)) {
+                return true; // Allow empty input
+            }
+            try {
+                double amount = Double.parseDouble(amountStr);
+                return amount >= 0; // Ensure amount is non-negative
+            } catch (NumberFormatException e) {
+                return false; // Not a valid numeric value
+            }
+        }
+        @Override
+        protected void onPostExecute(Pair<String, String> result) {
+            super.onPostExecute(result);
+            String amountText = result.first;
+            String descriptionText = result.second;
+            if (!TextUtils.isEmpty(amountText) && !TextUtils.isEmpty(descriptionText)) {
+                // Handle extracted text
+                amountEditText.setText(amountText.trim());
+                descriptionEditText.setText(descriptionText.trim());
+            } else {
+                // Show a message indicating no data was found
+                Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

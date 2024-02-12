@@ -93,6 +93,10 @@ public class LoginFragment extends Fragment {
         });
         biometricBtn = view.findViewById(R.id.biometricBtn);
 
+        // Prepopulate the username and password fields
+        emailInput.setText("jsmith@demo.io");
+        passwordInput.setText("Demo123!");
+
 
         registerTV = view.findViewById(R.id.registerTV);
         registerTV.setOnClickListener(new View.OnClickListener() {
