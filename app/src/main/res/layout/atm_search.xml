@@ -8,8 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".atm_search">
-
-
     <RelativeLayout
         android:id="@+id/atm_buttons"
         android:layout_width="match_parent"
@@ -18,76 +16,127 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp">
 
-    <ImageButton
-        android:id="@+id/action_atm_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="ATM Location - GPS"
-        android:src="@drawable/outline_gps_fixed_24"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Location by GPS" />
-        <!-- TextView below the ImageButton -->
-        <TextView
-            android:id="@+id/atmSearchLabel"
-            android:layout_width="wrap_content"
+        <!-- ATM Location - GPS -->
+
+        <View
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/atm_location_gps"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/black"/>
+
+        <LinearLayout
+            android:id="@+id/atm_location_gps"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/action_atm_search"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="ATM Location - GPS"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp">
+
+            <ImageButton
+                android:id="@+id/action_atm_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_gps_fixed_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Location by GPS" />
+
+            <TextView
+                android:id="@+id/atmSearchLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ATM Location - GPS"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginStart="24dp"
+                android:gravity="center_vertical" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/atm_location_network"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/black"/>
 
 
-    <ImageButton
-        android:id="@+id/action_get_ip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/atmSearchLabel"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="ATM Location - Network"
-        android:src="@drawable/outline_cell_tower_24"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Location by IP Address" />
-
-        <!-- TextView below the ImageButton -->
-        <TextView
-            android:id="@+id/atmSearchnetwork"
-            android:layout_width="wrap_content"
+        <!-- ATM Location - Network -->
+        <LinearLayout
+            android:id="@+id/atm_location_network"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/action_get_ip"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="ATM Location - Network"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:orientation="horizontal"
+            android:layout_below="@id/atm_location_gps"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp">
+
+            <ImageButton
+                android:id="@+id/action_get_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_cell_tower_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Location by IP Address" />
+
+            <TextView
+                android:id="@+id/atmSearchnetwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ATM Location - Network"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginStart="24dp"
+                android:gravity="center_vertical" />
+            <!-- Line below ATM Location - Network -->
 
 
-    <ImageButton
-        android:id="@+id/action_custom_request"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/atmSearchnetwork"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Search by Zip Code"
-        android:src="@drawable/outline_search_24"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Search by Zip code" />
+        </LinearLayout>
 
-        <!-- TextView below the ImageButton -->
-        <TextView
-            android:id="@+id/atmSearchzip"
-            android:layout_width="wrap_content"
+        <!-- Search by Zip Code -->
+        <LinearLayout
+            android:id="@+id/search_by_zip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/action_custom_request"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="Search by Zip Code"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:orientation="horizontal"
+            android:layout_below="@id/atm_location_network"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp">
+
+
+            <ImageButton
+                android:id="@+id/action_custom_request"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_search_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Search by Zip code" />
+
+            <TextView
+                android:id="@+id/atmSearchzip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Search by Zip Code"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginStart="24dp"
+                android:gravity="center_vertical" />
+
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/search_by_zip"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/black"/>
+
+
     </RelativeLayout>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

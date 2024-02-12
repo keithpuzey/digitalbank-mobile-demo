@@ -443,9 +443,6 @@ public class TransferFragment extends Fragment {
             Bitmap amountBitmap = Bitmap.createBitmap(imageBitmap, amountROI.left, amountROI.top, amountROI.width(), amountROI.height());
             Bitmap descriptionBitmap = Bitmap.createBitmap(imageBitmap, descriptionROI.left, descriptionROI.top, descriptionROI.width(), descriptionROI.height());
 
-            // Save the cropped images to the device's storage
-            saveBitmapToStorage(amountBitmap, "amount_bitmap.jpg");
-            saveBitmapToStorage(descriptionBitmap, "description_bitmap.jpg");
 
 
             // Initialize OCR for amount and description separately

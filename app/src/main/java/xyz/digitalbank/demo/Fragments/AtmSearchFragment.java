@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -57,6 +58,7 @@ public class AtmSearchFragment extends Fragment {
 
     private Context context;  // Declare a context variable
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -76,6 +78,11 @@ public class AtmSearchFragment extends Fragment {
             getLocationAndMakeRequest();
         }
 
+        LinearLayout searchByZipLayout = view.findViewById(R.id.search_by_zip);
+
+
+        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
+
 
         // Find buttons
         ImageButton atmSearchButton = view.findViewById(R.id.action_atm_search);
@@ -87,6 +94,22 @@ public class AtmSearchFragment extends Fragment {
         getIpButton.setOnClickListener(v -> getIpAddress());
         customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
 
+
+        LinearLayout atmLocationGPSLayout = view.findViewById(R.id.atm_location_gps);
+        LinearLayout atmLocationNetworkLayout = view.findViewById(R.id.atm_location_network);
+
+        // Set click listener
+        atmLocationNetworkLayout.setOnClickListener(v -> handleAtmLocationNetworkClick());
+        getIpButton.setOnClickListener(v -> handleAtmSearchButtonClick());
+
+        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
+        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
+
+        customRequestButton.setOnClickListener(v -> handleSearchByZipCodeClick());
+        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
+
+
+
         return view;
     }
 
@@ -95,6 +118,22 @@ public class AtmSearchFragment extends Fragment {
         Log.d("ClickAction", "ATM Search Button Clicked!");
         Log.d("ClickAction", "ATM Search Button Clicked at " + System.currentTimeMillis());
         getLocationAndMakeRequest();
+    }
+    private void handleAtmLocationGPSClick() {
+        // Your implementation here
+        // This method will be called when the ATM Location - GPS layout is clicked
+        getLocationAndMakeRequest();
+    }
+
+    private void handleSearchByZipCodeClick() {
+        // Your implementation here
+        showCustomRequestDialog();
+    }
+
+
+    private void handleAtmLocationNetworkClick() {
+        // Your implementation here
+        getIpAddress();
     }
 
 
@@ -511,7 +550,7 @@ public class AtmSearchFragment extends Fragment {
                         if (responseCode == 404) {
                             // Handle the case when the resource is not found (ZIP code not found)
                             responseTextView.setText("ZIP code not found.");
-                            responseTextView.setTextColor(Color.YELLOW);
+                            responseTextView.setTextColor(Color.GRAY);
                             responseTextView.setGravity(Gravity.CENTER);
                             responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 
