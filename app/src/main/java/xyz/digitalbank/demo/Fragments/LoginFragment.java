@@ -2,6 +2,7 @@ package xyz.digitalbank.demo.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,6 +57,8 @@ public class LoginFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private TextView versionTextView;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -76,6 +79,14 @@ public class LoginFragment extends Fragment {
         Log.e("Login", "BASE URL is = " + BASE_URL);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        // Find the TextView for version number
+        versionTextView = view.findViewById(R.id.versionTextView);
+
+        // Set version number dynamically
+        versionTextView.setText("Version 1.3.0"); // Set your desired version here
+
+
 
         // Initialize the ServiceApi instance
         serviceApi = RetrofitClient.getRetrofitInstance(context).create(ServiceApi.class);
