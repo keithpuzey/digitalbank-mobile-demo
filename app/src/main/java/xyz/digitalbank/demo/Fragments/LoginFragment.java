@@ -87,7 +87,7 @@ public class LoginFragment extends Fragment {
         versionTextView = view.findViewById(R.id.versionTextView);
 
         // Set version number dynamically
-        versionTextView.setText(buildNumber);
+        versionTextView.setText("Version :" + buildNumber);
 
 
 
