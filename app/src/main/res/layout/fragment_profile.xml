@@ -130,7 +130,7 @@
                 android:layout_below="@id/profile_fragment_container"
                 android:layout_marginTop="16dp"
                 android:divider="?android:attr/dividerVertical"
-                android:showDividers="beginning|middle|end">     </TableLayout>
+                android:showDividers="middle">     </TableLayout>
 
 
             <TableRow
@@ -145,6 +145,8 @@
                     android:gravity="left"
                     android:layout_weight="3"
                     android:text="Description"
+                    android:paddingLeft="10dp"
+                    android:layout_marginBottom="10dp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -153,6 +155,8 @@
                     android:layout_weight="1"
                     android:gravity="left"
                     android:text="Amount"
+                    android:paddingLeft="10dp"
+                    android:layout_marginBottom="10dp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -160,6 +164,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="left"
+                    android:paddingLeft="10dp"
+                    android:layout_marginBottom="10dp"
                     android:text="Balance"
                     android:textStyle="bold" />
 

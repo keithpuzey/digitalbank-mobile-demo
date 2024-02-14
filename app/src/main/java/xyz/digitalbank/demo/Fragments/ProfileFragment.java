@@ -487,7 +487,7 @@ public class ProfileFragment extends Fragment {
             TextView descriptionTextView = new TextView(requireContext());
             descriptionTextView.setText(transaction.getDescription());
             setTextViewAttributes(descriptionTextView, 60, Gravity.START); // Left-justified
-            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+//            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView amountTextView = new TextView(requireContext());
             String amountValue = String.valueOf(transaction.getAmount());
@@ -497,7 +497,7 @@ public class ProfileFragment extends Fragment {
                 amountTextView.setTextColor(Color.GREEN);
             }
             setTextViewAttributes(amountTextView, 20, Gravity.CENTER);
-            amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+ //           amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
@@ -506,15 +506,40 @@ public class ProfileFragment extends Fragment {
                 runningBalanceTextView.setTextColor(Color.GREEN);
             }
             setTextViewAttributes(runningBalanceTextView, 20, Gravity.CENTER);
+ //           runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+
+            // Apply the border/background to TextViews
+            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+            amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
             runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             // Add TextViews to the TableRow
             row.addView(descriptionTextView);
+            // Add TableRow to the TableLayout
+            tableLayout.addView(row);
+
             row.addView(amountTextView);
             row.addView(runningBalanceTextView);
 
-            // Add TableRow to the TableLayout
-            tableLayout.addView(row);
+            // Set padding for each TextView
+            descriptionTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
+            amountTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
+            runningBalanceTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
+
+
+            // Add padding to the TableRow
+            row.setPadding(00, 10, 0, 10); // Set padding to top and bottom
+
+// Postpone the height adjustment until the TextViews are measured and laid out
+            descriptionTextView.post(() -> {
+                int descriptionHeight = descriptionTextView.getHeight(); // Get the height of the description TextView
+
+                // Set the height of the other TextViews to match the height of the description TextView
+                amountTextView.setHeight(descriptionHeight);
+                runningBalanceTextView.setHeight(descriptionHeight);
+            });
+
+
         }
     }
 
