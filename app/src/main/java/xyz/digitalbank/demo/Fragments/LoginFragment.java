@@ -80,11 +80,14 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        String buildNumber = getString(R.string.app_version);
+
+
         // Find the TextView for version number
         versionTextView = view.findViewById(R.id.versionTextView);
 
         // Set version number dynamically
-        versionTextView.setText("Version 1.3.0"); // Set your desired version here
+        versionTextView.setText(buildNumber);
 
 
 
