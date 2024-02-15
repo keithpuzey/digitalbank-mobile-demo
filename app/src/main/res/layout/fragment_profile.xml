@@ -109,6 +109,7 @@
             android:padding="8dp"/>
     </androidx.cardview.widget.CardView>
 
+
     <!-- Transaction List -->
     <androidx.cardview.widget.CardView
         android:id="@+id/profile_fragment_container"
@@ -117,6 +118,11 @@
         android:layout_margin="16dp"
         android:layout_below="@+id/accountSpinnercard"
         android:foreground="?android:attr/selectableItemBackground">
+        <!-- Scrollable view for Transaction List -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -174,8 +180,9 @@
 
         </FrameLayout>
 
-    </androidx.cardview.widget.CardView>
+        </ScrollView>
 
+    </androidx.cardview.widget.CardView>
 
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
