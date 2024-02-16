@@ -490,7 +490,7 @@ public class TransferFragment extends Fragment {
                 descriptionEditText.setText(descriptionText.trim());
             } else {
                 // Show a message indicating no data was found
-                Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Cheque Not Found", Toast.LENGTH_SHORT).show();
             }
         }
     }
