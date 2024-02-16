@@ -476,7 +476,7 @@ public class ProfileFragment extends Fragment {
         tableLayout.setDividerDrawable(getResources().getDrawable(R.drawable.table_divider));
 
         // Loop through the transactions and add new rows to the TableLayout
-        int count = Math.min(accountTransactions.size(), 7);
+        int count = Math.min(accountTransactions.size(), 5);
         // for (int i = accountTransactions.size() - count; i < accountTransactions.size(); i++) {
         for (int i = count - 1; i >= 0; i--) {
             TransactionResponse transaction = accountTransactions.get(i);

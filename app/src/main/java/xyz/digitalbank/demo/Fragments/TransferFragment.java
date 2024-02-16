@@ -201,7 +201,7 @@ public class TransferFragment extends Fragment {
         if (takePictureIntent.resolveActivity(requireContext().getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         } else {
-            Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Cheque Not Found", Toast.LENGTH_SHORT).show();
         }
     }
 
