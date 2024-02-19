@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Deploy Puppet Manifest') {
             steps {
-                sh 'puppet apply tomcat_host.pp'
+                sh 'puppet apply --certname=keith-target docker_tomcat_host.pp'
             }
         }
 
