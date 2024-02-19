@@ -24,6 +24,13 @@ pipeline {
             }
         }
 
+        stage('Remove Puppet Manifest') {
+            steps {
+
+                sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
+            }
+        }
+
         stage('Set Environment and Build APK') {
             steps {
                 script {
