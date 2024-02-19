@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Call your API here
-                    // Example:
+                    sh 'sleep 20'
                     sh 'curl -X POST http://your.api.endpoint'
                 }
             }
