@@ -22,7 +22,7 @@ class tomcat_deploy (
 
   # Copy the WAR file into the container
   exec { 'copy_war_file':
-    command     => "docker cp ${war_file_path} ${container_name}:/usr/local/tomcat/webapps/",
+    command     => "/usr/bin/docker cp ${war_file_path} ${container_name}:/usr/local/tomcat/webapps/",
     refreshonly => true,
     require     => Docker::Run[$container_name],
   }
