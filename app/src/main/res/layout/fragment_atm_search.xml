@@ -46,12 +46,6 @@ xmlns:tools="http://schemas.android.com/tools"
         android:layout_height="wrap_content"
         android:text="" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/bottom_navigation_menu" />
+
 
 </RelativeLayout>

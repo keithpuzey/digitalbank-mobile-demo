@@ -69,13 +69,6 @@
             android:textStyle="bold"/>
     </LinearLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-android:id="@+id/bottomNavigationView"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:layout_alignParentBottom="true"
-android:background="?android:attr/windowBackground"
-app:menu="@menu/bottom_navigation_menu" />
 
     <FrameLayout
     android:id="@+id/profile_fragment_container"
