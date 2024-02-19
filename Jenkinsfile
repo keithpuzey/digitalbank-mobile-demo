@@ -6,6 +6,16 @@ pipeline {
     }
 
     stages {
+        stage('Preapre Puppet') {
+            steps {
+
+                sh '        puppet module install puppetlabs-docker'
+                sh 'puppet agent -t'
+            }
+        }
+
+
+
         stage('Deploy Puppet Manifest') {
             steps {
 
