@@ -17,6 +17,7 @@ class tomcat_deploy (
   docker::run { $container_name:
     image   => $docker_image,
     ports   => $port_mapping,
+    ensure  => absent,  # Ensure container is removed
     require => Docker::Image[$docker_image],
   }
 
