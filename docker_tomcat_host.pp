@@ -1,13 +1,10 @@
 # Define a class to manage Tomcat deployment
-include docker
-
 class tomcat_deploy (
   $docker_image = 'tomcat:latest',
   $container_name = 'dbank-host',
   $war_file_path = '/home/kpuzey/bank.war',
   $port_mapping = '80:8080', # Format: host_port:container_port
 ) {
-
   # Install Docker
   class { 'docker': }
 
@@ -32,6 +29,4 @@ class tomcat_deploy (
 }
 
 # Usage:
-class { 'tomcat_deploy':
-  war_file_path => '/path/to/your/war/file/app.war',
-}
+class { 'tomcat_deploy': }
