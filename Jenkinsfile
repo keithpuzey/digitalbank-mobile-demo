@@ -10,7 +10,7 @@ pipeline {
         stage('Deploy Puppet Manifest') {
             steps {
 
-                sh 'puppet apply docker_tomcat_host.pp'
+                sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
 
