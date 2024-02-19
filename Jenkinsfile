@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Deploy Puppet Manifest') {
             steps {
-                sh 'sudo su -'
+
                 sh 'puppet apply docker_tomcat_host.pp'
                 sh 'puppet agent -t'
             }
