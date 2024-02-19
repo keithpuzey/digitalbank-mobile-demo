@@ -19,7 +19,7 @@ pipeline {
                 script {
                     // Call your API here
                     sh 'sleep 20'
-                    sh 'curl -X POST http://your.api.endpoint'
+
                 }
             }
         }
