@@ -9,9 +9,8 @@ pipeline {
         stage('Preapre Puppet') {
             steps {
 
-                sh '        puppet module install puppetlabs-docker'
-                sh 'puppet agent -t'
-            }
+                sh 'puppet module install puppetlabs-docker'
+                 }
         }
 
 
@@ -20,7 +19,6 @@ pipeline {
             steps {
 
                 sh 'puppet apply docker_tomcat_host.pp'
-                sh 'puppet agent -t'
             }
         }
 
