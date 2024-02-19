@@ -5,6 +5,7 @@ class tomcat_deploy (
   $war_file_path = '/home/kpuzey/bank.war',
   $port_mapping = '80:8080', # Format: host_port:container_port
 ) {
+  include docker
 
   # Install Docker
   class { 'docker': }
