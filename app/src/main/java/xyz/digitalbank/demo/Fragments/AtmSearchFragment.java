@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import android.widget.CheckBox;
 
 import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.Constants.ConstantsManager;
@@ -47,17 +46,13 @@ import android.util.Log;
 import android.view.View;
 import android.content.Context;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+
+
 
 
 public class AtmSearchFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
-
-    private CheckBox checkBox1;
-    private CheckBox checkBox2;
-    private CheckBox checkBox3;
-    private Button getLocationButton;
 
     private View view;
 
@@ -83,92 +78,36 @@ public class AtmSearchFragment extends Fragment {
             getLocationAndMakeRequest();
         }
 
-        LinearLayout searchByZipLayout = view.findViewById(R.id.search_by_zip);
+  //      LinearLayout searchByZipLayout = view.findViewById(R.id.search_by_zip);
 
 
-        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
+   //     searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
 
 
         // Find buttons
-        ImageButton atmSearchButton = view.findViewById(R.id.action_atm_search);
-        ImageButton getIpButton = view.findViewById(R.id.action_get_ip);
-        ImageButton customRequestButton = view.findViewById(R.id.action_custom_request);
+ //       ImageButton atmSearchButton = view.findViewById(R.id.action_atm_search);
+ //       ImageButton getIpButton = view.findViewById(R.id.action_get_ip);
+ //       ImageButton customRequestButton = view.findViewById(R.id.action_custom_request);
 
         // Set click listeners
-        atmSearchButton.setOnClickListener(v -> handleAtmSearchButtonClick());
-        getIpButton.setOnClickListener(v -> getIpAddress());
-        customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
+  //      atmSearchButton.setOnClickListener(v -> handleAtmSearchButtonClick());
+  //      getIpButton.setOnClickListener(v -> getIpAddress());
+  //      customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
 
 
         LinearLayout atmLocationGPSLayout = view.findViewById(R.id.atm_location_gps);
         LinearLayout atmLocationNetworkLayout = view.findViewById(R.id.atm_location_network);
 
         // Set click listener
-        atmLocationNetworkLayout.setOnClickListener(v -> handleAtmLocationNetworkClick());
-        getIpButton.setOnClickListener(v -> handleAtmSearchButtonClick());
+  //      atmLocationNetworkLayout.setOnClickListener(v -> handleAtmLocationNetworkClick());
+//        getIpButton.setOnClickListener(v -> handleAtmSearchButtonClick());
 
-        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
-        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
+//        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
+    //    atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
 
-        customRequestButton.setOnClickListener(v -> handleSearchByZipCodeClick());
-        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
+  //      customRequestButton.setOnClickListener(v -> handleSearchByZipCodeClick());
+//        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
 
-        checkBox1 = view.findViewById(R.id.checkbox1);
-        checkBox2 = view.findViewById(R.id.checkbox2);
-        checkBox3 = view.findViewById(R.id.checkbox3);
-        getLocationButton = view.findViewById(R.id.getLocationButton);
-
-        // Set click listeners for checkboxes
-        checkBox1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkBox1.isChecked()) {
-                    checkBox2.setChecked(false);
-                    checkBox3.setChecked(false);
-                    // Change icon when checkbox is selected
-                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                } else {
-                    // Change icon when checkbox is deselected
-                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
-                }
-            }
-        });
-
-        checkBox2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkBox2.isChecked()) {
-                    checkBox1.setChecked(false);
-                    checkBox3.setChecked(false);
-                    // Change icon when checkbox is selected
-                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                } else {
-                    // Change icon when checkbox is deselected
-                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
-                }
-            }
-        });
-
-        checkBox3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkBox3.isChecked()) {
-                    checkBox1.setChecked(false);
-                    checkBox2.setChecked(false);
-                    // Change icon when checkbox is selected
-                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
-                } else {
-                    // Change icon when checkbox is deselected
-                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
-                }
-            }
-        });
 
 
         return view;
