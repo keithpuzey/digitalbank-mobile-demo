@@ -118,39 +118,55 @@ public class AtmSearchFragment extends Fragment {
         checkBox3 = view.findViewById(R.id.checkbox3);
         getLocationButton = view.findViewById(R.id.getLocationButton);
 
-        // Set listeners for checkboxes
-        checkBox1.setOnClickListener(v -> {
-            checkBox1.setChecked(true);
-            checkBox2.setChecked(false);
-            checkBox3.setChecked(false);
-            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
+        // Set click listeners for checkboxes
+        checkBox1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkBox1.isChecked()) {
+                    checkBox2.setChecked(false);
+                    checkBox3.setChecked(false);
+                    // Change icon when checkbox is selected
+                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                } else {
+                    // Change icon when checkbox is deselected
+                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
+                }
+            }
         });
 
-        checkBox2.setOnClickListener(v -> {
-            checkBox1.setChecked(false);
-            checkBox2.setChecked(true);
-            checkBox3.setChecked(false);
-            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
+        checkBox2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkBox2.isChecked()) {
+                    checkBox1.setChecked(false);
+                    checkBox3.setChecked(false);
+                    // Change icon when checkbox is selected
+                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                } else {
+                    // Change icon when checkbox is deselected
+                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
+                }
+            }
         });
 
-        checkBox3.setOnClickListener(v -> {
-            checkBox1.setChecked(false);
-            checkBox2.setChecked(false);
-            checkBox3.setChecked(true);
-            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
-        });
-
-        // Set listener for Get Location button
-        getLocationButton.setOnClickListener(v -> {
-            if (checkBox1.isChecked()) {
-                // Call command for checkbox 1
-                // Command for checkbox 1 logic here
-            } else if (checkBox2.isChecked()) {
-                // Call command for checkbox 2
-                // Command for checkbox 2 logic here
-            } else if (checkBox3.isChecked()) {
-                // Call command for checkbox 3
-                // Command for checkbox 3 logic here
+        checkBox3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkBox3.isChecked()) {
+                    checkBox1.setChecked(false);
+                    checkBox2.setChecked(false);
+                    // Change icon when checkbox is selected
+                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox1.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                    checkBox2.setButtonDrawable(R.drawable.outline_radio_button_checked_24);
+                } else {
+                    // Change icon when checkbox is deselected
+                    checkBox3.setButtonDrawable(R.drawable.outline_radio_button_unchecked_24);
+                }
             }
         });
 
