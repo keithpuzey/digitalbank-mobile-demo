@@ -35,11 +35,21 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp">
 
+
+            <ImageButton
+                android:id="@+id/select_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_radio_button_unchecked_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Location by GPS" />
+
             <ImageButton
                 android:id="@+id/action_atm_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_gps_fixed_24"
+                android:layout_marginStart="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Location by GPS" />
 
@@ -52,6 +62,8 @@
                 android:layout_marginStart="24dp"
                 android:gravity="center_vertical" />
         </LinearLayout>
+
+
 
         <View
             android:id="@+id/line2"
@@ -74,12 +86,23 @@
             android:layout_marginTop="32dp">
 
             <ImageButton
+                android:id="@+id/select_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_radio_button_unchecked_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Location by GPS" />
+
+            <ImageButton
                 android:id="@+id/action_get_ip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_cell_tower_24"
+                android:layout_marginStart="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Location by IP Address" />
+
+
 
             <TextView
                 android:id="@+id/atmSearchnetwork"
@@ -107,12 +130,23 @@
 
 
             <ImageButton
+                android:id="@+id/select_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_radio_button_unchecked_24"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Location by GPS" />
+
+
+            <ImageButton
                 android:id="@+id/action_custom_request"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_search_24"
+                android:layout_marginStart="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Search by Zip code" />
+
 
             <TextView
                 android:id="@+id/atmSearchzip"
@@ -134,6 +168,20 @@
             android:layout_marginTop="16dp"
             android:background="@android:color/black"/>
 
+        <Button
+            android:id="@+id/GetLocation"
+            android:layout_width="150dp"
+            android:layout_marginTop="24dp"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/line3"
+            android:text="Get Location"
+            android:background="@color/colorPrimary"
+            android:drawableStart="@drawable/outline_pin_drop_white_24"
+            android:drawablePadding="1dp"
+
+            android:contentDescription="Submit Button" />
 
     </RelativeLayout>
 

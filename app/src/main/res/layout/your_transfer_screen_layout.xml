@@ -107,8 +107,10 @@
         <Button
             android:id="@+id/submitButton"
             android:layout_width="178dp"
+            android:textColor="@android:color/white"
             android:layout_height="wrap_content"
             android:text="@string/submit"
+            android:background="@color/colorPrimary"
             android:contentDescription="Submit Button" />
 
         <TextView
