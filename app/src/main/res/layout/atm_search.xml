@@ -16,15 +16,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp">
 
-        <!-- ATM Location - GPS -->
-
-        <View
-            android:id="@+id/line1"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/atm_location_gps"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/black"/>
 
         <LinearLayout
             android:id="@+id/atm_location_gps"
@@ -36,13 +27,11 @@
             android:layout_marginTop="32dp">
 
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/checkbox1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/outline_radio_button_unchecked_24"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Location by GPS" />
+                android:text=""/>
 
             <ImageButton
                 android:id="@+id/action_atm_search"
@@ -65,15 +54,6 @@
 
 
 
-        <View
-            android:id="@+id/line2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/atm_location_network"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/black"/>
-
-
         <!-- ATM Location - Network -->
         <LinearLayout
             android:id="@+id/atm_location_network"
@@ -85,13 +65,10 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp">
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/checkbox2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/outline_radio_button_unchecked_24"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Location by GPS" />
+                android:layout_height="wrap_content"/>
 
             <ImageButton
                 android:id="@+id/action_get_ip"
@@ -129,13 +106,11 @@
             android:layout_marginTop="32dp">
 
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/checkbox3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/outline_radio_button_unchecked_24"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Location by GPS" />
+                android:text=""/>
 
 
             <ImageButton
@@ -160,28 +135,21 @@
 
         </LinearLayout>
 
-        <View
-            android:id="@+id/line3"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/search_by_zip"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/black"/>
 
         <Button
             android:id="@+id/getLocationButton"
-            android:layout_width="150dp"
-            android:layout_marginTop="24dp"
-            android:textColor="@android:color/white"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/line3"
-            android:text="Get Location"
+            android:layout_below="@+id/search_by_zip"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
             android:background="@color/colorPrimary"
+            android:contentDescription="Get Location"
+            android:layout_centerHorizontal="true"
             android:drawableStart="@drawable/outline_pin_drop_white_24"
-            android:drawablePadding="1dp"
-
-            android:contentDescription="Submit Button" />
+            android:drawablePadding="4dp"
+            android:text="Get Location"
+            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 
@@ -202,9 +170,24 @@
             android:layout_height="wrap_content"
             android:text=""
             android:padding="16dp"
+            android:visibility="gone"
             android:textColor="?android:attr/textColorPrimary" />
 
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/updateLocationButton"
+
+        android:layout_height="wrap_content"
+        android:layout_below="@id/responseTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:layout_width="180dp"
+        android:text="Update Location"
+        android:drawableStart="@drawable/outline_location_searching_24"
+        android:textColor="?android:attr/textColorPrimary"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,19 +12,22 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.LinearLayout;
-
+import android.text.Html;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import android.graphics.PorterDuff;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,24 +40,25 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
-import android.graphics.Color;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.util.Log;
-import android.view.View;
-import android.content.Context;
-import android.widget.ImageButton;
+import android.widget.Button;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.res.ResourcesCompat;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.text.Spannable;
+
+import android.text.SpannableStringBuilder;
 
 
-
-
-public class AtmSearchFragment extends Fragment {
+public class AtmSearchFragment extends Fragment implements View.OnClickListener  {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private CheckBox checkbox1, checkbox2, checkbox3;
+    private Button getLocationButton;
 
+    private Button updateLocationButton;
     private View view;
 
     private Context context;  // Declare a context variable
@@ -63,8 +68,16 @@ public class AtmSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.atm_search, container, false);
+        if (view == null) {
+            throw new NullPointerException("Failed to inflate the layout for AtmSearchFragment");
+        }
         context = getContext();
         String MOCK_URL = ConstantsManager.getMockUrl(requireContext());
+        TextView responseTextView = view.findViewById(R.id.responseTextView);
+        updateLocationButton = view.findViewById(R.id.updateLocationButton);
+      //  updateLocationButton = getView().findViewById(R.id.updateLocationButton);
+
+
 
 
         // Check and request location permission if not granted
@@ -75,42 +88,91 @@ public class AtmSearchFragment extends Fragment {
                     REQUEST_LOCATION_PERMISSION);
         } else {
             // Permission is granted, proceed to get location
-            getLocationAndMakeRequest();
+
         }
 
-  //      LinearLayout searchByZipLayout = view.findViewById(R.id.search_by_zip);
+        checkbox1 = view.findViewById(R.id.checkbox1);
+        checkbox2 = view.findViewById(R.id.checkbox2);
+        checkbox3 = view.findViewById(R.id.checkbox3);
+        getLocationButton = view.findViewById(R.id.getLocationButton);
 
+        // Set click listeners for checkboxes
+        checkbox1.setOnClickListener(this);
+        checkbox2.setOnClickListener(this);
+        checkbox3.setOnClickListener(this);
+        // Set click listener for getLocationButton
+        getLocationButton.setOnClickListener(new View.OnClickListener() {
 
-   //     searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
+            @Override
+            public void onClick(View v) {
+                // Perform action based on selected checkbox
+                if (!checkbox1.isChecked() && !checkbox2.isChecked() && !checkbox3.isChecked()) {
+                    // Display a message indicating no checkbox is selected
+                    Toast.makeText(requireContext(), "Please select  one option", Toast.LENGTH_SHORT).show();
+                    return; // Exit the method early
 
+                } else if (checkbox1.isChecked()) {
+                    responseTextView.setVisibility(View.VISIBLE);
+                    getLocationButton.setVisibility(View.GONE);
+                    updateLocationButton.setVisibility(View.VISIBLE);
+                    handleAtmLocationGPSClick();
+                        // Example: startActivity(intentForCheckbox1);
 
-        // Find buttons
- //       ImageButton atmSearchButton = view.findViewById(R.id.action_atm_search);
- //       ImageButton getIpButton = view.findViewById(R.id.action_get_ip);
- //       ImageButton customRequestButton = view.findViewById(R.id.action_custom_request);
-
-        // Set click listeners
-  //      atmSearchButton.setOnClickListener(v -> handleAtmSearchButtonClick());
-  //      getIpButton.setOnClickListener(v -> getIpAddress());
-  //      customRequestButton.setOnClickListener(v -> showCustomRequestDialog());
-
-
-        LinearLayout atmLocationGPSLayout = view.findViewById(R.id.atm_location_gps);
-        LinearLayout atmLocationNetworkLayout = view.findViewById(R.id.atm_location_network);
-
-        // Set click listener
-  //      atmLocationNetworkLayout.setOnClickListener(v -> handleAtmLocationNetworkClick());
-//        getIpButton.setOnClickListener(v -> handleAtmSearchButtonClick());
-
-//        atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
-    //    atmLocationGPSLayout.setOnClickListener(v -> handleAtmLocationGPSClick());
-
-  //      customRequestButton.setOnClickListener(v -> handleSearchByZipCodeClick());
-//        searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
-
+                } else if (checkbox2.isChecked()) {
+                    responseTextView.setVisibility(View.VISIBLE);
+                    getLocationButton.setVisibility(View.GONE);
+                    updateLocationButton.setVisibility(View.VISIBLE);
+                    handleAtmLocationNetworkClick();
+                    // Example: startActivity(intentForCheckbox2);
+                } else if (checkbox3.isChecked()) {
+                    responseTextView.setVisibility(View.GONE);
+                    getLocationButton.setVisibility(View.GONE);
+                    updateLocationButton.setVisibility(View.VISIBLE);
+                    handleSearchByZipCodeClick();
+                    // Example: startActivity(intentForCheckbox3);
+                } else {
+                    // No checkbox selected
+                    // Example: showErrorMessage();
+                }
+            }
+        });
+        updateLocationButton.setOnClickListener(v -> {
+            // Perform action based on selected checkbox
+            if (!checkbox1.isChecked() && !checkbox2.isChecked() && !checkbox3.isChecked()) {
+                // Display a message indicating no checkbox is selected
+                Toast.makeText(requireContext(), "Please select one option", Toast.LENGTH_SHORT).show();
+                return; // Exit the method early
+            } else if (checkbox1.isChecked()) {
+                responseTextView.setVisibility(View.VISIBLE);
+                handleAtmLocationGPSClick();
+                // Example: startActivity(intentForCheckbox1);
+            } else if (checkbox2.isChecked()) {
+                responseTextView.setVisibility(View.VISIBLE);
+                handleAtmLocationNetworkClick();
+                // Example: startActivity(intentForCheckbox2);
+            } else if (checkbox3.isChecked()) {
+                responseTextView.setVisibility(View.GONE);
+                handleSearchByZipCodeClick();
+                // Example: startActivity(intentForCheckbox3);
+            } else {
+                // No checkbox selected
+                // Example: showErrorMessage();
+            }
+        });
 
 
         return view;
+    }
+    @Override
+    public void onClick(View v) {
+        // Uncheck all checkboxes
+        checkbox1.setChecked(false);
+        checkbox2.setChecked(false);
+        checkbox3.setChecked(false);
+
+        // Check the clicked checkbox
+        CheckBox clickedCheckbox = (CheckBox) v;
+        clickedCheckbox.setChecked(true);
     }
 
 
@@ -196,22 +258,53 @@ public class AtmSearchFragment extends Fragment {
                                             String road = addressObject.optString("road", "");
 
                                             // Build a formatted string with the extracted information
-                                            String formattedInfo = "Road: " + road + "\n" +
-
-                                                    "County: " + county + "\n" +
-                                                    "State: " + state + "\n" +
-                                                    "Postcode: " + postcode + "\n" +
-                                                    "Country: " + country ;
+                                            String formattedInfo =
+                                                    "ATM Location - GPS :" + "\n" + "\n" +
+                                                    "Road:           " + road + "\n" +
+                                                            "County:        " + county + "\n" +
+                                                            "State:           " + state + "\n" +
+                                                            "Postcode:    " + postcode + "\n" +
+                                                            "Country:       " + country + "\n";
 
                                             Log.d("FormattedInfo", formattedInfo);
 
-                                            // Display the formatted information on the screen
+
                                             requireActivity().runOnUiThread(() -> {
                                                 TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                                responseTextView.setText("Location Based on GPS :" + "\n" + "\n" + "\n"  + formattedInfo);
+
+                                                // Load the cell tower icon drawable
+                                                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_gps_fixed_24, null);
+                                                drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+
+                                                // Check if the drawable is loaded successfully
+                                                if (drawable != null) {
+                                                    // Set bounds for the drawable
+                                                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+
+                                                    // Create a SpannableStringBuilder to combine text and image
+                                                    SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
+
+                                                    // Append the cell tower icon to the SpannableStringBuilder
+                                                    spannableBuilder.append("  ");
+                                                    ImageSpan imageSpan = new ImageSpan(drawable);
+                                                    spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                                    // Append the formattedInfo text after the icon
+                                                    spannableBuilder.append("\n\n\n").append(formattedInfo);
+
+                                                    // Set the combined text and image to the TextView
+                                                    responseTextView.setText(spannableBuilder);
+                                                } else {
+                                                    responseTextView.setText("ATM Location - GPS :" + "\n" + "\n" + "\n"  + formattedInfo);
+                                                }
+
                                                 responseTextView.setTextColor(Color.rgb(24,29,47));
-                                                responseTextView.setGravity(Gravity.CENTER);
+                                                responseTextView.setGravity(Gravity.LEFT);
                                                 responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                                responseTextView.setBackgroundColor(Color.rgb(217,217,214));
+
+                                                // Set padding to align the responses
+                                                responseTextView.setPadding(50, 0, 0, 0);
 
                                             });
 
@@ -292,7 +385,7 @@ public class AtmSearchFragment extends Fragment {
                     // Display the IP address on the screen
                     requireActivity().runOnUiThread(() -> {
                         TextView ipTextView = view.findViewById(R.id.responseTextView);
-                        ipTextView.setText("IP Address: " + ipAddress);
+                       // ipTextView.setText("IP Address: " + ipAddress);
                     });
 
                     // Make a second network request with the obtained IP address
@@ -401,21 +494,52 @@ public class AtmSearchFragment extends Fragment {
 
                                 // Build a formatted string with the extracted information
                                 String gpsformattedInfo =
+                                        "ATM Location - Network:" + "\n" + "\n" +
+                                        "Road:       " + gpsroad + "\n" +
+                                        "County:     " + gpscounty + "\n" +
+                                        "State:        " + gpsstate + "\n" +
+                                        "Postcode:   " + gpspostcode + "\n" +
+                                        "Country:      " + gpscountry + "\n" + "\n" +
+                                "IP Address: " + ipAddress + "\n";
 
-                                        "Road: " + gpsroad + "\n" +
-                                        "County: " + gpscounty + "\n" +
-                                        "State: " + gpsstate + "\n" +
-                                        "Postcode: " + gpspostcode + "\n" +
-                                        "Country: " + gpscountry + "\n";
 
                                 Log.d("FormattedInfo", gpsformattedInfo);
 
-                                // Display the second API response including the IP address
+
                                 requireActivity().runOnUiThread(() -> {
                                     TextView responseTextView = view.findViewById(R.id.responseTextView);
-                                    responseTextView.setText("Location Based on Network Location :" + "\n" + ipAddress + "\n"+ "\n"  + gpsformattedInfo);
-                                    responseTextView.setTextColor(Color.rgb(24,29,47));
-                                    responseTextView.setGravity(Gravity.CENTER);
+
+                                    // Load the cell tower icon drawable
+                                    Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_cell_tower_24, null);
+                                    drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+
+
+                                    // Check if the drawable is loaded successfully
+                                    if (drawable != null) {
+                                        // Set bounds for the drawable
+                                        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+
+                                        // Create a SpannableStringBuilder to combine text and image
+                                        SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
+
+                                        // Append the cell tower icon to the SpannableStringBuilder
+                                        spannableBuilder.append("  ");
+                                        ImageSpan imageSpan = new ImageSpan(drawable);
+                                        spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                        // Append the formattedInfo text after the icon
+                                        spannableBuilder.append("\n\n\n").append(gpsformattedInfo);
+
+                                        // Set the combined text and image to the TextView
+                                        responseTextView.setText(spannableBuilder);
+                                    } else {
+                                        // If drawable is null, simply set the text without the icon
+                                        responseTextView.setText("ATM Location - Network:\n\n\n" + formattedInfo);
+                                    }
+
+                                    responseTextView.setTextColor(Color.rgb(24, 29, 47));
+                                    responseTextView.setGravity(Gravity.LEFT);
+                                    responseTextView.setBackgroundColor(Color.rgb(217, 217, 214));
                                     responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                                 });
 
@@ -455,6 +579,11 @@ public class AtmSearchFragment extends Fragment {
 
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        // Set text color for the EditText
+
+        input.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
+
+
         builder.setView(input);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -472,7 +601,6 @@ public class AtmSearchFragment extends Fragment {
 
         builder.show();
     }
-
     private void performCustomRequest(String userInput) {
         // Construct the URL with the user input
         String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "zip?zipcode=" + userInput;
@@ -486,13 +614,10 @@ public class AtmSearchFragment extends Fragment {
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
-// Get the HTTP response code
                 responseCode = connection.getResponseCode();
                 Log.d("ZipCode", "Before if statement : " + responseCode);
 
-// Use getErrorStream() if the response code indicates an error
                 InputStream inputStream = (responseCode >= 400) ? connection.getErrorStream() : connection.getInputStream();
-
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder response = new StringBuilder();
                 String line;
@@ -500,74 +625,25 @@ public class AtmSearchFragment extends Fragment {
                     response.append(line);
                 }
 
-
-                // Handle the response based on the HTTP response code
                 requireActivity().runOnUiThread(() -> {
-                    TextView responseTextView = view.findViewById(R.id.responseTextView);
-
-                    Log.d("ZipCode", "Before if statement : " + responseCode);
-                    if (responseCode >= 200 && responseCode < 300) {
-                        // Successful response
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response.toString());
-                            JSONArray atmsArray = jsonResponse.getJSONArray("atms");
-
-                            // Assuming you want to display details for the first ATM only
-                            if (atmsArray.length() > 0) {
-                                JSONObject atm = atmsArray.getJSONObject(0);
-                                JSONObject atmLocation = atm.getJSONObject("atmLocation");
-
-                                // Extract details
-                                String name = atmLocation.getString("name");
-                                String locationDescription = atmLocation.getString("locationDescription");
-                                String street = atmLocation.getJSONObject("address").getString("street");
-                                String city = atmLocation.getJSONObject("address").getString("city");
-                                String country = atmLocation.getJSONObject("address").getString("country");
-                                String postalCode = atmLocation.getJSONObject("address").getString("postalCode");
-                                String state = atmLocation.getJSONObject("address").getString("state");
-
-                                // Build a formatted string with the extracted information
-                                String zipFormattedInfo =
-                                        "Name: " + name + "\n" +
-                                                "Description: " + locationDescription + "\n" +
-                                                "Street : " + street + "\n" +
-                                                "City: " + city + "\n" +
-                                                "Country: " + country + "\n" +
-                                                "Zip Code: " + postalCode;
-
-                                Log.d("FormattedInfo", zipFormattedInfo);
-
-                                // Display the response on the screen
-                                responseTextView.setText("Location Based on Zip Code :" + "\n" + "\n" + zipFormattedInfo);
-                                responseTextView.setTextColor(Color.rgb(24,29,47));
-                                responseTextView.setGravity(Gravity.CENTER);
-                                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        if (responseCode == 404) {
-                            // Handle the case when the resource is not found (ZIP code not found)
-                            responseTextView.setText("ZIP code not found.");
-                            responseTextView.setTextColor(Color.GRAY);
-                            responseTextView.setGravity(Gravity.CENTER);
-                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-
-                        } else if (responseCode >= 500) {
-                            // Display the response on the screen
-                            responseTextView.setText("Service Unavailable :" + "\n" + "\n" + " Response Code = " + responseCode + "\n");
-                            // Set text color to red
-                            responseTextView.setTextColor(Color.RED);
-                            responseTextView.setGravity(Gravity.CENTER);
-                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        } else {
-                            // Handle other error responses
-                            responseTextView.setText("Service Error: " + responseCode);
-                            responseTextView.setGravity(Gravity.CENTER);
-                             responseTextView.setTextColor(Color.BLACK);  // Change color as needed
-                            responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        }
+                    if (responseCode >= 500) {
+                        // Display error message in the initial dialog
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("Mock Service Response Code")
+                                .setMessage("Service Unavailable :\n\nResponse Code = " + responseCode + "\n")
+                                .setPositiveButton("OK", null)
+                                .show();
+                    }else if (responseCode >= 400) {
+                        // Display error message in the initial dialog
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("Mock Service Response Code")
+                                .setMessage("Zip Code Not found :\n\nResponse Code = " + responseCode + "\n")
+                                .setPositiveButton("OK", null)
+                                .show();
+                    }
+                    else {
+                        // Successful response, process as before
+                        handleSuccessfulResponse(response.toString());
                     }
                 });
 
@@ -582,7 +658,61 @@ public class AtmSearchFragment extends Fragment {
         }).start();
     }
 
+    private void handleSuccessfulResponse(String response) {
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            JSONArray atmsArray = jsonResponse.getJSONArray("atms");
 
+            // Assuming you want to display details for the first ATM only
+            if (atmsArray.length() > 0) {
+                JSONObject atm = atmsArray.getJSONObject(0);
+                JSONObject atmLocation = atm.getJSONObject("atmLocation");
+
+                // Extract details
+                String name = atmLocation.getString("name");
+                String locationDescription = atmLocation.getString("locationDescription");
+                String street = atmLocation.getJSONObject("address").getString("street");
+                String city = atmLocation.getJSONObject("address").getString("city");
+                String country = atmLocation.getJSONObject("address").getString("country");
+                String postalCode = atmLocation.getJSONObject("address").getString("postalCode");
+                String state = atmLocation.getJSONObject("address").getString("state");
+
+                // Build a formatted string with the extracted information
+                String zipFormattedInfo =
+                        "ATM Location - Zip Code:" + "\n" +
+                        "Name:             " + name + "\n" +
+                                "Description:   " + locationDescription + "\n" +
+                                "Street :             " + street + "\n" +
+                                "City:                  " + city + "\n" +
+                                "Country:          " + country + "\n" +
+                                "Zip Code:        " + postalCode +"\n";
+
+                Log.d("FormattedInfo", zipFormattedInfo);
+
+                TextView responseTextView = view.findViewById(R.id.responseTextView);
+                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_search_24, null);
+                drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+
+                // Set HTML formatted text to TextView
+                responseTextView.setText(Html.fromHtml(zipFormattedInfo));
+
+                SpannableStringBuilder spannableBuilder = new SpannableStringBuilder("  ");
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                ImageSpan imageSpan = new ImageSpan(drawable);
+                spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                spannableBuilder.append("\n\n\n").append(zipFormattedInfo);
+                responseTextView.setText(spannableBuilder);
+                responseTextView.setTextColor(Color.rgb(24, 29, 47));
+                responseTextView.setGravity(Gravity.LEFT);
+                responseTextView.setVisibility(View.VISIBLE);
+                responseTextView.setBackgroundColor(Color.rgb(217, 217, 214));
+                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
