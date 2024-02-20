@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import android.widget.CheckBox;
 
 import xyz.digitalbank.demo.Constants.Constant;
 import xyz.digitalbank.demo.Constants.ConstantsManager;
@@ -46,13 +47,17 @@ import android.util.Log;
 import android.view.View;
 import android.content.Context;
 import android.widget.ImageButton;
-
-
+import android.widget.ImageView;
 
 
 public class AtmSearchFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
+
+    private CheckBox checkBox1;
+    private CheckBox checkBox2;
+    private CheckBox checkBox3;
+    private Button getLocationButton;
 
     private View view;
 
@@ -108,6 +113,46 @@ public class AtmSearchFragment extends Fragment {
         customRequestButton.setOnClickListener(v -> handleSearchByZipCodeClick());
         searchByZipLayout.setOnClickListener(v -> handleSearchByZipCodeClick());
 
+        checkBox1 = view.findViewById(R.id.checkbox1);
+        checkBox2 = view.findViewById(R.id.checkbox2);
+        checkBox3 = view.findViewById(R.id.checkbox3);
+        getLocationButton = view.findViewById(R.id.getLocationButton);
+
+        // Set listeners for checkboxes
+        checkBox1.setOnClickListener(v -> {
+            checkBox1.setChecked(true);
+            checkBox2.setChecked(false);
+            checkBox3.setChecked(false);
+            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
+        });
+
+        checkBox2.setOnClickListener(v -> {
+            checkBox1.setChecked(false);
+            checkBox2.setChecked(true);
+            checkBox3.setChecked(false);
+            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
+        });
+
+        checkBox3.setOnClickListener(v -> {
+            checkBox1.setChecked(false);
+            checkBox2.setChecked(false);
+            checkBox3.setChecked(true);
+            iconImageView.setImageResource(R.drawable.outline_radio_button_checked_24);
+        });
+
+        // Set listener for Get Location button
+        getLocationButton.setOnClickListener(v -> {
+            if (checkBox1.isChecked()) {
+                // Call command for checkbox 1
+                // Command for checkbox 1 logic here
+            } else if (checkBox2.isChecked()) {
+                // Call command for checkbox 2
+                // Command for checkbox 2 logic here
+            } else if (checkBox3.isChecked()) {
+                // Call command for checkbox 3
+                // Command for checkbox 3 logic here
+            }
+        });
 
 
         return view;
