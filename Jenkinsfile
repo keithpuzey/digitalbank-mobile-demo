@@ -71,7 +71,7 @@ pipeline {
 
         stage('Execute Mobile and Load Test') {
             steps {
-                // Add steps for mobile and load testing here
+               sh 'sudo ./auto/delete_mock.py'
             }
         }
 
