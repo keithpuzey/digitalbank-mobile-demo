@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-            stage('Update Config') {
+        stage('Update Config') {
                 steps {
                     script {
                         // Read environment variables from Jenkins
@@ -15,9 +15,9 @@ pipeline {
 
                         // Update config.py file with the tokens
                         updateConfigFile(perfectotoken, BMCredentials)
-                    }
-                }
+                 }
             }
+        }
         stage('Deploy Puppet Manifest') {
             steps {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
@@ -73,15 +73,6 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            script {
-
-            }
-        }
-    }
-}
 
 def updateConfigFile(perfectotoken, BMCredentials) {
     // Define the path to your config.py file
