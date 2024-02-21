@@ -62,7 +62,7 @@ pipeline {
         }
     }
 
-    post {
+    pre {
         always {
             script {
                 // Read environment variables from Jenkins
