@@ -18,24 +18,20 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy Puppet Manifest') {
             steps {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
 
-        stage('Call API') {
+        stage('Create Mock Service and Generate Data') {
             steps {
                 script {
                     // Call your API here
-                    sh 'sleep 20'
+                    sh 'sudo ./auto/create_mock.py'
+                    sh 'sudo ./auto/generatedata.py'
                 }
-            }
-        }
-
-        stage('Remove Puppet Manifest') {
-            steps {
-                sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
 
@@ -70,6 +66,24 @@ pipeline {
                         '''
                     }
                 }
+            }
+        }
+
+        stage('Execute Mobile and Load Test') {
+            steps {
+                // Add steps for mobile and load testing here
+            }
+        }
+
+        stage('Remove Mock Service') {
+            steps {
+               sh 'sudo ./auto/delete_mock.py'
+            }
+        }
+
+        stage('Remove Puppet Manifest') {
+            steps {
+                sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
     }
