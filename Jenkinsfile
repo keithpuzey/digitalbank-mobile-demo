@@ -78,7 +78,7 @@ pipeline {
 
 def updateConfigFile(perfectotoken, BMCredentials) {
     // Define the path to your config.py file
-    def configFilePath = '\\var\\lib\\jenkins\\workspace\\DBank/ Mobile/ Pipeline\\auto\\config.py'
+    def configFilePath = '\\auto\\config.py'
 
     // Read the content of the config.py file
     def configFileContent = readFile(configFilePath)
