@@ -60,18 +60,17 @@ pipeline {
                 }
             }
         }
+    }
 
-        post {
-            always {
-                script {
-                    // Read environment variables from Jenkins
-                    def perfectotoken = env.perfectotoken
-                    def BMCredentials = env.BMCredentials
-                    // You should replace TOKEN1, TOKEN2 with the actual names of your environment variables
+    post {
+        always {
+            script {
+                // Read environment variables from Jenkins
+                def perfectotoken = env.perfectotoken
+                def BMCredentials = env.BMCredentials
 
-                    // Update config.py file with the tokens
-                    updateConfigFile(perfectotoken, BMCredentials)
-                }
+                // Update config.py file with the tokens
+                updateConfigFile(perfectotoken, BMCredentials)
             }
         }
     }
@@ -87,7 +86,6 @@ def updateConfigFile(perfectotoken, BMCredentials) {
     // Modify the content with the new tokens
     configFileContent = configFileContent.replaceAll(/token_perfectotoken/, perfectotoken)
     configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
-    // Replace TOKEN1_PLACEHOLDER and TOKEN2_PLACEHOLDER with the actual placeholders in your config.py file
 
     // Write the updated content back to the config.py file
     writeFile(file: configFilePath, text: configFileContent)
