@@ -147,7 +147,8 @@
             android:contentDescription="Get Location"
             android:layout_centerHorizontal="true"
             android:drawableStart="@drawable/outline_pin_drop_white_24"
-            android:drawablePadding="4dp"
+            android:drawablePadding="1dp"
+            android:elevation="10dp"
             android:text="Get Location"
             android:textColor="@android:color/white" />
 
@@ -184,7 +185,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
         android:layout_width="180dp"
-        android:text="Update Location"
+        android:text="Refresh Location"
+        android:elevation="10dp"
         android:drawableStart="@drawable/outline_location_searching_24"
         android:textColor="?android:attr/textColorPrimary"
         android:visibility="gone" />

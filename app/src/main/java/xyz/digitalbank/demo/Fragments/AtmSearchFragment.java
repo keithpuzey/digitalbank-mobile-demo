@@ -50,6 +50,10 @@ import android.text.style.ImageSpan;
 import android.text.Spannable;
 
 import android.text.SpannableStringBuilder;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 
 
 public class AtmSearchFragment extends Fragment implements View.OnClickListener  {
@@ -258,15 +262,15 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                             String road = addressObject.optString("road", "");
 
                                             // Build a formatted string with the extracted information
-                                            String formattedInfo =
-                                                    "ATM Location - GPS :" + "\n" + "\n" +
-                                                    "Road:           " + road + "\n" +
-                                                            "County:        " + county + "\n" +
-                                                            "State:           " + state + "\n" +
-                                                            "Postcode:    " + postcode + "\n" +
-                                                            "Country:       " + country + "\n";
+                                            //String formattedInfo =
+                                            //        "ATM Location - GPS :" + "\n" + "\n" +
+                                            //        "Road:" + road + "\n" +
+                                            //                "County:" + county + "\n" +
+                                            //                "State:" + state + "\n" +
+                                            //                "Postcode:" + postcode + "\n" +
+                                            //                "Country:" + country + "\n";
 
-                                            Log.d("FormattedInfo", formattedInfo);
+//                                            Log.d("FormattedInfo", formattedInfo);
 
 
                                             requireActivity().runOnUiThread(() -> {
@@ -284,27 +288,37 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                                     // Create a SpannableStringBuilder to combine text and image
                                                     SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
 
+                                                    String firstLine = "    ATM Location - GPS";
+                                                    spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                                    int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
+
+                                                    String restOfInfo =
+                                                            "\n\n" +
+                                                                    boldenColumn("Road:           ", road, maxColumnNameLength) + "\n" +
+                                                                    boldenColumn("County:       ", county, maxColumnNameLength) + "\n" +
+                                                                    boldenColumn("State:           ", state, maxColumnNameLength) + "\n" +
+                                                                    boldenColumn("Postcode: ", postcode, maxColumnNameLength) + "\n" +
+                                                                    boldenColumn("Country:      ", country, maxColumnNameLength);
+
+                                                    spannableBuilder.append(restOfInfo);
+
+
                                                     // Append the cell tower icon to the SpannableStringBuilder
                                                     spannableBuilder.append("  ");
                                                     ImageSpan imageSpan = new ImageSpan(drawable);
                                                     spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                                                    // Append the formattedInfo text after the icon
-                                                    spannableBuilder.append("\n\n\n").append(formattedInfo);
-
                                                     // Set the combined text and image to the TextView
                                                     responseTextView.setText(spannableBuilder);
+                                                    responseTextView.setTextColor(Color.rgb(24,29,47));
+                                                    //  responseTextView.setGravity(Gravity.LEFT);
+                                                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                                    responseTextView.setBackgroundColor(Color.rgb(217,217,214));
+
                                                 } else {
-                                                    responseTextView.setText("ATM Location - GPS :" + "\n" + "\n" + "\n"  + formattedInfo);
+
                                                 }
-
-                                                responseTextView.setTextColor(Color.rgb(24,29,47));
-                                                responseTextView.setGravity(Gravity.LEFT);
-                                                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                                                responseTextView.setBackgroundColor(Color.rgb(217,217,214));
-
-                                                // Set padding to align the responses
-                                                responseTextView.setPadding(50, 0, 0, 0);
 
                                             });
 
@@ -345,6 +359,30 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             // Request location permissions
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
+    }
+    private CharSequence boldenColumn(String columnName, String columnValue, int maxColumnNameLength) {
+        SpannableStringBuilder columnBuilder = new SpannableStringBuilder();
+
+        // Append spaces to align the second column
+        int spacesToAdd = maxColumnNameLength - columnName.length();
+        String spaces = "";
+        for (int i = 0; i < spacesToAdd; i++) {
+            spaces += " ";
+        }
+
+        // Append the first column name with added spaces
+        columnBuilder.append(columnName + spaces);
+
+        // Get the length of the appended column name
+        int columnNameLength = columnName.length() + spacesToAdd;
+
+        // Bolden the appended column name
+        columnBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, columnNameLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Append the second column value
+        columnBuilder.append(columnValue + "\n");
+
+        return columnBuilder;
     }
 
 
@@ -492,18 +530,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                 String gpsaddress = gpsaddressObject.optString("address", "");
                                 String gpsroad = gpsaddressObject.optString("road", "");
 
-                                // Build a formatted string with the extracted information
-                                String gpsformattedInfo =
-                                        "ATM Location - Network:" + "\n" + "\n" +
-                                        "Road:       " + gpsroad + "\n" +
-                                        "County:     " + gpscounty + "\n" +
-                                        "State:        " + gpsstate + "\n" +
-                                        "Postcode:   " + gpspostcode + "\n" +
-                                        "Country:      " + gpscountry + "\n" + "\n" +
-                                "IP Address: " + ipAddress + "\n";
-
-
-                                Log.d("FormattedInfo", gpsformattedInfo);
 
 
                                 requireActivity().runOnUiThread(() -> {
@@ -514,6 +540,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                     drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
 
+
                                     // Check if the drawable is loaded successfully
                                     if (drawable != null) {
                                         // Set bounds for the drawable
@@ -522,25 +549,39 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                         // Create a SpannableStringBuilder to combine text and image
                                         SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
 
+                                        String firstLine = "    ATM Location - Network";
+                                        spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                        int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
+
+                                        String restOfInfo =
+                                                "\n\n" +
+                                                        boldenColumn("Road:               ", gpsroad, maxColumnNameLength) + "\n" +
+                                                        boldenColumn("County:            ", gpscounty, maxColumnNameLength) +"\n" +
+                                                        boldenColumn("State:               ", gpsstate, maxColumnNameLength) +"\n" +
+                                                        boldenColumn("Postcode:       ", gpspostcode, maxColumnNameLength) +"\n" +
+                                                        boldenColumn("Country:          ", gpscountry, maxColumnNameLength) +"\n" +
+                                                        boldenColumn("IP Address:    ", ipAddress, maxColumnNameLength) ;                                                ;
+
+                                        spannableBuilder.append(restOfInfo);
+
+
                                         // Append the cell tower icon to the SpannableStringBuilder
                                         spannableBuilder.append("  ");
                                         ImageSpan imageSpan = new ImageSpan(drawable);
                                         spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                                        // Append the formattedInfo text after the icon
-                                        spannableBuilder.append("\n\n\n").append(gpsformattedInfo);
-
                                         // Set the combined text and image to the TextView
                                         responseTextView.setText(spannableBuilder);
+                                        responseTextView.setTextColor(Color.rgb(24,29,47));
+                                        //  responseTextView.setGravity(Gravity.LEFT);
+                                        responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                        responseTextView.setBackgroundColor(Color.rgb(217,217,214));
+
                                     } else {
-                                        // If drawable is null, simply set the text without the icon
-                                        responseTextView.setText("ATM Location - Network:\n\n\n" + formattedInfo);
+
                                     }
 
-                                    responseTextView.setTextColor(Color.rgb(24, 29, 47));
-                                    responseTextView.setGravity(Gravity.LEFT);
-                                    responseTextView.setBackgroundColor(Color.rgb(217, 217, 214));
-                                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                                 });
 
                             } catch (JSONException e) {
@@ -680,7 +721,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 // Build a formatted string with the extracted information
                 String zipFormattedInfo =
                         "ATM Location - Zip Code:" + "\n" +
-                        "Name:             " + name + "\n" +
+                                "Name:             " + name + "\n" +
                                 "Description:   " + locationDescription + "\n" +
                                 "Street :             " + street + "\n" +
                                 "City:                  " + city + "\n" +
@@ -693,26 +734,60 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_search_24, null);
                 drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
-                // Set HTML formatted text to TextView
-                responseTextView.setText(Html.fromHtml(zipFormattedInfo));
 
-                SpannableStringBuilder spannableBuilder = new SpannableStringBuilder("  ");
-                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-                ImageSpan imageSpan = new ImageSpan(drawable);
-                spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                // Check if the drawable is loaded successfully
+                if (drawable != null) {
+                    // Set bounds for the drawable
+                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
 
-                spannableBuilder.append("\n\n\n").append(zipFormattedInfo);
-                responseTextView.setText(spannableBuilder);
-                responseTextView.setTextColor(Color.rgb(24, 29, 47));
-                responseTextView.setGravity(Gravity.LEFT);
-                responseTextView.setVisibility(View.VISIBLE);
-                responseTextView.setBackgroundColor(Color.rgb(217, 217, 214));
-                responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                    // Create a SpannableStringBuilder to combine text and image
+                    SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
+
+                    String firstLine = "     ATM Location - GPS";
+                    spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
+
+                    String restOfInfo =
+                            "\n\n" +
+                                    boldenColumn("Name:           ", name, maxColumnNameLength) + "\n" +
+                                    boldenColumn("Street:           ", street, maxColumnNameLength) + "\n" +
+                                    boldenColumn("City:               ", city, maxColumnNameLength) + "\n" +
+                                    boldenColumn("Postcode:    ", postalCode, maxColumnNameLength) + "\n" +
+                                    boldenColumn("Country:        ", country, maxColumnNameLength);
+
+                    spannableBuilder.append(restOfInfo);
+
+
+                    // Append the cell tower icon to the SpannableStringBuilder
+                    spannableBuilder.append("  ");
+                    ImageSpan imageSpan = new ImageSpan(drawable);
+                    spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    // Set the combined text and image to the TextView
+                    responseTextView.setText(spannableBuilder);
+                    responseTextView.setTextColor(Color.rgb(24,29,47));
+                    //  responseTextView.setGravity(Gravity.LEFT);
+                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                    responseTextView.setBackgroundColor(Color.rgb(217,217,214));
+                    responseTextView.setVisibility(View.VISIBLE);
+
+                    // Handle the rest of the information if necessary
+                } else {
+                    // Handle case when drawable is not loaded
+                }
+            } else {
+                // Handle case when atmsArray is empty
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            // Handle JSON exception
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle other exceptions
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
