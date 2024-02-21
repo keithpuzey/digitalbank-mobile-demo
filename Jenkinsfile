@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // Call your API here
-                    sh 'sudo /usr/bin/python ./auto/create_mock.py'
+                    sh 'sudo /usr/bin/python ./auto/Create_mock.py'
                     sh 'sudo /usr/bin/python ./auto/generatedata.py'
                 }
             }
