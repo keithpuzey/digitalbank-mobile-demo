@@ -1,0 +1,52 @@
+{
+	"data": {
+		"type": "datamodel",
+		"attributes": {
+			"model": {
+				"id": "3b5f10fd-1923-9eaa-5c8d-2ae45937d972",
+				"kind": "tdm",
+				"type": "object",
+				"title": "DBank Registration",
+				"entities": {
+					"default": {
+						"type": "object",
+						"title": "Test Parameters",
+						"repeat": 20,
+						"targets": {
+							"default": {
+								"type": "csv",
+								"file": "blazedata-test.csv"
+							}
+						},
+						"properties": {
+							"FirstName": {
+								"type": "string"
+							},
+							"LastName": {
+								"type": "string"
+							},
+							"email": {
+								"type": "string"
+							},
+							"ParisStreet": {
+								"type": "string"
+							}
+						},
+						"datasources": [
+						],
+						"requirements": {
+							"FirstName": "randFromSeedlist(\"firstnames\")",
+							"LastName": "randFromSeedlist(\"lastnames\")",
+							"email": "${FirstName}+\".\"+${LastName}+\"@gmail.com\"",
+							"ParisStreet": "anySeedlist(\"streets in paris\")"
+						}
+					}
+				}
+			},
+			"context": {
+				"csvs": [
+				]
+			}
+		}
+	}
+}
