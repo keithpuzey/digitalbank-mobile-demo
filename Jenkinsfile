@@ -6,10 +6,8 @@ pipeline {
     }
 
     stages {
-
         stage('Deploy Puppet Manifest') {
             steps {
-
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
@@ -19,14 +17,12 @@ pipeline {
                 script {
                     // Call your API here
                     sh 'sleep 20'
-
                 }
             }
         }
 
         stage('Remove Puppet Manifest') {
             steps {
-
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
@@ -40,8 +36,8 @@ pipeline {
                         echo $BUILD_NUMBER
                         export APP_VERSION=1.3.$BUILD_NUMBER
                         sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
-                         /opt/gradle/gradle/bin/gradle assembleDebug --info
-                         /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
+                        /opt/gradle/gradle/bin/gradle assembleDebug --info
+                        /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
                     '''
                 }
             }
@@ -64,24 +60,24 @@ pipeline {
                 }
             }
         }
-    }
-}
-   post {
-        always {
-            script {
-                // Read environment variables from Jenkins
-                def perfectotoken = env.perfectotoken
-                def BMCredentials = env.BMCredentials
-                // You should replace TOKEN1, TOKEN2 with the actual names of your environment variables
 
-                // Update config.py file with the tokens
-                updateConfigFile(perfectotoken, BMCredentials)
+        post {
+            always {
+                script {
+                    // Read environment variables from Jenkins
+                    def perfectotoken = env.perfectotoken
+                    def BMCredentials = env.BMCredentials
+                    // You should replace TOKEN1, TOKEN2 with the actual names of your environment variables
+
+                    // Update config.py file with the tokens
+                    updateConfigFile(perfectotoken, BMCredentials)
+                }
             }
         }
     }
 }
 
-def updateConfigFile(token1, token2) {
+def updateConfigFile(perfectotoken, BMCredentials) {
     // Define the path to your config.py file
     def configFilePath = '../auto/config.py'
 
