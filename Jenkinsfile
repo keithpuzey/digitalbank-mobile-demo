@@ -57,7 +57,7 @@ pipeline {
                                 -H 'Content-Type: multipart/form-data' \
                                 -H 'Perfecto-Authorization: '$perfectotoken \
                                 -F 'inputStream=@Digital-Bank-1.3.apk' \
-                                -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
+                                -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
                                 -v
                         '''
                     }
