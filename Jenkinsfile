@@ -7,15 +7,15 @@ pipeline {
 
     stages {
         stage('Update Config') {
-                steps {
-                    script {
-                        // Read environment variables from Jenkins
-                        def perfectotoken = env.perfectotoken
-                        def BMCredentials = env.BMCredentials
+            steps {
+                script {
+                    // Read environment variables from Jenkins
+                    def perfectotoken = env.perfectotoken
+                    def BMCredentials = env.BMCredentials
 
-                        // Update config.py file with the tokens
-                        updateConfigFile(perfectotoken, BMCredentials)
-                 }
+                    // Update config.py file with the tokens
+                    updateConfigFile(perfectotoken, BMCredentials)
+                }
             }
         }
         stage('Deploy Puppet Manifest') {
@@ -73,6 +73,7 @@ pipeline {
             }
         }
     }
+}
 
 def updateConfigFile(perfectotoken, BMCredentials) {
     // Define the path to your config.py file
