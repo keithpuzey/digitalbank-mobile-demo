@@ -29,8 +29,8 @@ pipeline {
             steps {
                 script {
                     // Call your API here
-                    sh 'sudo ./auto/create_mock.py'
-                    sh 'sudo ./auto/generatedata.py'
+                    sh 'sudo /usr/bin/python ./auto/create_mock.py'
+                    sh 'sudo /usr/bin/python ./auto/generatedata.py'
                 }
             }
         }
@@ -71,13 +71,13 @@ pipeline {
 
         stage('Execute Mobile and Load Test') {
             steps {
-               sh 'sudo ./auto/delete_mock.py'
+               sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
 
         stage('Remove Mock Service') {
             steps {
-               sh 'sudo ./auto/delete_mock.py'
+               sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
 
