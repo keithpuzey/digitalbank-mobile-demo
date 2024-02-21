@@ -40,8 +40,8 @@ pipeline {
                         echo $BUILD_NUMBER
                         export APP_VERSION=1.3.$BUILD_NUMBER
                         sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
-                        gradle assembleDebug --info
-                        gradle assembleDebugAndroidTest --info
+                         /opt/gradle/gradle/bin/gradle assembleDebug --info
+                         /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
                     '''
                 }
             }
