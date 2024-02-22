@@ -43,7 +43,7 @@ additional_data = {
         ],
         "elementsData": csv_data
     },
-    "itemKey": "PUBLIC:test_data.csv_blazedata-test.xml",
+    "itemKey": "PUBLIC:test_data.csv",
     "overwrite": True,
     "draftKey": ""
 }

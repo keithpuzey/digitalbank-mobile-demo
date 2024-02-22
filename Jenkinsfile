@@ -31,6 +31,7 @@ pipeline {
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 25'
                     sh 'sudo /usr/bin/python ./auto/Update_mock.py'
+                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
                 }
             }
         }
