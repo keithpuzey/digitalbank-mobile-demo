@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py './auto/registration-data-model-full.json' 25'
+                    sh 'sudo /usr/bin/python ./auto/generatedata.p ./auto/registration-data-model-full.json 25'
                 }
             }
         }
