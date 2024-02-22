@@ -28,9 +28,8 @@ pipeline {
         stage('Create Mock Service and Generate Data') {
             steps {
                 script {
-                    // Call your API here
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py registration-data-model-full.json 25'
+                    sh 'sudo /usr/bin/python ./auto/generatedata.py '/var/lib/jenkins/workspace/DBank Mobile Pipeline/auto/results/registration-data-model-full.json' 25'
                 }
             }
         }
