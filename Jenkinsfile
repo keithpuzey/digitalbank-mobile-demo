@@ -56,7 +56,7 @@ pipeline {
             steps {
                 script {
                     // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
-                    dir("/var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/") {
+                    dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
                         sh '''
                             curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
                                 -H 'Content-Type: multipart/form-data' \
