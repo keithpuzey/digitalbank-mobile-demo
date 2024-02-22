@@ -19,13 +19,13 @@ pipeline {
             }
         }
 
-        stage('Deploy Puppet Manifest') {
+        stage('Create Test Environment -  Puppet') {
             steps {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
 
-        stage('Create Mock Service and Generate Data') {
+        stage('Create Mock Service and Generate Synthetic Data') {
             steps {
                 script {
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
@@ -35,7 +35,7 @@ pipeline {
             }
         }
 
-        stage('Set Environment and Build APK') {
+        stage('Build Mobile App') {
             steps {
                 script {
                     sh '''
@@ -51,7 +51,7 @@ pipeline {
             }
         }
 
-        stage('Upload APK') {
+        stage('Upload Mobile App to Perfecto') {
             steps {
                 script {
                     // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
@@ -81,7 +81,7 @@ pipeline {
             }
         }
 
-        stage('Remove Puppet Manifest') {
+        stage('Remove Test Environment - Puppet') {
             steps {
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
