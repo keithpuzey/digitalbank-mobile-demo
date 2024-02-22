@@ -1,14 +1,14 @@
 
 # Blazemeter Environment - Workspace / Account
-workspaceID = 1970503
-account = 1898667
+workspaceID = 2014117
+account = 352831
 
 # Blazemeter Mock Service Details
-ServiceID = "331652"
+ServiceID = "338990"
 MockThinkTime = "60"
 TemplateID = "5971"
-SharedFolderID = "65af8bbfaaa2fad8820592a8"
-RegistrationMockID = "141909"
+SharedFolderID = "65d71b4e8b2044fe570baf89"
+RegistrationMockID = "144333"
 
 BMCredentials = (
     token_BMCredentials )
