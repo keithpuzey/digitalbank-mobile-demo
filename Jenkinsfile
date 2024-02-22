@@ -70,7 +70,7 @@ pipeline {
 
         stage('Execute Mobile and Load Test') {
             steps {
-               sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py 10468560'
+               sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
             }
         }
 
