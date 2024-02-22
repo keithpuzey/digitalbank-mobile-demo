@@ -13,21 +13,21 @@ random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
 service_name = current_day + random_string
 
 payload = {
-    "description": f"WorkSoft Demo  {current_date}",
+    "description": f"E2E Demo  {current_date}",
     "endpointPreference": "HTTPS",
-    "harborId": "65a56d48e1ab5c98590583b8",
+    "harborId": "5c544422c7dc9735767b23ce",
     "type": "TRANSACTIONAL",
     "liveSystemHost": "null",
     "liveSystemPort": "null",
-    "name": f"WorkSoft Demo {service_name}",
+    "name": f"E2E Demo {service_name}",
     "serviceId": int(ServiceID),
-    "shipId": "65a56d52edfe2d1cac08f507",
+    "shipId": "5d3ccab3526ad28f53205574",
     "thinkTime": int(MockThinkTime),
     "appliedTemplateId": 5971,
     "mockServiceTransactions": [
-        {"txnId": 6378107, "priority": 10},
-        {"txnId": 6378106, "priority": 10},
-        {"txnId": 6378104, "priority": 10}
+        {"txnId": 6458371, "priority": 10},
+        {"txnId": 6458373, "priority": 10},
+        {"txnId": 6458374, "priority": 10}
     ]
 }
 
