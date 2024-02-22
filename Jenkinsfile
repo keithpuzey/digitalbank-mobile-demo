@@ -30,7 +30,7 @@ pipeline {
                 script {
                     // Call your API here
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py'
+                    sh 'sudo /usr/bin/python ./auto/generatedata.py registration-data-model-full.json 25'
                 }
             }
         }
