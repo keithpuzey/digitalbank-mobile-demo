@@ -15,7 +15,7 @@ BMCredentials = (
 
 PerfectoKey = "token_perfectotoken"
 
-base_dir = '\\var\\lib\\jenkins\\workspace\\DBank/ Mobile/ Pipeline\\auto\\results\\'
+base_dir = "/var/lib/jenkins/workspace/DBank\\ Mobile\\ Pipeline/auto/results/"
 mock_output = f'{base_dir}mockurl.txt'
 mock_output_id = f'{base_dir}mockid.txt'
 test_result_url = f'{base_dir}test_result.txt'
