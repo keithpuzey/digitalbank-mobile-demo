@@ -39,7 +39,11 @@ additional_data = {
             {"name": "city", "type": "STRING"},
             {"name": "State", "type": "STRING"},
             {"name": "ZipCode", "type": "STRING"},
-            {"name": "seq", "type": "STRING"}
+            {"name": "seq", "type": "STRING"},
+            {"name": "title", "type": "STRING"},
+            {"name": "phonenumber", "type": "STRING"},
+            {"name": "newuserpassword", "type": "STRING"},
+            {"name": "gender", "type": "STRING"}
         ],
         "elementsData": csv_data
     },
