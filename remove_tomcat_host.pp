@@ -1,33 +1,20 @@
-# Define a class to manage Tomcat deployment
-class tomcat_deploy (
-  $docker_image = 'tomcat:latest',
-  $container_name = 'dbank-host',
-  $war_file_path = '/var/lib/jenkins/workspace/bank.war',
-  $port_mapping = '80:8080', # Format: host_port:container_port
+class bank_remove (
+  $tomcat_container_name = 'bank-tomcat',
+  $sql_container_name = 'bank-db',
 ) {
-  # Install Docker
-  class { 'docker': }
 
-  # Pull the Docker image
-  docker::image { $docker_image:
-    ensure => present,
+  # Stop and remove Tomcat container
+  exec { "stop_and_remove_${tomcat_container_name}":
+    command => "/usr/bin/docker stop ${tomcat_container_name} && /usr/bin/docker rm ${tomcat_container_name}",
+    onlyif  => "/usr/bin/docker ps -a --filter name=${tomcat_container_name}",
   }
 
-  # Run the Docker container
-  docker::run { $container_name:
-    image   => $docker_image,
-    ports   => $port_mapping,
-    ensure  => absent,  # Ensure container is removed
-    require => Docker::Image[$docker_image],
-  }
-
-  # Copy the WAR file into the container
-  exec { 'copy_war_file':
-    command     => "/usr/bin/docker cp ${war_file_path} ${container_name}:/usr/local/tomcat/webapps/",
-    refreshonly => true,
-    require     => Docker::Run[$container_name],
+  # Stop and remove SQL container
+  exec { "stop_and_remove_${sql_container_name}":
+    command => "/usr/bin/docker stop ${sql_container_name} && /usr/bin/docker rm ${sql_container_name}",
+    onlyif  => "/usr/bin/docker ps -a --filter name=${sql_container_name}",
   }
 }
 
 # Usage:
-class { 'tomcat_deploy': }
+class { 'bank_remove': }
