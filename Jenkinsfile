@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Update Config') {
+        stage('Update Configuration') {
             steps {
                 script {
                     // Read environment variables from Jenkins
@@ -19,12 +19,16 @@ pipeline {
             }
         }
 
-        stage('Create Test Environment -  Puppet') {
+        stage('Create Environment -  Puppet') {
             steps {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
-
+        stage('Synch Masked Production Data - Delphix') {
+            steps {
+               sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
+            }
+        }
         stage('Create Mock Service and Generate Synthetic Data') {
             steps {
                 script {
@@ -70,7 +74,13 @@ pipeline {
             }
         }
 
-        stage('Execute Mobile and Load Test') {
+        stage('Execute Mobile - Registration Test') {
+            steps {
+               sh 'sudo /usr/bin/python ./auto/run_scriptless_test.py'
+            }
+        }
+
+        stage('Execute  Load and EUX (Mobile and Web)  Test') {
             steps {
                sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
             }
