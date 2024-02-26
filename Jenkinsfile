@@ -39,16 +39,14 @@ pipeline {
                 script {
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
+                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
+                    // Extract the endpoint details using regular expressions
                     // Execute the script and capture the output
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
-
-                    // Extract the endpoint details using regular expressions
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
-                    sh 'sudo /usr/bin/python ./auto/Update_mock.py'
-                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
-                    // Print or use the captured endpoint details
                     echo "Mock Service Endpoint: ${endpoint}"
+                    def updateOutput = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
                 }
             }
