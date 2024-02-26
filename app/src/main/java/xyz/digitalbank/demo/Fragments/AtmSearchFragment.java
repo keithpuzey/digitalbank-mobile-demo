@@ -78,7 +78,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         }
         context = getContext();
         String MOCK_URL = ConstantsManager.getMockUrl(requireContext());
-        TextView responseTextView = view.findViewById(R.id.responseTextView);
+
         updateLocationButton = view.findViewById(R.id.updateLocationButton);
       //  updateLocationButton = getView().findViewById(R.id.updateLocationButton);
 
