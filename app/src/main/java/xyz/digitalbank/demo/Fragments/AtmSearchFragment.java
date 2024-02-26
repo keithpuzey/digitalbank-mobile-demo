@@ -61,6 +61,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     private CheckBox checkbox1, checkbox2, checkbox3;
     private Button getLocationButton;
+    private TextView responseTextView;
 
     private Button updateLocationButton;
     private View view;
@@ -100,10 +101,16 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         checkbox3 = view.findViewById(R.id.checkbox3);
         getLocationButton = view.findViewById(R.id.getLocationButton);
 
+        // Initially hide responseTextView
+        responseTextView.setVisibility(View.GONE);
+
+        
+
         // Set click listeners for checkboxes
         checkbox1.setOnClickListener(this);
         checkbox2.setOnClickListener(this);
         checkbox3.setOnClickListener(this);
+
         // Set click listener for getLocationButton
         getLocationButton.setOnClickListener(new View.OnClickListener() {
 
@@ -177,7 +184,19 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         // Check the clicked checkbox
         CheckBox clickedCheckbox = (CheckBox) v;
         clickedCheckbox.setChecked(true);
+
+        // Handle clicks on checkboxes
+        if (v.getId() == R.id.checkbox1) {
+            responseTextView.setVisibility(View.GONE);
+        } else if (v.getId() == R.id.checkbox2) {
+            responseTextView.setVisibility(View.GONE);
+        } else if (v.getId() == R.id.checkbox3) {
+            responseTextView.setVisibility(View.GONE);
+        } else {
+            responseTextView.setVisibility(View.GONE);
+        }
     }
+
 
 
     private void handleAtmSearchButtonClick() {
