@@ -123,14 +123,14 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     return; // Exit the method early
 
                 } else if (checkbox1.isChecked()) {
-                    responseTextView.setVisibility(View.GONE);
+                    responseTextView.setVisibility(View.VISIBLE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationGPSClick();
                         // Example: startActivity(intentForCheckbox1);
 
                 } else if (checkbox2.isChecked()) {
-                    responseTextView.setVisibility(View.GONE);
+                    responseTextView.setVisibility(View.VISIBLE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationNetworkClick();
@@ -188,10 +188,13 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         // Handle clicks on checkboxes
         if (v.getId() == R.id.checkbox1) {
             responseTextView.setVisibility(View.GONE);
+            responseTextView.setText("");
         } else if (v.getId() == R.id.checkbox2) {
             responseTextView.setVisibility(View.GONE);
+            responseTextView.setText("");
         } else if (v.getId() == R.id.checkbox3) {
             responseTextView.setVisibility(View.GONE);
+            responseTextView.setText("");
         } else {
             responseTextView.setVisibility(View.GONE);
         }
