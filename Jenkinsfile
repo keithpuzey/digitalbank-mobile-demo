@@ -74,19 +74,22 @@ pipeline {
                 }
             }
         }
-
         stage('Execute Mobile - Registration Test') {
             steps {
                 echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
                 script {
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-                    // Parse the output to extract values
-                    def reason = scriptOutput =~ /Reason: (.+)/ ? scriptOutput[0][1].trim() : null
-                    def testGridReportUrl = scriptOutput =~ /Test Grid Report: (.+)/ ? scriptOutput[1][1].trim() : null
-                    def devices = scriptOutput =~ /Devices: (.+)/ ? scriptOutput[2][1].trim() : null
+            // Parse the output to extract values
+                    def reasonMatch = scriptOutput =~ /Reason: (.+)/
+                    def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
+                    def devicesMatch = scriptOutput =~ /Devices: (.+)/
 
-                    // Print or use the captured values as needed
+                    def reason = reasonMatch ? reasonMatch[0][1].trim() : null
+                    def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
+                    def devices = devicesMatch ? devicesMatch[0][1].trim() : null
+
+            // Print or use the captured values as needed
                     echo "Mobile Test Overview:"
                     echo "Execution Reason: ${reason}"
                     echo "Test Grid Report URL: ${testGridReportUrl}"

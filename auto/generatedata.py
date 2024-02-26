@@ -40,12 +40,16 @@ class CSVDataGeneration:
                 csv_file_path = f"{test_data_csv}_{csv_file_name}"
                 with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
                     csv_writer = csv.writer(csv_file)
-                    csv_writer.writerows(csv.reader(result_data.get('content', '').splitlines()))
+                    csv_content = result_data.get('content', '')
+                    csv_reader = csv.reader(csv_content.splitlines())
+                    for row in csv_reader:
+                        csv_writer.writerow(row)
+                        print(', '.join(row))
 
                 print(f"Data saved to CSV file: {csv_file_path}")
 
             print(f"\n{self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
-            print(response.text)
+            # print(response.text)
 
             # Make the API request to get the signed URL of the Shared Folder
             # API endpoint URL to download the JSON data
