@@ -25,13 +25,14 @@ pipeline {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
+
         stage('Synch Masked Production Data - Delphix') {
             description 'Prepare Data and make available to testing platform'
             steps {
-               sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
-               }
+                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
             }
         }
+
         stage('Create Mock Service and Generate Synthetic Data') {
             steps {
                 description 'Creating Synthetic Data and Mock Service'
@@ -46,7 +47,7 @@ pipeline {
 
         stage('Build Mobile App') {
             steps {
-                description 'Create LAtest Version of Mobile APK'
+                description 'Create Latest Version of Mobile APK'
                 script {
                     sh '''
                         export ANDROID_HOME=$ANDROID_HOME
@@ -82,7 +83,7 @@ pipeline {
 
         stage('Execute Mobile - Registration Test') {
             steps {
-                description 'Execute User Regsitration Tests using Synthetic Data on Mobile Devices - Perfecto'
+                description 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
                 script {
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
@@ -95,7 +96,7 @@ pipeline {
                     echo "Mobile Test Overview:"
                     echo "Execution Reason: ${reason}"
                     echo "Test Grid Report URL: ${testGridReportUrl}"
-                    echo "Devies : ${devices}"
+                    echo "Devices : ${devices}"
                 }
             }
         }
