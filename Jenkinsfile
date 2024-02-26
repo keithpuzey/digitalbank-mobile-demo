@@ -20,6 +20,7 @@ pipeline {
         }
 
         stage('Create Environment -  Puppet') {
+            description: 'Creating environment using Puppet'
             steps {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
@@ -30,6 +31,7 @@ pipeline {
             }
         }
         stage('Create Mock Service and Generate Synthetic Data') {
+            description: 'Creating Synthetic Data and Mock Service'
             steps {
                 script {
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
@@ -41,6 +43,7 @@ pipeline {
         }
 
         stage('Build Mobile App') {
+            description: 'Create LAtest Version of Mobile APK'
             steps {
                 script {
                     sh '''
@@ -57,6 +60,7 @@ pipeline {
         }
 
         stage('Upload Mobile App to Perfecto') {
+            description: 'Upload latest build version to Perfecto'
             steps {
                 script {
                     // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
@@ -75,9 +79,10 @@ pipeline {
         }
 
         stage('Execute Mobile - Registration Test') {
+            description: 'Execute User Regsitration Tests using Synthetic Data on Mobile Devices - Perfecto'
             steps {
                 script {
-                    def scriptOutput = sh(script: 'python run_scriptless_test.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
                     // Capture environment variables
                     def reason = sh(script: 'echo $reason', returnStdout: true).trim()
@@ -94,18 +99,21 @@ pipeline {
         }
 
         stage('Execute  Load and EUX (Mobile and Web)  Test') {
+            description: 'Execute Load and EUX Test - BlazeMeter'
             steps {
                sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
             }
         }
 
         stage('Remove Mock Service') {
+            description: 'Remove Mock Service'
             steps {
                sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
 
         stage('Remove Test Environment - Puppet') {
+            description: 'Remove Test Environment'
             steps {
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
