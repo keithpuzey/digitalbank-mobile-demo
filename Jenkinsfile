@@ -29,6 +29,7 @@ pipeline {
             description 'Prepare Data and make available to testing platform'
             steps {
                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
+               }
             }
         }
         stage('Create Mock Service and Generate Synthetic Data') {
