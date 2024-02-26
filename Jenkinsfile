@@ -101,7 +101,21 @@ pipeline {
         stage('Execute Load and EUX (Mobile and Web) Test') {
             steps {
                 echo 'Execute Load and EUX Test - BlazeMeter'
-                sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
+                script {
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
+
+                    // Extract the test URL from the script output
+                    def testUrlMatch = scriptOutput =~ /Test URL (.+)/
+                    def testUrl = testUrlMatch ? testUrlMatch[0][1].trim() : null
+
+                    // Assign the test URL to a Jenkins variable
+                    if (testUrl) {
+                        env.TEST_URL = testUrl
+                        echo "Test URL: ${env.TEST_URL}"
+                    } else {
+                        echo "Test URL not found in the script output."
+                    }
+                }
             }
         }
 
