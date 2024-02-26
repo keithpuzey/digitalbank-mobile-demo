@@ -37,6 +37,8 @@ pipeline {
             steps {
                 echo 'Creating Synthetic Data and Mock Service'
                 script {
+                    sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+
                     // Execute the script and capture the output
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
 
@@ -46,9 +48,8 @@ pipeline {
 
                     // Print or use the captured endpoint details
                     echo "Mock Service Endpoint: ${endpoint}"
-
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
                     sh 'sudo /usr/bin/python ./auto/Update_mock.py'
+
                     sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
                 }
             }
