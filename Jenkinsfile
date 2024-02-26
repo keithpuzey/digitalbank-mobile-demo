@@ -20,16 +20,18 @@ pipeline {
         }
 
         stage('Create Environment -  Puppet') {
-            steps {
+          steps {
                 description 'Creating environment using Puppet'
-                sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
+                script {
+                    sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
 
         stage('Synch Masked Production Data - Delphix') {
-            description 'Prepare Data and make available to testing platform'
             steps {
-                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
+                description 'Duplicate Secure Test Data and provision environment'
+                script {
+                    sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
             }
         }
 
