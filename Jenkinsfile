@@ -20,20 +20,20 @@ pipeline {
         }
 
         stage('Create Environment -  Puppet') {
-            description 'Creating environment using Puppet'
             steps {
+                description 'Creating environment using Puppet'
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
         stage('Synch Masked Production Data - Delphix') {
-            description 'Prepare Data for Testing and make available to testing platform'
+            description 'Prepare Data and make available to testing platform'
             steps {
                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
             }
         }
         stage('Create Mock Service and Generate Synthetic Data') {
-            description 'Creating Synthetic Data and Mock Service'
             steps {
+                description 'Creating Synthetic Data and Mock Service'
                 script {
                     sh 'sudo /usr/bin/python ./auto/Create_mock.py'
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
@@ -44,8 +44,8 @@ pipeline {
         }
 
         stage('Build Mobile App') {
-            description 'Create LAtest Version of Mobile APK'
             steps {
+                description 'Create LAtest Version of Mobile APK'
                 script {
                     sh '''
                         export ANDROID_HOME=$ANDROID_HOME
@@ -61,8 +61,8 @@ pipeline {
         }
 
         stage('Upload Mobile App to Perfecto') {
-            description 'Upload latest build version to Perfecto'
             steps {
+                description 'Upload latest build version to Perfecto'
                 script {
                     // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
                     dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
@@ -80,14 +80,14 @@ pipeline {
         }
 
         stage('Execute Mobile - Registration Test') {
-            description 'Execute User Regsitration Tests using Synthetic Data on Mobile Devices - Perfecto'
             steps {
+                description 'Execute User Regsitration Tests using Synthetic Data on Mobile Devices - Perfecto'
                 script {
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
                     // Capture environment variables
                     def reason = sh(script: 'echo $reason', returnStdout: true).trim()
-                     def testGridReportUrl = sh(script: 'echo $TEST_GRID_REPORT_URL', returnStdout: true).trim()
+                    def testGridReportUrl = sh(script: 'echo $TEST_GRID_REPORT_URL', returnStdout: true).trim()
                     def devices = sh(script: 'echo $devices', returnStdout: true).trim()
 
                     // Print or use the captured values as needed
@@ -100,22 +100,22 @@ pipeline {
         }
 
         stage('Execute  Load and EUX (Mobile and Web)  Test') {
-            description 'Execute Load and EUX Test - BlazeMeter'
             steps {
-               sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
+                description 'Execute Load and EUX Test - BlazeMeter'
+                sh 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest'
             }
         }
 
         stage('Remove Mock Service') {
-            description 'Remove Mock Service'
             steps {
-               sh 'sudo /usr/bin/python ./auto/delete_mock.py'
+                description 'Remove Mock Service'
+                sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
 
         stage('Remove Test Environment - Puppet') {
-            description: 'Remove Test Environment'
             steps {
+                description 'Remove Test Environment'
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
