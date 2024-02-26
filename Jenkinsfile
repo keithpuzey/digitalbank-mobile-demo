@@ -36,12 +36,24 @@ pipeline {
         stage('Create Mock Service and Generate Synthetic Data') {
             steps {
                 echo 'Creating Synthetic Data and Mock Service'
-                sh 'sudo /usr/bin/python ./auto/Create_mock.py'
-                sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
-                sh 'sudo /usr/bin/python ./auto/Update_mock.py'
-                sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
+                script {
+                    // Execute the script and capture the output
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+
+                    // Extract the endpoint details using regular expressions
+                    def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
+                    def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
+
+                    // Print or use the captured endpoint details
+                    echo "Mock Service Endpoint: ${endpoint}"
+
+                    sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh 'sudo /usr/bin/python ./auto/Update_mock.py'
+                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
+                }
             }
         }
+
 
         stage('Build Mobile App') {
             steps {
@@ -95,10 +107,8 @@ pipeline {
                         echo "Mobile Test Overview:"
                         echo "Test Grid Report URL: ${testGridReportUrl}"
                         echo "Devices : ${devices}"
-                        echo "Reason for Failure: ${reason}"
+                        echo "Final Status: ${reason}"
 
-                        // Debug statement to print out the value of reason
-                        echo "Debug: Reason = ${reason}"
 
                         // Check if the script should be rerun based on the reason
                         if (reason == 'ResourcesUnavailable') {
