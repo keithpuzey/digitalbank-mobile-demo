@@ -97,6 +97,9 @@ pipeline {
                         echo "Devices : ${devices}"
                         echo "Reason for Failure: ${reason}"
 
+                        // Debug statement to print out the value of reason
+                        echo "Debug: Reason = ${reason}"
+
                         // Check if the script should be rerun based on the reason
                         if (reason == 'ResourcesUnavailable') {
                             echo 'Reason: ResourcesUnavailable. Rerunning the script...'
@@ -108,6 +111,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Execute Load and EUX (Mobile and Web) Test') {
             steps {
