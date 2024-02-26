@@ -116,14 +116,14 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     return; // Exit the method early
 
                 } else if (checkbox1.isChecked()) {
-                    responseTextView.setVisibility(View.VISIBLE);
+                    responseTextView.setVisibility(View.GONE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationGPSClick();
                         // Example: startActivity(intentForCheckbox1);
 
                 } else if (checkbox2.isChecked()) {
-                    responseTextView.setVisibility(View.VISIBLE);
+                    responseTextView.setVisibility(View.GONE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationNetworkClick();

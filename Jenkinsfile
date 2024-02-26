@@ -76,7 +76,20 @@ pipeline {
 
         stage('Execute Mobile - Registration Test') {
             steps {
-               sh 'sudo /usr/bin/python ./auto/run_scriptless_test.py'
+                script {
+                    def scriptOutput = sh(script: 'python run_scriptless_test.py', returnStdout: true).trim()
+
+                    // Capture environment variables
+                    def reason = sh(script: 'echo $reason', returnStdout: true).trim()
+                     def testGridReportUrl = sh(script: 'echo $TEST_GRID_REPORT_URL', returnStdout: true).trim()
+                    def devices = sh(script: 'echo $devices', returnStdout: true).trim()
+
+                    // Print or use the captured values as needed
+                    echo "Mobile Test Overview:"
+                    echo "Execution Reason: ${reason}"
+                    echo "Test Grid Report URL: ${testGridReportUrl}"
+                    echo "Devies : ${devices}"
+                }
             }
         }
 
