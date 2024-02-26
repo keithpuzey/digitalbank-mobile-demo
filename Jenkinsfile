@@ -78,22 +78,33 @@ pipeline {
             steps {
                 echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
                 script {
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                    boolean shouldRerun = true
+                    while (shouldRerun) {
+                        def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-            // Parse the output to extract values
-                    def reasonMatch = scriptOutput =~ /Reason: (.+)/
-                    def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
-                    def devicesMatch = scriptOutput =~ /Devices: (.+)/
+                        // Parse the output to extract values
+                        def reasonMatch = scriptOutput =~ /Reason: (.+)/
+                        def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
+                        def devicesMatch = scriptOutput =~ /Devices: (.+)/
 
-                    def reason = reasonMatch ? reasonMatch[0][1].trim() : null
-                    def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
-                    def devices = devicesMatch ? devicesMatch[0][1].trim() : null
+                        def reason = reasonMatch ? reasonMatch[0][1].trim() : null
+                        def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
+                        def devices = devicesMatch ? devicesMatch[0][1].trim() : null
 
-            // Print or use the captured values as needed
-                    echo "Mobile Test Overview:"
-                    echo "Execution Reason: ${reason}"
-                    echo "Test Grid Report URL: ${testGridReportUrl}"
-                    echo "Devices : ${devices}"
+                        // Print or use the captured values as needed
+                        echo "Mobile Test Overview:"
+                        echo "Test Grid Report URL: ${testGridReportUrl}"
+                        echo "Devices : ${devices}"
+                        echo "Reason for Failure: ${reason}"
+
+                        // Check if the script should be rerun based on the reason
+                        if (reason == 'ResourcesUnavailable') {
+                            echo 'Reason: ResourcesUnavailable. Rerunning the script...'
+                            shouldRerun = true
+                        } else {
+                            shouldRerun = false
+                        }
+                    }
                 }
             }
         }
