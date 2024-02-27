@@ -188,12 +188,18 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         // Handle clicks on checkboxes
         if (v.getId() == R.id.checkbox1) {
             responseTextView.setVisibility(View.GONE);
+            updateLocationButton.setVisibility(View.GONE);
+            getLocationButton.setVisibility(View.VISIBLE);
             responseTextView.setText("");
         } else if (v.getId() == R.id.checkbox2) {
             responseTextView.setVisibility(View.GONE);
+            updateLocationButton.setVisibility(View.GONE);
+            getLocationButton.setVisibility(View.VISIBLE);
             responseTextView.setText("");
         } else if (v.getId() == R.id.checkbox3) {
             responseTextView.setVisibility(View.GONE);
+            updateLocationButton.setVisibility(View.GONE);
+            getLocationButton.setVisibility(View.VISIBLE);
             responseTextView.setText("");
         } else {
             responseTextView.setVisibility(View.GONE);

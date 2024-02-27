@@ -56,7 +56,7 @@ public class ProfileFragment extends Fragment {
     private AppPreference appPreference;
 
     private List<UserAccountResponse> userAccounts;
-
+    private BottomNavigationView bottomNavigationView;
     public String Email ;
     private String authToken;
     public int accountId ;
@@ -464,8 +464,12 @@ public class ProfileFragment extends Fragment {
                     }
                 });
     }
-
     private void displayAccountTransactions(List<TransactionResponse> accountTransactions) {
+        // Disable all menu items in the bottom navigation view
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setEnabled(false);
+        }
+
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
@@ -477,7 +481,6 @@ public class ProfileFragment extends Fragment {
 
         // Loop through the transactions and add new rows to the TableLayout
         int count = Math.min(accountTransactions.size(), 5);
-        // for (int i = accountTransactions.size() - count; i < accountTransactions.size(); i++) {
         for (int i = count - 1; i >= 0; i--) {
             TransactionResponse transaction = accountTransactions.get(i);
 
@@ -488,7 +491,6 @@ public class ProfileFragment extends Fragment {
             TextView descriptionTextView = new TextView(requireContext());
             descriptionTextView.setText(transaction.getDescription());
             setTextViewAttributes(descriptionTextView, 60, Gravity.START); // Left-justified
-//            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView amountTextView = new TextView(requireContext());
             String amountValue = String.valueOf(transaction.getAmount());
@@ -498,7 +500,6 @@ public class ProfileFragment extends Fragment {
                 amountTextView.setTextColor(Color.GREEN);
             }
             setTextViewAttributes(amountTextView, 20, Gravity.CENTER);
- //           amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
@@ -507,7 +508,6 @@ public class ProfileFragment extends Fragment {
                 runningBalanceTextView.setTextColor(Color.GREEN);
             }
             setTextViewAttributes(runningBalanceTextView, 20, Gravity.CENTER);
- //           runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             // Apply the border/background to TextViews
             descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
@@ -516,22 +516,21 @@ public class ProfileFragment extends Fragment {
 
             // Add TextViews to the TableRow
             row.addView(descriptionTextView);
-            // Add TableRow to the TableLayout
-            tableLayout.addView(row);
-
             row.addView(amountTextView);
             row.addView(runningBalanceTextView);
+
+            // Add padding to the TableRow
+            row.setPadding(00, 10, 0, 10); // Set padding to top and bottom
+
+            // Add the TableRow to the TableLayout
+            tableLayout.addView(row);
 
             // Set padding for each TextView
             descriptionTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
             amountTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
             runningBalanceTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
 
-
-            // Add padding to the TableRow
-            row.setPadding(00, 10, 0, 10); // Set padding to top and bottom
-
-// Postpone the height adjustment until the TextViews are measured and laid out
+            // Postpone the height adjustment until the TextViews are measured and laid out
             descriptionTextView.post(() -> {
                 int descriptionHeight = descriptionTextView.getHeight(); // Get the height of the description TextView
 
@@ -539,12 +538,13 @@ public class ProfileFragment extends Fragment {
                 amountTextView.setHeight(descriptionHeight);
                 runningBalanceTextView.setHeight(descriptionHeight);
             });
+        }
 
-
+        // After JSON processing, re-enable all menu items in the bottom navigation view
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setEnabled(true);
         }
     }
-
-
 
     private void setTextViewAttributes(TextView textView, int weight, int gravity) {
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
