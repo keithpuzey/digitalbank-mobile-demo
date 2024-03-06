@@ -383,7 +383,7 @@ public class TransferFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Toast.makeText(context, "Cheque Reader Ready", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(context, "Cheque Reader Ready", Toast.LENGTH_SHORT).show();
         }
     }
 

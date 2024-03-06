@@ -3,46 +3,45 @@ package xyz.digitalbank.demo.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Activity.atm_search;
-import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.MyInterface;
-import xyz.digitalbank.demo.Model.UserProfileResponse;
-import xyz.digitalbank.demo.Model.UserResponse;
-import xyz.digitalbank.demo.Model.UserAccountResponse;
 import com.google.gson.JsonObject;
-import xyz.digitalbank.demo.Services.RetrofitClient;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import java.util.List;
-import android.widget.Spinner;
-import org.json.JSONArray;
-import java.util.ArrayList;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import xyz.digitalbank.demo.Model.TransactionResponse;
-import xyz.digitalbank.demo.Model.AccountInfo;
-
-import com.google.gson.Gson;
-import android.view.Gravity;
-import android.widget.LinearLayout;
-import android.graphics.Color;
+import xyz.digitalbank.demo.Activity.MainActivity;
+import xyz.digitalbank.demo.Activity.atm_search;
 import xyz.digitalbank.demo.Extras.AppPreference;
-import androidx.core.content.ContextCompat;
+import xyz.digitalbank.demo.Model.AccountInfo;
+import xyz.digitalbank.demo.Model.TransactionResponse;
+import xyz.digitalbank.demo.Model.UserAccountResponse;
+import xyz.digitalbank.demo.Model.UserProfileResponse;
+import xyz.digitalbank.demo.Model.UserResponse;
+import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Services.MyInterface;
+import xyz.digitalbank.demo.Services.RetrofitClient;
 
 
 
@@ -54,9 +53,9 @@ public class ProfileFragment extends Fragment {
     private List<AccountInfo> accountInfoList = new ArrayList<>();
 
     private AppPreference appPreference;
-
-    private List<UserAccountResponse> userAccounts;
     private BottomNavigationView bottomNavigationView;
+    private List<UserAccountResponse> userAccounts;
+
     public String Email ;
     private String authToken;
     public int accountId ;
@@ -82,16 +81,17 @@ public class ProfileFragment extends Fragment {
 
         authToken = MainActivity.appPreference.getauthToken();
 
-
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (name != null) {
                 // Get Account Details
                 updateProfileDetails();
-                getAndDisplayAccountTransactions(authToken, accountId);
+
                 String displayName = MainActivity.appPreference.getDisplayName();
                 String greetingMessage = "Loading ";
+                getAndDisplayAccountTransactions(authToken, accountId);
                 name.setText(greetingMessage);
             } else {
                 Log.e("ProfileFragment", "TextView 'name' is null");
@@ -426,11 +426,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void displayUserProfile(UserProfileResponse userProfileResponse) {
-        // Update UI to display user profile details
-        // For example, you can set text in TextViews or update UI components
-        // with the information obtained from userProfileResponse
-        // userProfileResponse.getFirstName(), userProfileResponse.getLastName(), etc.
-        // Check if 'name' TextView is null before setting text
+
         if (name != null) {
             String fullName = userProfileResponse.getTitle() + " " + userProfileResponse.getFirstName() + " " + userProfileResponse.getLastName();
             name.setText(fullName);
@@ -465,11 +461,8 @@ public class ProfileFragment extends Fragment {
                 });
     }
     private void displayAccountTransactions(List<TransactionResponse> accountTransactions) {
-        // Disable all menu items in the bottom navigation view
-        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setEnabled(false);
-        }
 
+     //  bottomNavigationView.setVisibility(View.GONE);
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
@@ -539,11 +532,7 @@ public class ProfileFragment extends Fragment {
                 runningBalanceTextView.setHeight(descriptionHeight);
             });
         }
-
-        // After JSON processing, re-enable all menu items in the bottom navigation view
-        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setEnabled(true);
-        }
+       // bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     private void setTextViewAttributes(TextView textView, int weight, int gravity) {
@@ -590,6 +579,7 @@ public class ProfileFragment extends Fragment {
         super.onResume();
         Log.d("ProfileFragment", "onResume");
     }
+
 
 
     @Override

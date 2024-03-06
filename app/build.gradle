@@ -15,7 +15,7 @@ android {
         applicationId "xyz.digitalbank.demo"
         minSdkVersion 28
         targetSdkVersion 31
-        versionCode 3
+        versionCode 4
         versionName versionNumber
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
