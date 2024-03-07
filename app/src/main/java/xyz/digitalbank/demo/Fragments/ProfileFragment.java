@@ -81,6 +81,9 @@ public class ProfileFragment extends Fragment {
 
         authToken = MainActivity.appPreference.getauthToken();
 
+
+
+
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -92,6 +95,10 @@ public class ProfileFragment extends Fragment {
                 String displayName = MainActivity.appPreference.getDisplayName();
                 String greetingMessage = "Loading ";
                 getAndDisplayAccountTransactions(authToken, accountId);
+                // Assuming you have retrieved the user's name and stored it in a variable named userName
+                // Concatenate "Welcome" with the userName
+                //  String welcomeMessage = "Hi, " + name;
+
                 name.setText(greetingMessage);
             } else {
                 Log.e("ProfileFragment", "TextView 'name' is null");
@@ -185,7 +192,7 @@ public class ProfileFragment extends Fragment {
 
         String displayName = MainActivity.appPreference.getDisplayName();
         String greetingMessage = "Loading ";
-        name.setText(greetingMessage);
+      //  name.setText(greetingMessage);
 
         email = view.findViewById(R.id.email);
 
@@ -351,13 +358,17 @@ public class ProfileFragment extends Fragment {
             if (account.getAccountType() != null) {
                 accountTypeName = account.getAccountType().getName();
             }
+            int accountNumber = account.getAccountNumber();
+
 
             // Create an AccountInfo object and add it to the list
-            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, accountTypeName);
+            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, accountTypeName, accountNumber);
             accountInfoList.add(accountInfo);
+
 
             // Display other account details as needed
             Log.d("UserAccount", "Account Name: " + accountName);
+            Log.d("UserAccount", "Account Type Name: " + accountTypeName);
             Log.d("UserAccount", "Account ID: " + accountId);
             Log.d("UserAccount", "Current Balance: " + currentBalance);
             Log.d("User Account", "Account Number: " + account.getAccountNumber());
@@ -408,18 +419,27 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateSelectedAccountDetails(AccountInfo accountInfo) {
+
         // Check if 'accountName' TextView is null before setting text
-        TextView accountNameTextView = getView().findViewById(R.id.accountName);
-        if (accountNameTextView != null) {
-            accountNameTextView.setText(accountInfo.getAccountTypeName());
+        TextView accountTypeNameTextView = getView().findViewById(R.id.accountTypeName);
+        if (accountTypeNameTextView != null) {
+            accountTypeNameTextView.setText(" " + accountInfo.getAccountName());
         } else {
             Log.e("ProfileFragment", "TextView 'accountName' is null");
+        }
+
+        TextView accountNumberTextView = getView().findViewById(R.id.accountNumber);
+        if (accountNumberTextView != null) {
+
+            accountNumberTextView.setText(" " + accountInfo.getAccountNumber());
+        } else {
+            Log.e("ProfileFragment", "TextView 'accountNumber' is null");
         }
 
         // Check if 'balance' TextView is null before setting text
         TextView balanceTextView = getView().findViewById(R.id.balance);
         if (balanceTextView != null) {
-            balanceTextView.setText("Balance: " + accountInfo.getCurrentBalance());
+            balanceTextView.setText(" " + accountInfo.getCurrentBalance());
         } else {
             Log.e("ProfileFragment", "TextView 'balance' is null");
         }
@@ -461,81 +481,63 @@ public class ProfileFragment extends Fragment {
                 });
     }
     private void displayAccountTransactions(List<TransactionResponse> accountTransactions) {
-
-     //  bottomNavigationView.setVisibility(View.GONE);
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
-        // Clear existing rows in the TableLayout
-        tableLayout.removeAllViews();
-
-        // Set divider drawable for columns
-        tableLayout.setDividerDrawable(getResources().getDrawable(R.drawable.table_divider));
+        // Clear existing rows in the TableLayout except the header row
+        tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
 
         // Loop through the transactions and add new rows to the TableLayout
-        int count = Math.min(accountTransactions.size(), 5);
-        for (int i = count - 1; i >= 0; i--) {
-            TransactionResponse transaction = accountTransactions.get(i);
-
+        for (TransactionResponse transaction : accountTransactions) {
             // Create a new TableRow
             TableRow row = new TableRow(requireContext());
 
             // Create TextViews to display the transaction details
             TextView descriptionTextView = new TextView(requireContext());
             descriptionTextView.setText(transaction.getDescription());
-            setTextViewAttributes(descriptionTextView, 60, Gravity.START); // Left-justified
+            setTextViewAttributes(descriptionTextView, 6, Gravity.START, 16); // Adjust weight to occupy 40% of the width
 
             TextView amountTextView = new TextView(requireContext());
             String amountValue = String.valueOf(transaction.getAmount());
             amountTextView.setText(amountValue);
             // Set text color to green if the amount is negative
             if (transaction.getAmount() < 0) {
-                amountTextView.setTextColor(Color.GREEN);
+                amountTextView.setTextColor(Color.parseColor("#006400"));
             }
-            setTextViewAttributes(amountTextView, 20, Gravity.CENTER);
+            setTextViewAttributes(amountTextView, 2, Gravity.CENTER, 16); // Adjust weight to occupy 30% of the width
 
             TextView runningBalanceTextView = new TextView(requireContext());
             runningBalanceTextView.setText(String.valueOf(transaction.getRunningBalance()));
             // Set text color to green if the running balance is negative
             if (transaction.getRunningBalance() < 0) {
-                runningBalanceTextView.setTextColor(Color.GREEN);
+                runningBalanceTextView.setTextColor(Color.parseColor("#006400"));
             }
-            setTextViewAttributes(runningBalanceTextView, 20, Gravity.CENTER);
-
-            // Apply the border/background to TextViews
-            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
-            amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
-            runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+            setTextViewAttributes(runningBalanceTextView, 2, Gravity.CENTER, 16); // Adjust weight to occupy 30% of the width
 
             // Add TextViews to the TableRow
             row.addView(descriptionTextView);
             row.addView(amountTextView);
             row.addView(runningBalanceTextView);
 
-            // Add padding to the TableRow
-            row.setPadding(00, 10, 0, 10); // Set padding to top and bottom
+
+// Call this method for each TextView
+            setFixedHeight(descriptionTextView);
+            setFixedHeight(amountTextView);
+            setFixedHeight(runningBalanceTextView);
+
+
+            // Apply the border/background to TextViews
+            descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+            amountTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
+            runningBalanceTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
 
             // Add the TableRow to the TableLayout
             tableLayout.addView(row);
-
-            // Set padding for each TextView
-            descriptionTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
-            amountTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
-            runningBalanceTextView.setPadding(16, 16, 16, 16); // Adjust padding as needed
-
-            // Postpone the height adjustment until the TextViews are measured and laid out
-            descriptionTextView.post(() -> {
-                int descriptionHeight = descriptionTextView.getHeight(); // Get the height of the description TextView
-
-                // Set the height of the other TextViews to match the height of the description TextView
-                amountTextView.setHeight(descriptionHeight);
-                runningBalanceTextView.setHeight(descriptionHeight);
-            });
         }
-       // bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
-    private void setTextViewAttributes(TextView textView, int weight, int gravity) {
+
+    private void setTextViewAttributes(TextView textView, int weight, int gravity, int padding) {
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
                 0,
                 TableRow.LayoutParams.WRAP_CONTENT,
@@ -543,6 +545,7 @@ public class ProfileFragment extends Fragment {
         );
         layoutParams.gravity = gravity;
         textView.setLayoutParams(layoutParams);
+        textView.setPadding(padding, 0, padding, 0); // Add horizontal padding
     }
 
 
@@ -580,7 +583,11 @@ public class ProfileFragment extends Fragment {
         Log.d("ProfileFragment", "onResume");
     }
 
-
+    // Add this method to set fixed height for TextViews
+    private void setFixedHeight(TextView textView) {
+        // Set a fixed height for TextView
+        textView.setHeight(getResources().getDimensionPixelSize(R.dimen.row_height));
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {

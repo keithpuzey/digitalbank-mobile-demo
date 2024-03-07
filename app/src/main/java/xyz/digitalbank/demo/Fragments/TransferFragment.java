@@ -301,9 +301,10 @@ public class TransferFragment extends Fragment {
             String accountName = account.getName();
             String currentBalanceStr = String.valueOf(account.getCurrentBalance());
             double currentBalance = Double.parseDouble(currentBalanceStr);
+            int accountNumber = account.getAccountNumber();
 
             // Instantiate AccountInfo and add it to the list
-            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, "SomeDefaultValue");
+            AccountInfo accountInfo = new AccountInfo(accountId, accountName, currentBalance, "SomeDefaultValue", accountNumber );
             accountInfoList.add(accountInfo);
         }
 

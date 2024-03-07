@@ -7,13 +7,15 @@ public class AccountInfo {
     private String accountName;
     private double currentBalance;
     private String accountTypeName;
+    private int accountNumber;
 
 
-    public AccountInfo(int id, String accountName, double currentBalance, String accountTypeName) {
+    public AccountInfo(int id, String accountName, double currentBalance, String accountTypeName, int accountNumber) {
         this.id = id;
         this.accountName = accountName;
         this.currentBalance = currentBalance;
         this.accountTypeName = accountTypeName;
+        this.accountNumber = accountNumber;
     }
 
     // Add getters for the new field
@@ -24,7 +26,9 @@ public class AccountInfo {
         return accountName;
     }
 
-
+    public int getAccountNumber() {
+        return accountNumber;
+    }
 
     public double getCurrentBalance() {
         return currentBalance;
