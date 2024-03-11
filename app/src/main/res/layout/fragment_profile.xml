@@ -8,6 +8,7 @@
     android:padding="16dp"
     tools:context=".Fragments.ProfileFragment">
 
+
     <!-- Welcome Message and First Name -->
     <TextView
         android:id="@+id/welcomeText"

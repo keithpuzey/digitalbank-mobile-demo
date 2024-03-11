@@ -1,4 +1,4 @@
-# Digital Bank Demo Android App
+# Digital Bank Android App
 
    The Android app has been created for Demonstration purposes and is a mobile application for the Web based Digital Bank application 
     

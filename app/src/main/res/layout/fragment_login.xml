@@ -15,40 +15,33 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
         android:clickable="true"
+        android:layout_gravity="right"
         android:src="@drawable/baseline_settings_24"
         android:contentDescription="Settings Cog Icon" />
 
 
     <ImageView
         android:id="@+id/ic_logo"
-        android:layout_width="358dp"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="36dp"
         android:gravity="center_horizontal"
-        android:src="@drawable/ic_launcher_foreground"
+        android:src="@drawable/dblogo"
+        android:layout_gravity="center"
         android:contentDescription="DB Logo"  />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        android:text="Digital Banking at it's Best"
-        android:contentDescription="Digital Banking at it's Best"
-        android:textColor="@color/colorPrimary"
-        android:textSize="22sp" />
+
 
     <EditText
         android:id="@+id/emailInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="85dp"
         android:hint="Enter User Name"
         android:inputType="textEmailAddress"
         android:contentDescription="Enter Email Address" />

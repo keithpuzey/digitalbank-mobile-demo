@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Digital Bank Demo</string>
+    <string name="app_name">Digital Bank</string>
 
 
     <string name="hello_blank_fragment">Hello fragment</string>
