@@ -7,12 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+
 import androidx.fragment.app.Fragment;
-import com.google.gson.Gson;
+
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Bar;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,14 +31,6 @@ import xyz.digitalbank.demo.Model.AccountInfo;
 import xyz.digitalbank.demo.Model.UserAccountResponse;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.RetrofitClient;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Column;
-import com.anychart.core.cartesian.series.Bar;
-import com.anychart.AnyChart;
-import android.widget.ProgressBar;
 
 
 
@@ -87,9 +88,8 @@ public class DashboardFragment extends Fragment {
 
         } else {
             // User is not logged in, handle accordingly
-            // For example, redirect to the login screen
-            // You might want to show a login screen or handle the scenario appropriately
-            Log.d("DashboardFragment", "User is not logged in. Redirect to login screen.");
+ //
+         //   Log.d("DashboardFragment", "User is not logged in. Redirect to login screen.");
         }
 
         return view;
@@ -150,8 +150,6 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-        // Log the exit point of the method
-        Log.d("DashBoard", "Exiting DashBoard Graph");
     }
 
     private void updateChart() {
@@ -180,9 +178,8 @@ public class DashboardFragment extends Fragment {
                     bar.tooltip().format("{%Value}");
                     anyChartView.setChart(cartesian);
                     anyChartView.setVisibility(View.VISIBLE);
-                    Log.d("DashboardFragment", "AnyChartView visibility after setting chart: " + anyChartView.getVisibility());
+
                 } else {
-                    Log.e("DashboardFragment", "anyChartView is null. Cannot set the chart.");
                 }
 
             }

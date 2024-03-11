@@ -21,7 +21,6 @@ public class ConstantsManager {
 
     public static void setBaseUrl(Context context, String baseUrl) {
         getSharedPreferences(context).edit().putString(BASE_URL, baseUrl).apply();
-        Log.d("ConstantsManager", "BaseUrl set to: " + baseUrl);
     }
 
     public static String getMockUrl(Context context) {
@@ -30,6 +29,5 @@ public class ConstantsManager {
 
     public static void setMockUrl(Context context, String mockUrl) {
         getSharedPreferences(context).edit().putString(MOCK_URL, mockUrl).apply();
-        Log.d("ConstantsManager", "MockUrl set to: " + mockUrl);
-    }
+      }
 }

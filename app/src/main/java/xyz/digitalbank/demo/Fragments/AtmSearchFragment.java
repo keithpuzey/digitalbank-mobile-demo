@@ -5,29 +5,35 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.text.Html;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import android.graphics.PorterDuff;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,18 +48,6 @@ import java.net.URL;
 
 import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
-import android.widget.Button;
-import android.graphics.drawable.Drawable;
-import androidx.core.content.res.ResourcesCompat;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
-import android.text.Spannable;
-
-import android.text.SpannableStringBuilder;
-import android.graphics.Typeface;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 
 
 public class AtmSearchFragment extends Fragment implements View.OnClickListener  {
@@ -170,8 +164,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 // Example: showErrorMessage();
             }
         });
-
-
         return view;
     }
     @Override
@@ -209,8 +201,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
 
     private void handleAtmSearchButtonClick() {
-        Log.d("ClickAction", "ATM Search Button Clicked!");
-        Log.d("ClickAction", "ATM Search Button Clicked at " + System.currentTimeMillis());
         getLocationAndMakeRequest();
     }
     private void handleAtmLocationGPSClick() {
@@ -257,7 +247,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                 double latitude = location.getLatitude();
                                 double longitude = location.getLongitude();
                                 String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
-                                Log.d("GPS", "URL =  " + apiUrl );
+                             //   Log.d("GPS", "URL =  " + apiUrl );
                                 // Perform network request on a separate thread
                                 new Thread(() -> {
                                     try {
@@ -273,7 +263,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                         while ((line = bufferedReader.readLine()) != null) {
                                             response.append(line);
                                         }
-                                        Log.d("NetworkResponse", "Response: " + response.toString());
+                                    //    Log.d("NetworkResponse", "Response: " + response.toString());
 
                                         try {
                                             JSONObject jsonResponse = new JSONObject(response.toString());
@@ -425,7 +415,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 URL url = new URL(ipApiUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                Log.d("IpResponse", "Connection String : " + connection);
+               // Log.d("IpResponse", "Connection String : " + connection);
 
                 // Read the response
                 InputStream inputStream = connection.getInputStream();
@@ -433,12 +423,12 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    Log.d("IpResponse", "Process Response : " + bufferedReader.readLine());
+                 //   Log.d("IpResponse", "Process Response : " + bufferedReader.readLine());
                     response.append(line);
                 }
 
                 // Log the IP address response
-                Log.d("IpResponse", "Response: " + response.toString());
+            //    Log.d("IpResponse", "Response: " + response.toString());
 
                 try {
                     // Extract IP address from the JSON response
@@ -514,10 +504,10 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                             "lat: " + lat + "\n" +
                             "lon: " + lon + "\n";
 
-                    Log.d("FormattedInfo", formattedInfo);
+                  //  Log.d("FormattedInfo", formattedInfo);
 
                     // Log the second API response
-                    Log.d("SecondApiResponse", "Response: " + formattedInfo);
+               //     Log.d("SecondApiResponse", "Response: " + formattedInfo);
 
 
                     // Close connections
@@ -527,7 +517,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
                     // Third request to another API using the latitude and longitude
                     String gpsApiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + lat + "&lon=" + lon;
-                    Log.d("Coordinates", "Debug: " + gpsApiUrl);
+                  //  Log.d("Coordinates", "Debug: " + gpsApiUrl);
                     new Thread(() -> {
                         try {
                             URL urlgps = new URL(gpsApiUrl);
@@ -684,7 +674,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 connection.setRequestMethod("GET");
 
                 responseCode = connection.getResponseCode();
-                Log.d("ZipCode", "Before if statement : " + responseCode);
+             //   Log.d("ZipCode", "Before if statement : " + responseCode);
 
                 InputStream inputStream = (responseCode >= 400) ? connection.getErrorStream() : connection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -756,7 +746,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                 "Country:          " + country + "\n" +
                                 "Zip Code:        " + postalCode +"\n";
 
-                Log.d("FormattedInfo", zipFormattedInfo);
+         //       Log.d("FormattedInfo", zipFormattedInfo);
 
                 TextView responseTextView = view.findViewById(R.id.responseTextView);
                 Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_search_24, null);

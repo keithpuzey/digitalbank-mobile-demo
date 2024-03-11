@@ -233,7 +233,7 @@ public class atm_search extends AppCompatActivity {
                 }
 
                 // Log the IP address response
-                Log.d("IpResponse", "Response: " + response.toString());
+              //  Log.d("IpResponse", "Response: " + response.toString());
 
                 try {
                     // Extract IP address from the JSON response
@@ -301,10 +301,10 @@ public class atm_search extends AppCompatActivity {
                             "lat: " + lat + "\n" +
                             "lon: " + lon + "\n";
 
-                    Log.d("FormattedInfo", formattedInfo);
+                 //   Log.d("FormattedInfo", formattedInfo);
 
                     // Log the second API response
-                    Log.d("SecondApiResponse", "Response: " + formattedInfo);
+                 //   Log.d("SecondApiResponse", "Response: " + formattedInfo);
 
 
                     // Display the second API response including the IP address
@@ -336,7 +336,7 @@ public class atm_search extends AppCompatActivity {
                                 gpsresponse.append(gpsline);
                             }
                             // Handle the response as needed
-                            Log.d("GPSApiResponse", "Response: " + gpsresponse.toString());
+                           // Log.d("GPSApiResponse", "Response: " + gpsresponse.toString());
                             try {
                                 JSONObject gpsjsonResponse = new JSONObject(gpsresponse.toString());
 
@@ -359,7 +359,7 @@ public class atm_search extends AppCompatActivity {
                                         "Address: " + gpsaddress + "\n" +
                                         "Road: " + gpsroad;
 
-                                Log.d("FormattedInfo", gpsformattedInfo);
+                               // Log.d("FormattedInfo", gpsformattedInfo);
 
                                 // Display the second API response including the IP address
                                 runOnUiThread(() -> {
@@ -444,7 +444,7 @@ public class atm_search extends AppCompatActivity {
                     }
 
                     // Handle the response as needed
-                    Log.d("CustomRequest", "Response: " + response.toString());
+                //    Log.d("CustomRequest", "Response: " + response.toString());
 
                     // Display the custom request response
                     runOnUiThread(() -> {

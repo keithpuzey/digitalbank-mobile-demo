@@ -2,7 +2,6 @@ package xyz.digitalbank.demo.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -101,7 +100,7 @@ public class LoginFragment extends Fragment {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("LoginFragment", "Login button clicked");
+                // Log.d("LoginFragment", "Login button clicked");
                 loginUser();
             }
         });
@@ -271,12 +270,12 @@ public class LoginFragment extends Fragment {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     if (response.body() != null) {
-                        Log.d("Response", "Response: " + response.body());
+                      //  Log.d("Response", "Response: " + response.body());
 
                         ((MainActivity) requireActivity()).setEmail(Email);
 
                         MainActivity.appPreference.setLoginStatus(true);
-                        Log.d("Login", " Login API Being Called");
+                    //    Log.d("Login", " Login API Being Called");
 
                         myInterface.login(response.body().getAuthToken(), Email);
 

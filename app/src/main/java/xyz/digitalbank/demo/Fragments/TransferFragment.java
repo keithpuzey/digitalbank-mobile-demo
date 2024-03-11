@@ -11,7 +11,9 @@ import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -25,11 +27,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.text.TextWatcher;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import android.text.Editable;
 
 import com.google.gson.Gson;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -39,10 +40,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.OutputStream;
-import java.io.PrintStream;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -309,7 +310,7 @@ public class TransferFragment extends Fragment {
         }
 
         // Log the number of accounts for debugging
-        Log.d("TransferFragment", "Number of accounts: " + accountInfoList.size());
+      //  Log.d("TransferFragment", "Number of accounts: " + accountInfoList.size());
 
         // Create an ArrayAdapter with AccountInfo objects
         adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, accountInfoList);
@@ -319,7 +320,7 @@ public class TransferFragment extends Fragment {
         accountSpinner.setAdapter(adapter);
 
         // Log the exit point of the method
-        Log.d("TransferFragment", "Exiting setupAccountSpinner");
+      //  Log.d("TransferFragment", "Exiting setupAccountSpinner");
     }
 
     private void transferFunds(int userId, String authToken, double amount, int toAccountId, boolean isCredit, String description) {
@@ -335,18 +336,18 @@ public class TransferFragment extends Fragment {
         String jsonBody = gson.toJson(depositRequest);
 
         // Log the contents of the JSON request body
-        Log.d("TransferFragment", "JSON Request Body: " + jsonBody);
+     //   Log.d("TransferFragment", "JSON Request Body: " + jsonBody);
 
 
         // Log the contents of the depositRequest
-        Log.d("TransferFragment", "transfer Funds Initiated - userId = " + userId + " AuthToken " + authToken + " Body = " + depositRequest.toString());
+   //     Log.d("TransferFragment", "transfer Funds Initiated - userId = " + userId + " AuthToken " + authToken + " Body = " + depositRequest.toString());
 
         Context context = getContext();
         RetrofitClient.transferFunds(toAccountId, authToken, "application/json", depositRequest, isCredit, new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Log.d("TransferFragment", "Submitted Transfer Request - Amount: " + amount + ", To Account ID: " + toAccountId + ", Is Credit? " + isCredit + ", Description: " + description);
+            //        Log.d("TransferFragment", "Submitted Transfer Request - Amount: " + amount + ", To Account ID: " + toAccountId + ", Is Credit? " + isCredit + ", Description: " + description);
                     // API call successful, handle the response as needed
                     // Example: Display a toast message
                     Toast.makeText(requireContext(), "Update successful", Toast.LENGTH_SHORT).show();
@@ -434,8 +435,8 @@ public class TransferFragment extends Fragment {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
 
-            Log.d("OCR", "Height =" + height);
-            Log.d("OCR", "Width =" + width);
+        //    Log.d("OCR", "Height =" + height);
+        //    Log.d("OCR", "Width =" + width);
             // Define regions of interest (ROIs)
             Rect amountROI = new Rect((int) (width * 2 / 3), 0, width, height);
             Rect descriptionROI = new Rect(0, 0, (int) (width / 3), height);

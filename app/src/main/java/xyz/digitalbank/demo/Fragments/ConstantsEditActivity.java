@@ -1,17 +1,16 @@
 package xyz.digitalbank.demo.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import xyz.digitalbank.demo.Constants.Constant;
+import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
-import xyz.digitalbank.demo.Constants.ConstantsManager;
-import android.util.Log;
 
 public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener, MyInterface {
 
@@ -22,9 +21,6 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constants_edit);
-
-        // Log statement to check if onCreate is called
-        Log.d("ConstantsEditActivity", "onCreate called");
 
 
         // Initialize UI elements
@@ -93,8 +89,8 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
 
     protected void onResume() {
         super.onResume();
-        // Log statement to check if onResume is called
-        Log.d("ConstantsEditActivity", "onResume called");
+
+
     }
 
 

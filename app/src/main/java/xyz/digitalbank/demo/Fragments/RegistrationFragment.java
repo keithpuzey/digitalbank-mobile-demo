@@ -73,25 +73,6 @@ public class RegistrationFragment extends Fragment {
     }
 
 
-    private void switchToProfileFragment() {
-        // Create an instance of the ProfileFragment
-        ProfileFragment profileFragment = new ProfileFragment();
-
-        // Get the FragmentManager
-        FragmentManager fragmentManager = getParentFragmentManager();
-
-        // Start a FragmentTransaction
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        // Replace the current fragment with the ProfileFragment
-        fragmentTransaction.replace(R.id.fragment_container, profileFragment);
-
-        // Add the transaction to the back stack (optional, allows for back navigation)
-        fragmentTransaction.addToBackStack(null);
-
-        // Commit the transaction
-        fragmentTransaction.commit();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -157,18 +138,18 @@ public class RegistrationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 try {
-                    Log.d("RegistrationFragment", "Register button clicked");
+                //  Log.d("RegistrationFragment", "Register button clicked");
                     if (agreeCheckBox.isChecked()) {
                         // The user has agreed to the Terms and Conditions, proceed with registration
-                        Log.d("RegistrationFragment", "Agree checkbox is checked");
+               //       Log.d("RegistrationFragment", "Agree checkbox is checked");
                         registerUser();
                     } else {
                         // Display a message indicating that the user needs to agree to the Terms and Conditions
-                        Log.d("RegistrationFragment", "Agree checkbox is not checked");
+               //         Log.d("RegistrationFragment", "Agree checkbox is not checked");
                         MainActivity.appPreference.showToast("Please agree to the Terms and Conditions.");
                     }
                 } catch (Exception e) {
-                    Log.e("RegistrationFragment", "Exception in onClick: " + e.getMessage());
+               //     Log.e("RegistrationFragment", "Exception in onClick: " + e.getMessage());
                 }
             }
         });
@@ -372,8 +353,8 @@ public class RegistrationFragment extends Fragment {
 
 
                                                 // Log success information
-                                                Log.d("API", "Request successful: " + call.request().url());
-                                                Log.d("API", "Response Code: " + response.code());
+                                      //          Log.d("API", "Request successful: " + call.request().url());
+                                      //          Log.d("API", "Response Code: " + response.code());
 
 
                                                 // Log response body as JSON string
@@ -387,15 +368,15 @@ public class RegistrationFragment extends Fragment {
                                                     createUserData(authToken, userId);
 
                                                 } else {
-                                                    Log.d("API", "Response Body is null");
+                                     //               Log.d("API", "Response Body is null");
                                                 }
 
 
                                             } else {
                                                 // Log error information
-                                                Log.e("API", "Request failed: " + call.request().url());
-                                                Log.e("API", "Error Code: " + response.code());
-                                                Log.e("API", "Error Body: " + response.errorBody().toString());
+                                      //          Log.e("API", "Request failed: " + call.request().url());
+                                     //           Log.e("API", "Error Code: " + response.code());
+                                       //         Log.e("API", "Error Body: " + response.errorBody().toString());
                                                 MainActivity.appPreference.showToast("User not found");
 
                                                 // Handle the error
@@ -493,20 +474,20 @@ public class RegistrationFragment extends Fragment {
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
 
-                            Log.d("API", "Data Creation Code: " + response.code());
-                            Log.d("API", "Data Creation Code: " + response.code());
-                            Log.d("API", "Data Creation Body " + response.body());
+                       //     Log.d("API", "Data Creation Code: " + response.code());
+                        //    Log.d("API", "Data Creation Code: " + response.code());
+                       //     Log.d("API", "Data Creation Body " + response.body());
 
                             MainActivity.appPreference.showToast("Data creation successful");
                             // Handle success
                         } else {
                             // Handle the case where data creation failed
-                            Log.d("API", "ID Value = : " + userId );
-                            Log.d("API", "Token Value = : " + authToken );
-                            Log.e("API", "Request failed: " + call.request().url());
+                      //      Log.d("API", "ID Value = : " + userId );
+                     //      Log.d("API", "Token Value = : " + authToken );
+                      //      Log.e("API", "Request failed: " + call.request().url());
 
-                            Log.d("API", "Data Creation Failed Code: " + response.code());
-                            Log.d("API", "Data Creation Failed Body " + response.body());
+                    //        Log.d("API", "Data Creation Failed Code: " + response.code());
+                     //       Log.d("API", "Data Creation Failed Body " + response.body());
 
                             MainActivity.appPreference.showToast("Data creation failed");
                         }

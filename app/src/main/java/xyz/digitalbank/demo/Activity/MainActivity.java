@@ -88,11 +88,9 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
                 }
                 return true;
             } else if (itemId == R.id.action_dashboard) {
-                Log.d("MainActivity", "Switching to Dashboard");
                 switchToDashboardFragment();
                 return true;
             } else if (itemId == R.id.action_transfer) {
-                Log.d("MainActivity", "Switching to TransferFragment");
                 switchToTransferFragment();
                 return true;
             } else if (itemId == R.id.action_atm_search) {
@@ -108,20 +106,13 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
             }
         });
 
-
-        Log.d("MainActivity", "savedInstanceState before if statement : " + savedInstanceState);
-
         if (savedInstanceState == null) {
-            Log.d("MainActivity", "Login status inside If statement: " + appPreference.getLoginStatus());
 
             if (appPreference.getLoginStatus()) {
-                Log.d("MainActivity", "Replacing with ProfileFragment");
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ProfileFragment())
                         .commit();
             } else {
-
-                Log.d("MainActivity", "Replacing with LoginFragment");
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new LoginFragment())
                         .commit();
@@ -198,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
 
 
     private void switchToTransferFragment() {
-        Log.d("MainActivity", "Switching to TransferFragment");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new TransferFragment())
                 .addToBackStack(null)
@@ -206,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     }
 
     private void switchToDashboardFragment() {
-        Log.d("MainActivity", "Switching to DashBoardFragment");
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new DashboardFragment())
                 .addToBackStack(null)

@@ -52,16 +52,17 @@ public class ProfileFragment extends Fragment {
 
     private List<AccountInfo> accountInfoList = new ArrayList<>();
 
+    private ProgressBar progressBar;
     private AppPreference appPreference;
-    private BottomNavigationView bottomNavigationView;
+
     private List<UserAccountResponse> userAccounts;
+
+    private TextView progressTextView;
 
     public String Email ;
     private String authToken;
     public int accountId ;
     private Spinner accountSpinner;
-    public  AccountInfo selectedAccountInfo;
-    private Context context; // Declare the context variable
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -76,14 +77,17 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        Log.d("ProfileFragment", "onCreateView");
+        // Log.d("ProfileFragment", "onCreateView");
+
+        // Perform null check after inflating the view
+        if (view != null) {
         appPreference = new AppPreference(requireContext());
-
         authToken = MainActivity.appPreference.getauthToken();
+        progressTextView = view.findViewById(R.id.progressTextView);
 
-
-
-
+        if (progressTextView != null) {
+               progressTextView.setVisibility(View.VISIBLE);
+        }
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -168,7 +172,13 @@ public class ProfileFragment extends Fragment {
                 // Handle item selection
                 UserAccountResponse selectedAccount = userAccounts.get(position);
                 int selectedAccountId = selectedAccount.getId();
-                Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId );
+               //  Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId );
+
+                // Show progress text
+                if (progressTextView != null) {
+                    progressTextView.setVisibility(View.VISIBLE);
+                }
+
 
                 // Call the method to get and display account transactions for the selected account
                 getAndDisplayAccountTransactions(authToken , selectedAccountId);
@@ -190,13 +200,16 @@ public class ProfileFragment extends Fragment {
 
         getAndDisplayAccountTransactions( authToken , accountId);
 
+
         String displayName = MainActivity.appPreference.getDisplayName();
         String greetingMessage = "Loading ";
       //  name.setText(greetingMessage);
 
         email = view.findViewById(R.id.email);
 
-     //   email.setText(authTokenMessage);
+        } else {
+            Log.e("ProfileFragment", "View is null");
+        }
 
         return view;
     }
@@ -218,7 +231,7 @@ public class ProfileFragment extends Fragment {
                         if (response.isSuccessful()) {
                             // Authentication successful, get the authToken
                             String authToken = "Bearer " +  response.body().get("authToken").getAsString();
-                            Log.d("API", "Auth Token is = : " + authToken );
+                          //   Log.d("API", "Auth Token is = : " + authToken );
                             // Save the authToken to your app preferences or wherever you need it
                             MainActivity.appPreference.setauthToken(authToken);
 
@@ -236,7 +249,7 @@ public class ProfileFragment extends Fragment {
                                         @Override
                                         public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
 
-                                            Log.d("API", "Email address is = : " + email );
+                                     //      Log.d("API", "Email address is = : " + email );
                                             if (response.isSuccessful()) {
                                                 UserResponse userResponse = response.body();
 
@@ -244,7 +257,7 @@ public class ProfileFragment extends Fragment {
                                                 loggedinuserId = userResponse.getId();
                                                 // Save the authToken to your app preferences or wherever you need it
 
-                                                Log.d("API", "Logged in user ID = : " + loggedinuserId );
+                                            //    Log.d("API", "Logged in user ID = : " + loggedinuserId );
 
                                                 ((MainActivity) requireActivity()).setLoggedinuserId(loggedinuserId);
                                                 appPreference.setLoggedinuserId(loggedinuserId);
@@ -254,7 +267,7 @@ public class ProfileFragment extends Fragment {
                                             } else {
                                                 // Handle the case where findUserId API failed
                                                 MainActivity.appPreference.showToast("Failed to retrieve user ID");
-                                                Log.d("API", "Email address not found  = : " + email );
+                                             //   Log.d("API", "Email address not found  = : " + email );
                                             }
                                         }
 
@@ -367,16 +380,16 @@ public class ProfileFragment extends Fragment {
 
 
             // Display other account details as needed
-            Log.d("UserAccount", "Account Name: " + accountName);
-            Log.d("UserAccount", "Account Type Name: " + accountTypeName);
-            Log.d("UserAccount", "Account ID: " + accountId);
-            Log.d("UserAccount", "Current Balance: " + currentBalance);
-            Log.d("User Account", "Account Number: " + account.getAccountNumber());
-            Log.d("User Account", "Current Balance: " + account.getCurrentBalance());
-            Log.d("User Account", "Opening Balance: " + account.getOpeningBalance());
-            Log.d("User Account", "Interest Rate: " + account.getInterestRate());
+         //   Log.d("UserAccount", "Account Name: " + accountName);
+         //   Log.d("UserAccount", "Account Type Name: " + accountTypeName);
+         //   Log.d("UserAccount", "Account ID: " + accountId);
+            //   Log.d("UserAccount", "Current Balance: " + currentBalance);
+            // Log.d("User Account", "Account Number: " + account.getAccountNumber());
+            // Log.d("User Account", "Current Balance: " + account.getCurrentBalance());
+            // Log.d("User Account", "Opening Balance: " + account.getOpeningBalance());
+            // Log.d("User Account", "Interest Rate: " + account.getInterestRate());
             if (account.getAccountType() != null) {
-                Log.d("User Account", "Account Type Name: " + account.getAccountType().getName());
+            //    Log.d("User Account", "Account Type Name: " + account.getAccountType().getName());
             }
 
 
@@ -403,7 +416,7 @@ public class ProfileFragment extends Fragment {
                 AccountInfo selectedAccount = accountInfoList.get(position);
                 int selectedAccountId = selectedAccount.getId();
 
-                Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId);
+             //   Log.d("API", "Selected Account ID from Drop Down = : " + selectedAccountId);
                 // Call the method to get and display account transactions for the selected account
                 authToken = MainActivity.appPreference.getauthToken();
                 updateSelectedAccountDetails(accountInfoList.get(position));
@@ -463,9 +476,14 @@ public class ProfileFragment extends Fragment {
     }
     private void getAndDisplayAccountTransactions(String authToken, int accountId) {
         RetrofitClient.getServiceApi(requireContext()).getAccountTransactions(accountId, authToken)
+
                 .enqueue(new Callback<List<TransactionResponse>>() {
+
                     @Override
                     public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                        if (progressTextView != null) {
+                            progressTextView.setVisibility(View.VISIBLE);
+                        }
                         if (response.isSuccessful()) {
                             List<TransactionResponse> accountTransactions = response.body();
                             displayAccountTransactions(accountTransactions);
@@ -484,6 +502,11 @@ public class ProfileFragment extends Fragment {
         // Assuming you have a reference to the TableLayout in your fragment
         TableLayout tableLayout = getView().findViewById(R.id.tableLayout);
 
+        if (tableLayout == null) {
+            Log.e("ProfileFragment", "TableLayout is null");
+            return; // Exit the method if TableLayout is null
+        }
+
         // Clear existing rows in the TableLayout except the header row
         tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
 
@@ -491,6 +514,9 @@ public class ProfileFragment extends Fragment {
         for (TransactionResponse transaction : accountTransactions) {
             // Create a new TableRow
             TableRow row = new TableRow(requireContext());
+            if (progressTextView != null) {
+                progressTextView.setVisibility(View.VISIBLE);
+            }
 
             // Create TextViews to display the transaction details
             TextView descriptionTextView = new TextView(requireContext());
@@ -519,12 +545,10 @@ public class ProfileFragment extends Fragment {
             row.addView(amountTextView);
             row.addView(runningBalanceTextView);
 
-
-// Call this method for each TextView
+            // Call this method for each TextView
             setFixedHeight(descriptionTextView);
             setFixedHeight(amountTextView);
             setFixedHeight(runningBalanceTextView);
-
 
             // Apply the border/background to TextViews
             descriptionTextView.setBackgroundResource(R.drawable.border_background); // Apply the border
@@ -533,6 +557,8 @@ public class ProfileFragment extends Fragment {
 
             // Add the TableRow to the TableLayout
             tableLayout.addView(row);
+            progressTextView.setVisibility(View.INVISIBLE);
+
         }
     }
 
@@ -552,7 +578,7 @@ public class ProfileFragment extends Fragment {
 
     private void switchToProfileFragment() {
         // Log to check if this method is being called
-        Log.d("ProfileFragment", "Switching to Check Accounts");
+        // Log.d("ProfileFragment", "Switching to Check Accounts");
 
         // Check if the current fragment is not already MainActivity
         if (!(getActivity() instanceof MainActivity)) {
@@ -576,11 +602,11 @@ public class ProfileFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("ProfileFragment", "onCreate");
+
     }
     public void onResume() {
         super.onResume();
-        Log.d("ProfileFragment", "onResume");
+
     }
 
     // Add this method to set fixed height for TextViews
@@ -589,7 +615,18 @@ public class ProfileFragment extends Fragment {
         textView.setHeight(getResources().getDimensionPixelSize(R.dimen.row_height));
     }
 
-    @Override
+    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+        progressBar.setVisibility(View.GONE); // Hide progressBar after receiving response
+        // Rest of your code...
+    }
+
+
+    public void onFailure(Call<JsonObject> call, Throwable t) {
+        progressBar.setVisibility(View.GONE); // Hide progressBar in case of API call failure
+        // Handle failure...
+    }
+
+
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Activity activity = (Activity) context;
