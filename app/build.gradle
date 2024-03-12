@@ -6,11 +6,20 @@ perfectoGradleSettings {
     configFileLocation "configFile.json"
 }
 
-def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.4"
+// Perfecto's artifact repository
+repositories {
+    maven {
+        url 'https://repo1.perfectomobile.com/public/repositories/maven'
+    }
+    mavenCentral() // Adding Maven Central repository
+    // Add other repositories if necessary
+}
 
+def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.4"
 
 android {
     compileSdk 34
+    namespace 'xyz.digitalbank.demo'
     defaultConfig {
         applicationId "xyz.digitalbank.demo"
         minSdkVersion 28
@@ -20,7 +29,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-         coreLibraryDesugaringEnabled = false
+        coreLibraryDesugaringEnabled = false
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
     }
     signingConfigs {
         release {
@@ -30,6 +42,7 @@ android {
             keyPassword "password"
         }
     }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -44,16 +57,19 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            // Use archivesBaseName to set the output file name
             outputFileName = "Digital-Bank-${variant.versionName}.apk"
         }
     }
-    namespace 'xyz.digitalbank.demo'
-    flavorDimensions "default"
+
+    sourceSets {
+        // Define the source set for the androidTest configuration
+        androidTest {
+            java.srcDirs = ['src/androidTest/java']
+        }
+    }
 
 
 }
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -84,7 +100,13 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.google.android.material:material:1.5.0'
 
-
-
-
+    implementation 'org.seleniumhq.selenium:selenium-java:4.18.1'
+    implementation 'org.seleniumhq.selenium:selenium-android-driver:2.39.0'
+    implementation 'org.seleniumhq.selenium:selenium-support:4.18.1'
+    implementation 'io.appium:java-client:9.1.0'
+    // TestNG
+    testImplementation 'org.testng:testng:7.4.0'
+    androidTestImplementation 'org.testng:testng:7.4.0'
+    // Reportium SDK
+    implementation "com.perfecto.reporting-sdk:reportium-java:2.3.4"
 }

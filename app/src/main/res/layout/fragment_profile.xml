@@ -8,6 +8,10 @@
     android:padding="16dp"
     tools:context=".Fragments.ProfileFragment">
 
+    <!-- Include your custom action bar layout -->
+    <include
+        android:id="@+id/action_bar"
+        layout="@layout/action_bar"/>
 
     <!-- Welcome Message and First Name -->
     <TextView

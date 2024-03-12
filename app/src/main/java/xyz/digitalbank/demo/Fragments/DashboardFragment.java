@@ -18,6 +18,7 @@ import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
 import com.anychart.core.cartesian.series.Bar;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,18 @@ import xyz.digitalbank.demo.Model.AccountInfo;
 import xyz.digitalbank.demo.Model.UserAccountResponse;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.RetrofitClient;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.view.WindowManager;
+import androidx.appcompat.widget.Toolbar;
+
+import android.view.MenuItem;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
 
 
 
@@ -42,6 +55,13 @@ public class DashboardFragment extends Fragment {
 
     private String authToken;
     private int loggedinuserId;
+
+
+
+    // Declare PopupWindow and its components
+    private PopupWindow popupWindow;
+    private TextView userNameTextView;
+    private TextView logoutLinkTextView;
 
     private ProgressBar progressBar;
 
@@ -56,6 +76,7 @@ public class DashboardFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.your_dashboard_layout, container, false);
@@ -63,6 +84,60 @@ public class DashboardFragment extends Fragment {
         anyChartView = view.findViewById(R.id.Any_chart_view);
         progressBar = view.findViewById(R.id.progressBar);
         context = getContext();
+
+        Toolbar toolbar = view.findViewById(R.id.action_bar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.outline_account_circle_24); // Set your profile icon drawable here
+
+        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+        toolbarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle profile icon click event here
+                // For example, show popup window
+                PopupWindow popupWindow = new PopupWindow(context);
+                View popupView = getLayoutInflater().inflate(R.layout.popup_user_info, null);
+
+                // Set up popup window content
+                TextView userNameTextView = popupView.findViewById(R.id.text_user_name);
+                // Set the user name in the text view
+                userNameTextView.setText("User Name"); // Replace "User Name" with the actual user name
+
+                TextView logoutLinkTextView = popupView.findViewById(R.id.link_logout);
+                // Set a click listener for the logout link
+                logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Handle logout action here
+                        MainActivity mainActivity = (MainActivity) requireActivity();
+                        if (popupWindow != null && popupWindow.isShowing()) {
+                            popupWindow.dismiss();
+                        }
+                        mainActivity.logout();
+                    }
+                });
+
+                // Set popup window size and show at the bottom of the toolbar
+                popupWindow.setContentView(popupView);
+                popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+                popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+                popupWindow.showAsDropDown(toolbar);
+            }
+        });
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == android.R.id.home) {
+                    // Handle home/menu item click event here
+                    return true;
+                }
+                return false;
+            }
+        });
 
         // Retrieve authToken from SharedPreferences
         authToken = MainActivity.appPreference.getauthToken();
@@ -77,24 +152,16 @@ public class DashboardFragment extends Fragment {
 
             String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
             Log.e("DashBoard", "BASE URL is = " + BASE_URL);
-            //    FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
-
-
-
-            //    View transferScreen = inflater.inflate(R.layout.your_dashboard_layout, transferContainer, false);
-
             // Call the method to get user accounts and update the chart
             getUserAccounts(authToken, loggedinuserId);
 
         } else {
             // User is not logged in, handle accordingly
- //
-         //   Log.d("DashboardFragment", "User is not logged in. Redirect to login screen.");
+            // Log.d("DashboardFragment", "User is not logged in. Redirect to login screen.");
         }
 
         return view;
     }
-
 
 
     private void getUserAccounts(String authToken, int loggedinuserId) {

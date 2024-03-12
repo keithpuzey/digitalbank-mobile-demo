@@ -123,13 +123,7 @@ public class ProfileFragment extends Fragment {
                 // Start the atm_search activity
                 startActivity(new Intent(getActivity(), atm_search.class));
                 return true;
-            } else if (itemId == R.id.action_logout) {
-                // Handle the logout click
-                if (logoutListener != null) {
-                    logoutListener.logout();
-                }
-                return true;
-            } else {
+            }  else {
                 return false;
             }
         });

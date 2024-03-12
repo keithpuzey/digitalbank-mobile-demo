@@ -25,8 +25,6 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-
-
 public class MainActivity extends AppCompatActivity implements MyInterface {
 
     private BottomNavigationView bottomNavigationView;
@@ -98,10 +96,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
                         .replace(R.id.fragment_container, new AtmSearchFragment())
                         .commit();
                 return true;
-            } else if (itemId == R.id.action_logout) {
-                logout();
-                return true;
-            } else {
+            }  else {
                 return false;
             }
         });
