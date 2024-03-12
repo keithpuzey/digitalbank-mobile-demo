@@ -41,6 +41,7 @@ import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Services.ServiceApi;
 
 
+
 @RequiresApi(api = Build.VERSION_CODES.P)
 
 public class LoginFragment extends Fragment {
@@ -74,8 +75,22 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getContext();
+        if (context == null) {
+            // Log an error or handle the null context appropriately
+            Log.e("YourFragment", "getContext() returned null in onCreateView()");
+            return null; // Return early or handle the null context case
+        }
+
         String BASE_URL = ConstantsManager.getBaseUrl(context);
-        Log.e("Login", "BASE URL is = " + BASE_URL);
+
+        // Logging the value of BASE_URL after retrieving it from SharedPreferences
+        Log.d("SharedPreferences", "BASE_URL: " + BASE_URL);
+
+// Logging the value of MOCK_URL after retrieving it from SharedPreferences
+        String MOCK_URL = ConstantsManager.getMockUrl(context);
+        Log.d("SharedPreferences", "MOCK_URL: " + MOCK_URL);
+
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
@@ -88,8 +103,6 @@ public class LoginFragment extends Fragment {
         // Set version number dynamically
         versionTextView.setText("Version :" + buildNumber);
 
-
-
         // Initialize the ServiceApi instance
         serviceApi = RetrofitClient.getRetrofitInstance(context).create(ServiceApi.class);
 
@@ -100,7 +113,9 @@ public class LoginFragment extends Fragment {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Log.d("LoginFragment", "Login button clicked");
+                Log.d("LoginFragment", "Login button clicked");
+                Log.e("LoginFragment", "BASE URL is = " + BASE_URL);
+                Log.d("SharedPreferences", "BASE_URL: " + BASE_URL);
                 loginUser();
             }
         });
@@ -250,8 +265,6 @@ public class LoginFragment extends Fragment {
 
     }
 
-
-
     private void loginUser() {
         String Email = emailInput.getText().toString();
         String Password = passwordInput.getText().toString();
@@ -275,7 +288,7 @@ public class LoginFragment extends Fragment {
                         ((MainActivity) requireActivity()).setEmail(Email);
 
                         MainActivity.appPreference.setLoginStatus(true);
-                    //    Log.d("Login", " Login API Being Called");
+                        Log.d("Login", " Login API Being Called");
 
                         myInterface.login(response.body().getAuthToken(), Email);
 

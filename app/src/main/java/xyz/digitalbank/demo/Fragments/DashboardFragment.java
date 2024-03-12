@@ -76,7 +76,7 @@ public class DashboardFragment extends Fragment {
             String email = MainActivity.appPreference.getDisplayEmail();
 
             String BASE_URL = ConstantsManager.getBaseUrl(requireContext());
-            Log.e("Login", "BASE URL is = " + BASE_URL);
+            Log.e("DashBoard", "BASE URL is = " + BASE_URL);
             //    FrameLayout transferContainer = view.findViewById(R.id.transferContainer);
 
 

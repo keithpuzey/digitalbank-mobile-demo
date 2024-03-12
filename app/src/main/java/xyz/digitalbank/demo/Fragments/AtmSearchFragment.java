@@ -98,7 +98,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         // Initially hide responseTextView
         responseTextView.setVisibility(View.GONE);
 
-        
+
 
         // Set click listeners for checkboxes
         checkbox1.setOnClickListener(this);
@@ -114,21 +114,19 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 if (!checkbox1.isChecked() && !checkbox2.isChecked() && !checkbox3.isChecked()) {
                     // Display a message indicating no checkbox is selected
                     Toast.makeText(requireContext(), "Please select  one option", Toast.LENGTH_SHORT).show();
-                    return; // Exit the method early
 
                 } else if (checkbox1.isChecked()) {
                     responseTextView.setVisibility(View.VISIBLE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationGPSClick();
-                        // Example: startActivity(intentForCheckbox1);
 
                 } else if (checkbox2.isChecked()) {
                     responseTextView.setVisibility(View.VISIBLE);
                     getLocationButton.setVisibility(View.GONE);
                     updateLocationButton.setVisibility(View.VISIBLE);
                     handleAtmLocationNetworkClick();
-                    // Example: startActivity(intentForCheckbox2);
+
                 } else if (checkbox3.isChecked()) {
                     responseTextView.setVisibility(View.GONE);
                     getLocationButton.setVisibility(View.GONE);
@@ -137,7 +135,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     // Example: startActivity(intentForCheckbox3);
                 } else {
                     // No checkbox selected
-                    // Example: showErrorMessage();
+
                 }
             }
         });
@@ -220,7 +218,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         getIpAddress();
     }
 
-
     private void getLocationAndMakeRequest() {
         // Get the location manager
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -247,106 +244,39 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                 double latitude = location.getLatitude();
                                 double longitude = location.getLongitude();
                                 String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
-                             //   Log.d("GPS", "URL =  " + apiUrl );
+
                                 // Perform network request on a separate thread
                                 new Thread(() -> {
                                     try {
                                         URL url = new URL(apiUrl);
+
                                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                                         connection.setRequestMethod("GET");
 
-                                        // Read the response
-                                        InputStream inputStream = connection.getInputStream();
-                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                                        StringBuilder response = new StringBuilder();
-                                        String line;
-                                        while ((line = bufferedReader.readLine()) != null) {
-                                            response.append(line);
-                                        }
-                                    //    Log.d("NetworkResponse", "Response: " + response.toString());
+                                        // Read the response code
+                                        int responseCode = connection.getResponseCode();
 
-                                        try {
-                                            JSONObject jsonResponse = new JSONObject(response.toString());
+                                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                                            // Read the response
+                                            InputStream inputStream = connection.getInputStream();
+                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                                            StringBuilder response = new StringBuilder();
+                                            String line;
+                                            while ((line = bufferedReader.readLine()) != null) {
+                                                response.append(line);
+                                            }
 
-                                            // Extract the "address" object from the JSON response
-                                            JSONObject addressObject = jsonResponse.optJSONObject("address");
+                                            // Process the response
+                                            processgpsApiResponse(response.toString());
 
-                                            // Extract relevant information
-                                            String country = addressObject.optString("country", "");
-                                            String postcode = addressObject.optString("postcode", "");
-                                            String state = addressObject.optString("state", "");
-                                            String county = addressObject.optString("county", "");
-                                            String address = addressObject.optString("address", "");
-                                            String road = addressObject.optString("road", "");
-
-                                            // Build a formatted string with the extracted information
-                                            //String formattedInfo =
-                                            //        "ATM Location - GPS :" + "\n" + "\n" +
-                                            //        "Road:" + road + "\n" +
-                                            //                "County:" + county + "\n" +
-                                            //                "State:" + state + "\n" +
-                                            //                "Postcode:" + postcode + "\n" +
-                                            //                "Country:" + country + "\n";
-
-//                                            Log.d("FormattedInfo", formattedInfo);
-
-
+                                        } else {
+                                            // Handle HTTP error response
                                             requireActivity().runOnUiThread(() -> {
-                                                TextView responseTextView = view.findViewById(R.id.responseTextView);
-
-                                                // Load the cell tower icon drawable
-                                                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_gps_fixed_24, null);
-                                                drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-
-                                                // Check if the drawable is loaded successfully
-                                                if (drawable != null) {
-                                                    // Set bounds for the drawable
-                                                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-
-                                                    // Create a SpannableStringBuilder to combine text and image
-                                                    SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
-
-                                                    String firstLine = "    ATM Location - GPS";
-                                                    spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                                                    int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
-
-                                                    String restOfInfo =
-                                                            "\n\n" +
-                                                                    boldenColumn("Road:           ", road, maxColumnNameLength) + "\n" +
-                                                                    boldenColumn("County:       ", county, maxColumnNameLength) + "\n" +
-                                                                    boldenColumn("State:           ", state, maxColumnNameLength) + "\n" +
-                                                                    boldenColumn("Postcode: ", postcode, maxColumnNameLength) + "\n" +
-                                                                    boldenColumn("Country:      ", country, maxColumnNameLength);
-
-                                                    spannableBuilder.append(restOfInfo);
-
-
-                                                    // Append the cell tower icon to the SpannableStringBuilder
-                                                    spannableBuilder.append("  ");
-                                                    ImageSpan imageSpan = new ImageSpan(drawable);
-                                                    spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                                                    // Set the combined text and image to the TextView
-                                                    responseTextView.setText(spannableBuilder);
-                                                    responseTextView.setTextColor(Color.rgb(24,29,47));
-                                                    //  responseTextView.setGravity(Gravity.LEFT);
-                                                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                                                    responseTextView.setBackgroundColor(Color.rgb(217,217,214));
-
-                                                } else {
-
-                                                }
-
+                                                handleError("HTTP Error: " + responseCode);
                                             });
-
-                                        } catch (JSONException e) {
-                                            e.printStackTrace(); // Handle the exception in an appropriate way
                                         }
 
                                         // Close connections
-                                        bufferedReader.close();
-                                        inputStream.close();
                                         connection.disconnect();
 
                                     } catch (IOException e) {
@@ -378,6 +308,71 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
+    // Method to process the API response
+    private void processgpsApiResponse(String response) {
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+
+            // Extract the "address" object from the JSON response
+            JSONObject addressObject = jsonResponse.optJSONObject("address");
+
+            // Extract relevant information
+            String country = addressObject.optString("country", "");
+            String postcode = addressObject.optString("postcode", "");
+            String state = addressObject.optString("state", "");
+            String county = addressObject.optString("county", "");
+            String address = addressObject.optString("address", "");
+            String road = addressObject.optString("road", "");
+
+            // Display the response on the UI
+            requireActivity().runOnUiThread(() -> {
+                TextView responseTextView = view.findViewById(R.id.responseTextView);
+
+                // Load the cell tower icon drawable
+                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.outline_gps_fixed_24, null);
+                drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+
+                if (drawable != null) {
+                    // Set bounds for the drawable
+                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+
+                    // Create a SpannableStringBuilder to combine text and image
+                    SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
+
+                    String firstLine = "    ATM Location - GPS";
+                    spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
+
+                    String restOfInfo =
+                            "\n\n" +
+                                    boldenColumn("Road:           ", road, maxColumnNameLength) + "\n" +
+                                    boldenColumn("County:       ", county, maxColumnNameLength) + "\n" +
+                                    boldenColumn("State:           ", state, maxColumnNameLength) + "\n" +
+                                    boldenColumn("Postcode: ", postcode, maxColumnNameLength) + "\n" +
+                                    boldenColumn("Country:      ", country, maxColumnNameLength);
+
+                    spannableBuilder.append(restOfInfo);
+
+                    // Append the cell tower icon to the SpannableStringBuilder
+                    spannableBuilder.append("  ");
+                    ImageSpan imageSpan = new ImageSpan(drawable);
+                    spannableBuilder.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    // Set the combined text and image to the TextView
+                    responseTextView.setText(spannableBuilder);
+                    responseTextView.setTextColor(Color.rgb(24, 29, 47));
+                    responseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                    responseTextView.setBackgroundColor(Color.rgb(217, 217, 214));
+                }
+            });
+
+        } catch (JSONException e) {
+            e.printStackTrace(); // Handle the exception in an appropriate way
+        }
+    }
+
     private CharSequence boldenColumn(String columnName, String columnValue, int maxColumnNameLength) {
         SpannableStringBuilder columnBuilder = new SpannableStringBuilder();
 
@@ -407,61 +402,42 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
     private void getIpAddress() {
         // URL for the IP address API
-    //    String ipApiUrl = "https://api.ipify.org/?format=json";
-        String ipApiUrl = " https://api.seeip.org/jsonip?";
+        String ipApiUrl = "https://api.seeip.org/jsonip";
+
         // Perform network request on a separate thread
         new Thread(() -> {
             try {
                 URL url = new URL(ipApiUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-               // Log.d("IpResponse", "Connection String : " + connection);
 
                 // Read the response
-                InputStream inputStream = connection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                 //   Log.d("IpResponse", "Process Response : " + bufferedReader.readLine());
-                    response.append(line);
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = connection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    // Process the response
+                    processIpAddressResponse(response.toString());
+
+                    // Close connections
+                    bufferedReader.close();
+                    inputStream.close();
+                } else {
+                    // Handle HTTP error response
+                    handleError("HTTP Error: " + responseCode);
                 }
 
-                // Log the IP address response
-            //    Log.d("IpResponse", "Response: " + response.toString());
-
-                try {
-                    // Extract IP address from the JSON response
-                    JSONObject jsonResponse = new JSONObject(response.toString());
-                    String ipAddress = jsonResponse.optString("ip", "");
-
-
-
-
-                    // Display the IP address on the screen
-                    requireActivity().runOnUiThread(() -> {
-                        TextView ipTextView = view.findViewById(R.id.responseTextView);
-                       // ipTextView.setText("IP Address: " + ipAddress);
-                    });
-
-                    // Make a second network request with the obtained IP address
-                    getDetailsForIpAddress(ipAddress);
-
-                } catch (JSONException e) {
-                    e.printStackTrace(); // Log the error for debugging
-                    requireActivity().runOnUiThread(() -> {
-                        // Handle the exception in an appropriate way (e.g., show a Toast)
-                        Toast.makeText(requireContext(), "Error parsing JSON response", Toast.LENGTH_SHORT).show();
-                    });
-                }
-
-                // Close connections
-                bufferedReader.close();
-                inputStream.close();
                 connection.disconnect();
-
             } catch (IOException e) {
                 e.printStackTrace();
+                // Handle IO exceptions
+                handleError("IO Exception: " + e.getMessage());
             }
         }).start();
     }
@@ -790,7 +766,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     responseTextView.setBackgroundColor(Color.rgb(217,217,214));
                     responseTextView.setVisibility(View.VISIBLE);
 
-                    // Handle the rest of the information if necessary
                 } else {
                     // Handle case when drawable is not loaded
                 }
@@ -806,7 +781,47 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         }
     }
 
+    private void processIpAddressResponse(String response) {
+        try {
+            // Extract IP address from the JSON response
+            JSONObject jsonResponse = new JSONObject(response);
+            String ipAddress = jsonResponse.optString("ip", "");
 
+            // Display the IP address on the screen
+            requireActivity().runOnUiThread(() -> {
+                TextView ipTextView = view.findViewById(R.id.responseTextView);
+                ipTextView.setText("IP Address: " + ipAddress);
+            });
+
+            // Make a second network request with the obtained IP address
+            getDetailsForIpAddress(ipAddress);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            // Handle JSON parsing exceptions
+            handleError("JSON Exception: " + e.getMessage());
+        }
+    }
+
+    // Method to process the API response
+    private void processApiResponse(String response) {
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            // Process the JSON response here
+        } catch (JSONException e) {
+            e.printStackTrace();
+            // Handle JSON parsing exceptions
+            handleError("JSON Exception: " + e.getMessage());
+        }
+    }
+
+    // Method to handle API errors
+    private void handleError(String errorMessage) {
+        requireActivity().runOnUiThread(() -> {
+            // Display error message to the user
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            // You can also update UI elements or perform other actions based on the error
+        });
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -815,8 +830,8 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                 // Permission granted, call your location-related method again
                 getLocationAndMakeRequest();
             } else {
-                // Permission denied, handle accordingly
-                // You may want to inform the user or provide an alternative flow
+                // Permission denied
+
             }
         }
     }

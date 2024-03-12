@@ -23,13 +23,13 @@ public interface ServiceApi {
     @GET("register.php")
     Call<User> doRegistration(@Query("name") String name, @Query("email") String email, @Query("phone") String phone, @Query("password") String password);
 
-    @POST("bank/api/v1/auth")
+    @POST("api/v1/auth")
     Call<User> doLogin(@Query("username") String email, @Query("password") String password);
 
-    @POST("bank/api/v1/auth")
+    @POST("api/v1/auth")
     Call<JsonObject> authenticateUser(@Query("username") String username, @Query("password") String adminpassword);
 
-    @POST("bank/api/v1/user")
+    @POST("api/v1/user")
     Call<Void> registerUser(
             @Header("Authorization") String authToken,
             @Header("Content-Type") String contentType,
@@ -37,7 +37,7 @@ public interface ServiceApi {
             @Body UserRequest userRequest
     );
 
-    @POST("bank/api/v1/account/{toAccountId}/transaction")
+    @POST("api/v1/account/{toAccountId}/transaction")
     Call<Void> transferFunds(
             @Path("toAccountId") int toAccountId,
             @Query("action") String action,
@@ -47,31 +47,31 @@ public interface ServiceApi {
     );
 
 
-    @GET("bank/api/v1/user/find")
+    @GET("api/v1/user/find")
     Call<UserResponse> findUserId(
             @Header("Authorization") String authToken,
             @Query("username") String email
     );
 
-    @POST("bank/api/v1/user/{id}/data/create")
+    @POST("api/v1/user/{id}/data/create")
     Call<Void> createData(
             @Path("id") int userId,
             @Header("Authorization") String authToken
     );
 
-    @GET("bank/api/v1/user/{id}/profile")
+    @GET("api/v1/user/{id}/profile")
     Call<UserProfileResponse> getUserProfile(
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
         );
 
-    @GET("bank/api/v1/user/{id}/account")
+    @GET("api/v1/user/{id}/account")
     Call<List<UserAccountResponse>> getUserAccounts(
             @Path("id") int loggedinuserId,
             @Header("Authorization") String authToken
     );
 
-    @GET("bank/api/v1/account/{accountid}/transaction")
+    @GET("api/v1/account/{accountid}/transaction")
     Call<List<TransactionResponse>> getAccountTransactions(
             @Path("accountid") int accountId,
             @Header("Authorization") String authToken

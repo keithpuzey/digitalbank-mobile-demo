@@ -1,21 +1,27 @@
 package xyz.digitalbank.demo.Fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
 import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.MyInterface;
+import android.content.Intent;
+import xyz.digitalbank.demo.Activity.MainActivity;
+import android.app.PendingIntent;
+import android.app.AlarmManager;
+import xyz.digitalbank.demo.Constants.Constant;
 
-public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener, MyInterface {
+public class ConstantsEditActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button cancelBtn,  saveBtn;
+    private Button cancelBtn,  saveBtn, restartBtn, resetBtn;
+
     private EditText editTextBaseUrl, editTextMockUrl;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,22 +33,17 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         editTextBaseUrl = findViewById(R.id.editTextBaseUrl);
         editTextMockUrl = findViewById(R.id.editTextMockUrl);
         cancelBtn = findViewById(R.id.cancelBtn);
-        saveBtn = findViewById(R.id.saveBtn); // Initialize the save button
-
-
-        // Set current constant values in EditText fields
-      //  editTextBaseUrl.setText(Constant.baseUrl.BASE_URL);
-      //  editTextMockUrl.setText(Constant.baseUrl.MOCK_URL);
-
+        saveBtn = findViewById(R.id.saveBtn);
+        restartBtn = findViewById(R.id.restartBtn);
+        resetBtn = findViewById(R.id.resetBtn);
 
         // Set click listeners for buttons
         cancelBtn.setOnClickListener(this);
-        saveBtn.setOnClickListener(this); // Set click listener for the save button
-
+        saveBtn.setOnClickListener(this);
+        restartBtn.setOnClickListener(this);
+        resetBtn.setOnClickListener(this);
         // Set current constant values in EditText fields
-        loadCurrentConstants(); // Load the values when the activity is created
-
-
+        loadCurrentConstants();
     }
 
     @Override
@@ -53,65 +54,72 @@ public class ConstantsEditActivity extends AppCompatActivity implements View.OnC
         } else if (view.getId() == R.id.saveBtn) {
             // Handle save button click
             updateConstants();
+         } else if (view.getId() == R.id.restartBtn) {
+            // Handle restart button click
+            restartApp();
+        } else if (view.getId() == R.id.resetBtn) {
+            // Handle reset button click
+            resetConstants();
         }
     }
-
 
     private void loadCurrentConstants() {
         // Load the current values from SharedPreferences and set them to EditText fields
         String currentBaseUrl = ConstantsManager.getBaseUrl(this);
         String currentMockUrl = ConstantsManager.getMockUrl(this);
 
-        // Log statements to check values
-        Log.d("ConstantsEditActivity", "Loaded BaseUrl: " + currentBaseUrl);
-        Log.d("ConstantsEditActivity", "Loaded MockUrl: " + currentMockUrl);
-
         editTextBaseUrl.setText(currentBaseUrl);
         editTextMockUrl.setText(currentMockUrl);
     }
 
+    private void resetConstants() {
+        // Reset the values to the original ones
+        ConstantsManager.setBaseUrl(this, "http://dbankdemo.com/bank/");
+        ConstantsManager.setMockUrl(this, "http://dbmobile322871.mock.blazemeter.com/");
+
+        // Reload the EditText fields with original values
+        loadCurrentConstants();
+
+        // Show a toast message to indicate reset success
+        Toast.makeText(this, "Constants reset successfully", Toast.LENGTH_SHORT).show();
+
+    }
     private void updateConstants() {
-        // Get the new values from EditText fields
         String newBaseUrl = editTextBaseUrl.getText().toString();
         String newMockUrl = editTextMockUrl.getText().toString();
 
-        // Update the constant values using ConstantsManager
-        ConstantsManager.setBaseUrl(this, newBaseUrl);
-        ConstantsManager.setMockUrl(this, newMockUrl);
+        // Validate the input (optional)
+        if (isValidUrl(newBaseUrl) && isValidUrl(newMockUrl)) {
+            ConstantsManager.setBaseUrl(this, newBaseUrl);
+            ConstantsManager.setMockUrl(this, newMockUrl);
 
-        // Log statements to check values
-        Log.d("ConstantsEditActivity", "Updated BaseUrl: " + newBaseUrl);
-        Log.d("ConstantsEditActivity", "Updated MockUrl: " + newMockUrl);
-
-        // Finish the activity when save button is clicked
-        finish();
+            // Show a toast message to indicate success
+            Toast.makeText(this, "Constants updated successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            // Show an error message if input is invalid
+            Toast.makeText(this, "Invalid URL", Toast.LENGTH_SHORT).show();
+        }
     }
-
-    protected void onResume() {
-        super.onResume();
-
-
-    }
-
 
     private void navigateToLoginFragment() {
 
         finish();
     }
 
-
-
-    @Override
-    public void login(String authToken, String Email) {
-        // Dummy implementation or leave it empty
+    private void restartApp() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        int mPendingIntentId = 123456;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE); // Add FLAG_IMMUTABLE
+        AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
     }
 
-    @Override
-    public void register() {
-        // Dummy implementation or leave it empty
+    private boolean isValidUrl(String url) {
+        // Add your URL validation logic here
+        // For example, you can use regular expressions to validate the URL format
+        // This is just a placeholder method; replace it with your actual validation logic
+        return url != null && !url.isEmpty(); // Example: Validates if the URL is not empty
     }
 
-    public void logout() {
-        // Add any necessary implementation or leave it empty if not needed
-    }
 }
