@@ -2,17 +2,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_gravity="end"
-    android:padding="16dp"
+    android:layout_gravity="right"
+    android:padding="5dp"
     android:background="@android:color/white">
 
-    <!-- Display user name -->
-    <TextView
-        android:id="@+id/text_user_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User Name"
-        android:textSize="18sp"/>
 
     <!-- Logout link -->
     <TextView
@@ -20,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Logout"
-        android:textColor="@android:color/holo_blue_dark"
+        android:textColor="@color/colorPrimary"
         android:textSize="16sp"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="5dp"/>
 </LinearLayout>

@@ -17,17 +17,24 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -53,6 +60,9 @@ import xyz.digitalbank.demo.Model.DepositRequest;
 import xyz.digitalbank.demo.Model.UserAccountResponse;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.RetrofitClient;
+
+
+
 public class TransferFragment extends Fragment {
 
     private ArrayAdapter<AccountInfo> adapter;
@@ -76,6 +86,15 @@ public class TransferFragment extends Fragment {
     private RadioButton creditRadioButton;
     private RadioButton debitRadioButton;
     private static final String TAG = TransferFragment.class.getSimpleName();
+
+
+
+    // Declare PopupWindow and its components
+    private PopupWindow popupWindow;
+    private TextView userNameTextView;
+    private TextView logoutLinkTextView;
+
+
 
     private boolean isValidAmount(String amountStr) {
         try {
@@ -141,6 +160,32 @@ public class TransferFragment extends Fragment {
         creditRadioButton = view.findViewById(R.id.creditRadioButton);
         debitRadioButton = view.findViewById(R.id.debitRadioButton);
 
+        Toolbar toolbar = view.findViewById(R.id.action_bar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setHomeAsUpIndicator(null);
+
+        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+        toolbarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(toolbarImage);
+            }
+        });
+
+        View rootLayout = view.findViewById(R.id.transfer_root_layout);
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (popupWindow != null && popupWindow.isShowing()) {
+                    popupWindow.dismiss();
+                    return true; // Consume the touch event to prevent it from propagating further
+                }
+                return false; // Allow the touch event to propagate if the popup menu is not showing
+            }
+        });
 
         setupAccountSpinner(accountSpinner);
 
@@ -225,6 +270,27 @@ public class TransferFragment extends Fragment {
         }
     }
 
+    private void showPopupMenu(View anchorView) {
+        if (popupWindow == null) {
+            View popupView = getLayoutInflater().inflate(R.layout.popup_user_info, null);
+
+            logoutLinkTextView = popupView.findViewById(R.id.link_logout);
+            logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity mainActivity = (MainActivity) requireActivity();
+                    if (popupWindow != null && popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                    }
+                    mainActivity.logout();
+                }
+            });
+
+            popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+        }
+
+        popupWindow.showAsDropDown(anchorView);
+    }
     private void initializeOCR() {
         tessBaseAPI = new TessBaseAPI();
         String dataPath = requireActivity().getFilesDir().getAbsolutePath();

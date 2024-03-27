@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -20,6 +24,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -57,6 +64,13 @@ public class ProfileFragment extends Fragment {
 
     private List<UserAccountResponse> userAccounts;
 
+
+
+    // Declare PopupWindow and its components
+    private PopupWindow popupWindow;
+    private TextView userNameTextView;
+    private TextView logoutLinkTextView;
+
     private TextView progressTextView;
 
     public String Email ;
@@ -84,6 +98,33 @@ public class ProfileFragment extends Fragment {
         appPreference = new AppPreference(requireContext());
         authToken = MainActivity.appPreference.getauthToken();
         progressTextView = view.findViewById(R.id.progressTextView);
+        Toolbar toolbar = view.findViewById(R.id.action_bar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setHomeAsUpIndicator(null);
+
+            ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+            toolbarImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showPopupMenu(toolbarImage);
+                }
+            });
+
+            View rootLayout = view.findViewById(R.id.profile_root_layout);
+            rootLayout.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (popupWindow != null && popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                        return true; // Consume the touch event to prevent it from propagating further
+                    }
+                    return false; // Allow the touch event to propagate if the popup menu is not showing
+                }
+            });
+
 
         if (progressTextView != null) {
                progressTextView.setVisibility(View.VISIBLE);
@@ -128,7 +169,9 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Check if the view is not null
+
+
+            // Check if the view is not null
         if (view != null) {
             accountSpinner = view.findViewById(R.id.accountSpinner);
             name = view.findViewById(R.id.name);
@@ -208,6 +251,7 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+
     public void updateProfileDetails() {
         if (!isAdded()) {
             // Fragment is not attached, handle accordingly
@@ -285,6 +329,27 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    private void showPopupMenu(View anchorView) {
+        if (popupWindow == null) {
+            View popupView = getLayoutInflater().inflate(R.layout.popup_user_info, null);
+
+            logoutLinkTextView = popupView.findViewById(R.id.link_logout);
+            logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity mainActivity = (MainActivity) requireActivity();
+                    if (popupWindow != null && popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                    }
+                    mainActivity.logout();
+                }
+            });
+
+            popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+        }
+
+        popupWindow.showAsDropDown(anchorView);
+    }
     private void getUserProfile(String authToken, int loggedinuserId) {
         // Call the API to get user profile details using the obtained user ID
 

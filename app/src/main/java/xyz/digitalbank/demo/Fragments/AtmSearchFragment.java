@@ -21,15 +21,22 @@ import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -46,8 +53,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.Constants.ConstantsManager;
 import xyz.digitalbank.demo.R;
+import android.view.Gravity;
 
 
 public class AtmSearchFragment extends Fragment implements View.OnClickListener  {
@@ -60,7 +69,16 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
     private Button updateLocationButton;
     private View view;
 
-    private Context context;  // Declare a context variable
+    private Context context;
+
+
+    // Declare PopupWindow and its components
+    private PopupWindow popupWindow;
+    private TextView userNameTextView;
+    private TextView logoutLinkTextView;
+
+    private ImageView toolbarImage;
+
 
 
     @Override
@@ -75,6 +93,39 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         responseTextView = view.findViewById(R.id.responseTextView);
         updateLocationButton = view.findViewById(R.id.updateLocationButton);
       //  updateLocationButton = getView().findViewById(R.id.updateLocationButton);
+
+
+        Toolbar toolbar = view.findViewById(R.id.action_bar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false); // This will remove the left arrow
+        actionBar.setHomeAsUpIndicator(null);
+
+        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+        toolbarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(v, toolbarImage);
+            }
+        });
+        ;
+
+        View rootLayout = view.findViewById(R.id.atm_root_layout);
+        if (rootLayout != null) {
+            rootLayout.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (popupWindow != null && popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                        return true; // Consume the touch event to prevent it from propagating further
+                    }
+                    return false; // Allow the touch event to propagate if the popup menu is not showing
+                }
+            });
+        } else {
+            Log.e("AtmSearchFragment", "Root layout is null");
+        }
 
 
 
@@ -217,7 +268,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         // Your implementation here
         getIpAddress();
     }
-
     private void getLocationAndMakeRequest() {
         // Get the location manager
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -239,53 +289,51 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                         new LocationListener() {
                             @Override
                             public void onLocationChanged(Location location) {
-                                // Location obtained, make network request
-                                // Log the location information
-                                double latitude = location.getLatitude();
-                                double longitude = location.getLongitude();
-                                String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                                if (context != null) { // Check if context is not null
+                                    // Location obtained, make network request
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    String apiUrl = ConstantsManager.getMockUrl(context) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
-                                // Perform network request on a separate thread
-                                new Thread(() -> {
-                                    try {
-                                        URL url = new URL(apiUrl);
+                                    // Perform network request on a separate thread
+                                    new Thread(() -> {
+                                        try {
+                                            URL url = new URL(apiUrl);
 
-                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                        connection.setRequestMethod("GET");
+                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                            connection.setRequestMethod("GET");
 
-                                        // Read the response code
-                                        int responseCode = connection.getResponseCode();
+                                            // Read the response code
+                                            int responseCode = connection.getResponseCode();
 
-                                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                                            // Read the response
-                                            InputStream inputStream = connection.getInputStream();
-                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                                            StringBuilder response = new StringBuilder();
-                                            String line;
-                                            while ((line = bufferedReader.readLine()) != null) {
-                                                response.append(line);
+                                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                                // Read the response
+                                                InputStream inputStream = connection.getInputStream();
+                                                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                                                StringBuilder response = new StringBuilder();
+                                                String line;
+                                                while ((line = bufferedReader.readLine()) != null) {
+                                                    response.append(line);
+                                                }
+
+                                                // Process the response
+                                                processgpsApiResponse(response.toString());
+
+                                            } else {
+                                                // Handle HTTP error response
+                                                requireActivity().runOnUiThread(() -> {
+                                                    handleError("HTTP Error: " + responseCode);
+                                                });
                                             }
 
-                                            // Process the response
-                                            processgpsApiResponse(response.toString());
+                                            // Close connections
+                                            connection.disconnect();
 
-                                        } else {
-                                            // Handle HTTP error response
-                                            requireActivity().runOnUiThread(() -> {
-                                                handleError("HTTP Error: " + responseCode);
-                                            });
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
                                         }
-
-                                        // Close connections
-                                        connection.disconnect();
-
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }).start();
-
-                                // Remove location updates to conserve battery
-                                locationManager.removeUpdates(this);
+                                    }).start();
+                                }
                             }
 
                             @Override
@@ -308,6 +356,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
 
     // Method to process the API response
     private void processgpsApiResponse(String response) {
@@ -737,7 +786,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     // Create a SpannableStringBuilder to combine text and image
                     SpannableStringBuilder spannableBuilder = new SpannableStringBuilder();
 
-                    String firstLine = "     ATM Location - GPS";
+                    String firstLine = "     ATM Location - Mock Service";
                     spannableBuilder.append(firstLine, new StyleSpan(Typeface.BOLD), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     int maxColumnNameLength = "Postcode:   ".length(); // Adjust based on your actual column names
@@ -822,6 +871,49 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             // You can also update UI elements or perform other actions based on the error
         });
     }
+
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context; // Initialize the context when the fragment is attached
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.context = null; // Release the context when the fragment is detached
+    }
+    private void showPopupMenu(View anchorView, ImageView toolbarImage) {
+        if (popupWindow == null) {
+            View popupView = getLayoutInflater().inflate(R.layout.popup_user_info, null);
+
+            logoutLinkTextView = popupView.findViewById(R.id.link_logout);
+            logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity mainActivity = (MainActivity) requireActivity();
+                    if (popupWindow != null && popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                    }
+                    mainActivity.logout();
+                }
+            });
+
+    //        int[] location = new int[2];
+    //        toolbarImage.getLocationOnScreen(location);
+    //        int x = location[0] - popupView.getWidth() - yourDesiredOffset;
+    //        Log.d("PopupPosition", "X coordinate: " + x);
+    //        int x = location[0] - popupView.getWidth() - 50;
+    //        int y = location[1];
+
+            popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+
+            popupWindow.showAsDropDown(anchorView, -popupView.getWidth() - 60, 0);
+
+        }
+
+        popupWindow.showAsDropDown(anchorView);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

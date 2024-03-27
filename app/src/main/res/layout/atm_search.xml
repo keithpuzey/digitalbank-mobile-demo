@@ -9,9 +9,25 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".atm_search">
 
-    <include
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/action_bar"
-        layout="@layout/action_bar"/>
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:elevation="4dp"
+        android:gravity="end"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+        <ImageView
+            android:id="@+id/toolbar_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/outline_more_vert_24"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
 
 
     <RelativeLayout

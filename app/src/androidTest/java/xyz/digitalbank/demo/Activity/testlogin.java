@@ -42,7 +42,7 @@ public class testlogin {
         capabilities.setCapability("securityToken", securityToken);
 
         // Initialize driver
-        driver = new AndroidDriver<>(new URL("https://" + cloudName + ".perfectomobile.com/nexperience/perfectomobile/wd/hub"), capabilities);
+        driver = new AndroidDriver(new URL("https://" + cloudName + ".perfectomobile.com/nexperience/perfectomobile/wd/hub"), capabilities);
         driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 
         // Your test steps
