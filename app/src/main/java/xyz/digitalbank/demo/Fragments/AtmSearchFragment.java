@@ -70,6 +70,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
     private View view;
 
     private Context context;
+    private boolean errorLogged = false;
 
 
     // Declare PopupWindow and its components
@@ -249,12 +250,13 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
 
 
-    private void handleAtmSearchButtonClick() {
-        getLocationAndMakeRequest();
-    }
+   // private void handleAtmSearchButtonClick() {
+
+     //   getLocationAndMakeRequest();
+   // }
     private void handleAtmLocationGPSClick() {
-        // Your implementation here
-        // This method will be called when the ATM Location - GPS layout is clicked
+
+        // This method will be called when the ATM Location - GPS is clicked
         getLocationAndMakeRequest();
     }
 
@@ -271,6 +273,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
     private void getLocationAndMakeRequest() {
         // Get the location manager
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
+        Log.e("AtmSearchFragment", "progress API line276: ");
 
         // Check if permissions are granted
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -281,59 +284,60 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                     locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
                     locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 
-                // Request location updates
+                // Request location updates with a minimum time interval of 0 milliseconds and a minimum distance interval of 0 meters
                 locationManager.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
-                        0,
-                        0,
+                        0,  // Minimum time interval in milliseconds
+                        0,  // Minimum distance interval in meters
                         new LocationListener() {
                             @Override
                             public void onLocationChanged(Location location) {
-                                if (context != null) { // Check if context is not null
-                                    // Location obtained, make network request
-                                    double latitude = location.getLatitude();
-                                    double longitude = location.getLongitude();
-                                    String apiUrl = ConstantsManager.getMockUrl(context) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                                // Unregister the listener to receive location updates only once
+                                locationManager.removeUpdates(this);
 
-                                    // Perform network request on a separate thread
-                                    new Thread(() -> {
-                                        try {
-                                            URL url = new URL(apiUrl);
+                                // Location obtained, make network request
+                                double latitude = location.getLatitude();
+                                double longitude = location.getLongitude();
+                                String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
-                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                            connection.setRequestMethod("GET");
+                                // Perform network request on a separate thread
+                                new Thread(() -> {
+                                    try {
+                                        URL url = new URL(apiUrl);
 
-                                            // Read the response code
-                                            int responseCode = connection.getResponseCode();
+                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                        connection.setRequestMethod("GET");
 
-                                            if (responseCode == HttpURLConnection.HTTP_OK) {
-                                                // Read the response
-                                                InputStream inputStream = connection.getInputStream();
-                                                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                                                StringBuilder response = new StringBuilder();
-                                                String line;
-                                                while ((line = bufferedReader.readLine()) != null) {
-                                                    response.append(line);
-                                                }
+                                        // Read the response code
+                                        int responseCode = connection.getResponseCode();
 
-                                                // Process the response
-                                                processgpsApiResponse(response.toString());
-
-                                            } else {
-                                                // Handle HTTP error response
-                                                requireActivity().runOnUiThread(() -> {
-                                                    handleError("HTTP Error: " + responseCode);
-                                                });
+                                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                                            // Read the response
+                                            InputStream inputStream = connection.getInputStream();
+                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                                            StringBuilder response = new StringBuilder();
+                                            String line;
+                                            while ((line = bufferedReader.readLine()) != null) {
+                                                response.append(line);
                                             }
+                                            Log.e("AtmSearchFragment", "Called lie 320: ");
+                                            // Process the response
+                                            processgpsApiResponse(response.toString());
 
-                                            // Close connections
-                                            connection.disconnect();
-
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
+                                        } else {
+                                            // Handle HTTP error response
+                                            requireActivity().runOnUiThread(() -> {
+                                                handleError("HTTP Error: " + responseCode);
+                                            });
                                         }
-                                    }).start();
-                                }
+
+                                        // Close connections
+                                        connection.disconnect();
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                             }
 
                             @Override
@@ -360,6 +364,14 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
     // Method to process the API response
     private void processgpsApiResponse(String response) {
+        Log.e("AtmSearchFragment", "progress API Response has been called: ");
+        if (response.startsWith("<!DOCTYPE")) {
+            // Handle the non-JSON response
+            Log.e("AtmSearchFragment", "Non-JSON response received: " + response);
+            // Optionally, show an error message to the user
+            return;
+        }
+
         try {
             JSONObject jsonResponse = new JSONObject(response);
 
@@ -418,10 +430,15 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             });
 
         } catch (JSONException e) {
-            e.printStackTrace(); // Handle the exception in an appropriate way
+            // Handle the case where the response is not valid JSON
+            if (!errorLogged) {
+                Log.e("AtmSearchFragment", "Invalid JSON response: " + response);
+                errorLogged = true;
+            }
+            e.printStackTrace();
+            // Maybe show an error message to the user
         }
     }
-
     private CharSequence boldenColumn(String columnName, String columnValue, int maxColumnNameLength) {
         SpannableStringBuilder columnBuilder = new SpannableStringBuilder();
 
