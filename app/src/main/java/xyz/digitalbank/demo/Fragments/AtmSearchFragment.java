@@ -273,7 +273,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
     private void getLocationAndMakeRequest() {
         // Get the location manager
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
-        Log.e("AtmSearchFragment", "progress API line276: ");
 
         // Check if permissions are granted
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -320,7 +319,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                             while ((line = bufferedReader.readLine()) != null) {
                                                 response.append(line);
                                             }
-                                            Log.e("AtmSearchFragment", "Called lie 320: ");
+
                                             // Process the response
                                             processgpsApiResponse(response.toString());
 
@@ -364,6 +363,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
     // Method to process the API response
     private void processgpsApiResponse(String response) {
+
         Log.e("AtmSearchFragment", "progress API Response has been called: ");
         if (response.startsWith("<!DOCTYPE")) {
             // Handle the non-JSON response
