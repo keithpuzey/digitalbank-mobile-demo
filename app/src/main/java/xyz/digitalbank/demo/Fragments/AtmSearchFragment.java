@@ -294,49 +294,58 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
                                 // Unregister the listener to receive location updates only once
                                 locationManager.removeUpdates(this);
 
-                                // Location obtained, make network request
-                                double latitude = location.getLatitude();
-                                double longitude = location.getLongitude();
-                                String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
+                                // Check if the obtained location matches the specific coordinates
+                                double targetLatitude = 37.2430548;
+                                double targetLongitude = -115.7930198;
 
-                                // Perform network request on a separate thread
-                                new Thread(() -> {
-                                    try {
-                                        URL url = new URL(apiUrl);
+                                if (location.getLatitude() == targetLatitude && location.getLongitude() == targetLongitude) {
+                                    // Location matches the target coordinates, call your function here
+                                    area51Location();
+                                } else {
+                                    // Location obtained, make network request
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    String apiUrl = ConstantsManager.getMockUrl(requireContext()) + "gps?type=atm&lat=" + latitude + "&lon=" + longitude;
 
-                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                        connection.setRequestMethod("GET");
+                                    // Perform network request on a separate thread
+                                    new Thread(() -> {
+                                        try {
+                                            URL url = new URL(apiUrl);
 
-                                        // Read the response code
-                                        int responseCode = connection.getResponseCode();
+                                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                            connection.setRequestMethod("GET");
 
-                                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                                            // Read the response
-                                            InputStream inputStream = connection.getInputStream();
-                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                                            StringBuilder response = new StringBuilder();
-                                            String line;
-                                            while ((line = bufferedReader.readLine()) != null) {
-                                                response.append(line);
+                                            // Read the response code
+                                            int responseCode = connection.getResponseCode();
+
+                                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                                // Read the response
+                                                InputStream inputStream = connection.getInputStream();
+                                                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                                                StringBuilder response = new StringBuilder();
+                                                String line;
+                                                while ((line = bufferedReader.readLine()) != null) {
+                                                    response.append(line);
+                                                }
+
+                                                // Process the response
+                                                processgpsApiResponse(response.toString());
+
+                                            } else {
+                                                // Handle HTTP error response
+                                                requireActivity().runOnUiThread(() -> {
+                                                    handleError("HTTP Error: " + responseCode);
+                                                });
                                             }
 
-                                            // Process the response
-                                            processgpsApiResponse(response.toString());
+                                            // Close connections
+                                            connection.disconnect();
 
-                                        } else {
-                                            // Handle HTTP error response
-                                            requireActivity().runOnUiThread(() -> {
-                                                handleError("HTTP Error: " + responseCode);
-                                            });
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
                                         }
-
-                                        // Close connections
-                                        connection.disconnect();
-
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }).start();
+                                    }).start();
+                                }
                             }
 
                             @Override
@@ -358,6 +367,32 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
             // Request location permissions
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
+    }
+
+    // Function to handle the case when location matches the target coordinates
+    private void handleTargetCoordinatesLocation() {
+        // Your code to handle the target coordinates location
+    }
+
+
+    // Function to handle the case when location matches the North Pole
+    private void area51Location() {
+        Log.e("AtmSearchFragment", "Area 51 Selected: ");
+        // Intentional Crash with Uncaught Exception:
+        //Throw an uncaught exception
+        throw new RuntimeException("Intentional crash");
+
+        // Crash with Assertion Error:
+        //Use assertions to intentionally fail a condition
+
+        // assert false : "Intentional crash";
+
+        //Force Close with System.exit():
+        //Force close the app by calling System.exit()
+
+        // System.exit(0);
+
+
     }
 
 
