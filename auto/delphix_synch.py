@@ -11,7 +11,7 @@ def main():
     snapshotid = sys.argv[2]
 
     # Navigate to the directory
-    subprocess.run(["cd", "/src"], shell=True)
+    subprocess.run(["cd", "/var/lib/jenkins"], shell=True)
 
     # Execute the command
     command = f"./dct-toolkit refresh_vdb_by_snapshot vdb_id={snapshotvdb} snapshot_id={snapshotid} -js"
