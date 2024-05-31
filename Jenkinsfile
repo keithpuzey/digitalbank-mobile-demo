@@ -37,6 +37,7 @@ pipeline {
                     echo 'Revert Database to Snapshot'
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
                     echo 'Registered Users in Database'
+                    sh 'sudo chmod 777 ./auto/listbankusers.sh'
                     sh "sudo ./auto/listbankusers.sh"
                 }
             }
@@ -140,7 +141,8 @@ pipeline {
         stage('Confirm User Registration has worked') {
             steps {
                     echo 'Registered Users in Database after Registration Test'
-                    sh "sudo ./auto/listbankusers.sh"
+                    sh 'sudo chmod 777 ./auto/listbankusers.sh'
+                    sh sudo ./auto/listbankusers.sh'
             }
         }
 
