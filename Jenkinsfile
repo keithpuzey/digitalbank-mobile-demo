@@ -36,6 +36,8 @@ pipeline {
                     def snapshotvdb = env.snapshotvdb
                     echo 'Revert Database to Snapshot'
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+                    echo 'Registered Users in Database'
+                    sh "sudo ./auto/listbankusers.sh"
                 }
             }
         }
@@ -135,6 +137,12 @@ pipeline {
             }
         }
 
+        stage('Confirm User Registration has worked') {
+            steps {
+                    echo 'Registered Users in Database after Registration Test'
+                    sh "sudo ./auto/listbankusers.sh"
+            }
+        }
 
         stage('Execute Load and EUX (Mobile and Web) Test') {
             steps {
