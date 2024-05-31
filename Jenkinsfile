@@ -38,7 +38,7 @@ pipeline {
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
                     echo 'Registered Users in Database'
                     sh 'sudo chmod 777 ./auto/listbankusers.sh'
-                    sh "sudo ./auto/listbankusers.sh"
+                    sh 'sudo ./auto/listbankusers.sh'
                 }
             }
         }
@@ -142,7 +142,7 @@ pipeline {
             steps {
                     echo 'Registered Users in Database after Registration Test'
                     sh 'sudo chmod 777 ./auto/listbankusers.sh'
-                    sh sudo ./auto/listbankusers.sh'
+                    sh 'sudo ./auto/listbankusers.sh'
             }
         }
 
