@@ -71,7 +71,7 @@ pipeline {
                     export APP_VERSION=1.4.$BUILD_NUMBER
                     sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
                     # Update the BASE_URL in Constants.java
-                    sed -i 's|http://dbankdemo.com/bank/|http://dev.dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants.java
+                    sed -i 's|http://dbankdemo.com/bank/|http://dev.dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/Constants.java
 
                     /opt/gradle/gradle/bin/gradle assembleDebug --info
                     /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
