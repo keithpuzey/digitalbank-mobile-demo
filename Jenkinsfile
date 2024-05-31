@@ -15,6 +15,8 @@ pipeline {
 
                     // Update config.py file with the tokens
                     updateConfigFile(perfectotoken, BMCredentials)
+                    echo 'Setting up DCT configuration for Jenkins user'
+                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
             }
         }
@@ -26,10 +28,13 @@ pipeline {
             }
         }
 
-        stage('Synch Masked Production Data - Delphix') {
+        stage('Revert Database to Snapshot - Delphix') {
             steps {
-                echo 'Duplicate Secure Test Data and provision environment'
-                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
+                    // Read environment variables from Jenkins
+                    def snapshotid = env.snapshotid
+                    def snapshotvdb = env.snapshotvdb
+                    echo 'Revert Database to Snapshot'
+                    sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
             }
         }
 
