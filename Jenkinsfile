@@ -30,11 +30,13 @@ pipeline {
 
         stage('Revert Database to Snapshot - Delphix') {
             steps {
+                script {
                     // Read environment variables from Jenkins
                     def snapshotid = env.snapshotid
                     def snapshotvdb = env.snapshotvdb
                     echo 'Revert Database to Snapshot'
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+                }
             }
         }
 
