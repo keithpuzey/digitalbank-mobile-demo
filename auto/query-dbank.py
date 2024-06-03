@@ -2,9 +2,9 @@ import mysql.connector
 
 # MySQL database connection details
 db_config = {
-    'host': '10.128.0.118',
-    'user': 'root',
-    'password': 'CAdemo123',
+    'host': '',
+    'user': '',
+    'password': '',
     'database': 'digitalbank',
     'port': 3309
 }
