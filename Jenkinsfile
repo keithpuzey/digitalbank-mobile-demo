@@ -105,7 +105,7 @@ pipeline {
             }
         }
 
-        stage('Execute Mobile - Registration Test') {
+        stage('Execute Mobile Registration Test - Perfecto') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
@@ -142,7 +142,7 @@ pipeline {
             }
         }
 
-        stage('Confirm User Registration has worked') {
+        stage('Confirm User Registration Process') {
             steps {
                     echo 'Registered Users in Database after Registration Test'
                     sh 'sudo chmod 777 ./auto/listbankusers.sh'
