@@ -47,9 +47,9 @@ pipeline {
             }
         }
 
-        stage('Create Mock Service and Generate Synthetic Data') {
+        stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
-                echo 'Creating Synthetic Data and Mock Service'
+                echo 'Creating Synthetic Data and Virtual Service'
                 script {
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
@@ -172,9 +172,9 @@ pipeline {
             }
         }
 
-        stage('Remove Mock Service') {
+        stage('Remove Virtual Service') {
             steps {
-                echo 'Remove Mock Service'
+                echo 'Remove Virtual Service'
                 sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
