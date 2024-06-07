@@ -15,7 +15,7 @@ pipeline {
 
                 echo 'Installing required Python packages'
                 sh '''
- 
+
                     sudo python3 -m pip install mysql-connector-python tabulate
                 '''
 
