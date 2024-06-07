@@ -13,15 +13,15 @@ pipeline {
                     def perfectotoken = env.perfectotoken
                     def BMCredentials = env.BMCredentials
 
-                    echo 'Installing required Python packages'
-                    sh '''
+                echo 'Installing required Python packages'
+                sh '''
                     if ! command -v pip &> /dev/null; then
                         echo "pip could not be found, installing pip"
-                        sudo apt-get update
-                        sudo apt-get install -y python3-pip
+                        sudo yum update -y
+                        sudo yum install -y python3-pip
                     fi
                     sudo python3 -m pip install mysql-connector-python tabulate
-                    '''
+                '''
 
                     // Update config.py file with the tokens
                     updateConfigFile(perfectotoken, BMCredentials)
