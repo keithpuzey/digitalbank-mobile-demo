@@ -13,6 +13,9 @@ pipeline {
                     def perfectotoken = env.perfectotoken
                     def BMCredentials = env.BMCredentials
 
+                    echo 'Installing required Python packages'
+                    sh 'sudo pip install mysql-connector-python tabulate'
+
                     // Update config.py file with the tokens
                     updateConfigFile(perfectotoken, BMCredentials)
                     echo 'Setting up DCT configuration for Jenkins user'
