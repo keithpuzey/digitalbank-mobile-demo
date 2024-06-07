@@ -13,12 +13,7 @@ pipeline {
                     def perfectotoken = env.perfectotoken
                     def BMCredentials = env.BMCredentials
 
-                echo 'Installing required Python packages'
-                sh '''
-
-                    sudo python3 -m pip install mysql-connector-python tabulate
-                '''
-
+                    sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
                     // Update config.py file with the tokens
                     updateConfigFile(perfectotoken, BMCredentials)
                     echo 'Setting up DCT configuration for Jenkins user'
@@ -41,13 +36,13 @@ pipeline {
                     def snapshotid = env.snapshotid
                     def snapshotvdb = env.snapshotvdb
                     echo 'Registered Users in Database Before Snapshot Refresh'
-                    sh 'sudo /usr/bin/python ./auto/queryvdb.py'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
                     sh 'sudo chmod 777 ./auto/listbankusers.sh'
                     sh 'sudo ./auto/listbankusers.sh'
                     echo 'Revert Database to Snapshot'
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
                     echo 'Registered Users in Database after Snapshot Refresh'
-                    sh 'sudo /usr/bin/python ./auto/queryvdb.py'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
                     sh 'sudo ./auto/listbankusers.sh'
                 }
             }
@@ -153,7 +148,7 @@ pipeline {
                     echo 'Registered Users in Database after Registration Test'
                     sh 'sudo chmod 777 ./auto/listbankusers.sh'
                     sh 'sudo ./auto/listbankusers.sh'
-                    sh 'sudo /usr/bin/python ./auto/queryvdb.py'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
             }
         }
 
