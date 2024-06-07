@@ -1,5 +1,4 @@
 import mysql.connector
-from tabulate import tabulate
 
 # MySQL database connection details
 db_config = {
@@ -37,7 +36,8 @@ try:
     if user_result:
         user_headers = [i[0] for i in cursor.description]
         print("\n10 Most Recently Registered Bank Customers:")
-        print(tabulate(user_result, headers=user_headers, tablefmt="pretty"))
+        for row in user_result:
+            print("{:<10} {:<}".format(row[0], row[1]))  # Adjust column width as needed
     else:
         print("No registered users found.")
 
