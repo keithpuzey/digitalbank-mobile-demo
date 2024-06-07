@@ -17,7 +17,6 @@ pipeline {
                 sh '''
                     if ! command -v pip &> /dev/null; then
                         echo "pip could not be found, installing pip"
-                        sudo yum update -y
                         sudo yum install -y python3-pip
                     fi
                     sudo python3 -m pip install mysql-connector-python tabulate
