@@ -20,7 +20,7 @@ try:
     number_of_customers = count_result[0] if count_result and count_result[0] else "No data available"
 
     # Print the number of registered customers
-    print(f"Number of Registered Customers: {number_of_customers}")
+    print("Number of Registered Customers: {}".format(number_of_customers))
 
     # Query to get the last 10 registered users
     user_query = """
@@ -32,14 +32,13 @@ try:
     cursor.execute(user_query)
     user_result = cursor.fetchall()
 
-    # Format and display last 10 registered users
-    if user_result:
-        user_headers = [i[0] for i in cursor.description]
-        print("\n10 Most Recently Registered Bank Customers:")
-        for row in user_result:
-            print("{:<10} {:<}".format(row[0], row[1]))  # Adjust column width as needed
-    else:
-        print("No registered users found.")
+    # Print the header
+    print("\n10 Most Recently Registered Bank Customers:")
+    print("ID\tUsername")  # Adjust column width as needed
+
+    # Print the data
+    for row in user_result:
+        print("{}\t{}".format(row[0], row[1]))
 
     # Query to get the last opened account
     account_query = "SELECT MAX(transaction_date) AS last_opened_account FROM account_transaction;"
@@ -53,4 +52,4 @@ try:
     cursor.close()
     conn.close()
 except mysql.connector.Error as err:
-    print(f"Error: {err}")
+    print("Error:", err)
