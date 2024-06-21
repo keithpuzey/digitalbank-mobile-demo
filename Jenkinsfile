@@ -13,8 +13,11 @@ pipeline {
                     def perfectotoken = env.perfectotoken
                     def BMCredentials = env.BMCredentials
 
+                    sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
                     // Update config.py file with the tokens
                     updateConfigFile(perfectotoken, BMCredentials)
+                    echo 'Setting up DCT configuration for Jenkins user'
+                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
             }
         }
@@ -26,16 +29,25 @@ pipeline {
             }
         }
 
-        stage('Synch Masked Production Data - Delphix') {
+        stage('Revert Database to Snapshot - Delphix') {
             steps {
-                echo 'Duplicate Secure Test Data and provision environment'
-                sh 'sudo /usr/bin/python ./auto/delphix_synch.py'
+                script {
+                    // Read environment variables from Jenkins
+                    def snapshotid = env.snapshotid
+                    def snapshotvdb = env.snapshotvdb
+                    echo 'Registered Users in Database Before Snapshot Refresh'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+                    echo 'Revert Database to Snapshot'
+                    sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+                    echo 'Registered Users in Database after Snapshot Refresh'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+                }
             }
         }
 
-        stage('Create Mock Service and Generate Synthetic Data') {
+        stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
-                echo 'Creating Synthetic Data and Mock Service'
+                echo 'Creating Synthetic Data and Virtual Service'
                 script {
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
@@ -63,6 +75,11 @@ pipeline {
                     echo $BUILD_NUMBER
                     export APP_VERSION=1.4.$BUILD_NUMBER
                     sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
+                    # Update the BASE_URL to redirect to dev environment
+                    sed -i 's|http://dbankdemo.com/bank/|http://dev.dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/Constant.java
+                    sed -i 's|http://dbankdemo.com/bank/|http://dev.dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/ConstantsManager.java
+                    sed -i 's|http://dbankdemo.com/bank/|http://dev.dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Fragments/ConstantsEditActivity.java
+
                     /opt/gradle/gradle/bin/gradle assembleDebug --info
                     /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
                 '''
@@ -85,42 +102,52 @@ pipeline {
                 }
             }
         }
-        stage('Execute Mobile - Registration Test') {
+
+        stage('Execute Mobile Registration Test - Perfecto') {
             steps {
-                echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
-                script {
-                    boolean shouldRerun = true
-                    while (shouldRerun) {
-                        def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
+                    script {
+                        boolean shouldRerun = true
+                        while (shouldRerun) {
+                            def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-                        // Parse the output to extract values
-                        def reasonMatch = scriptOutput =~ /Reason: (.+)/
-                        def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
-                        def devicesMatch = scriptOutput =~ /Devices: (.+)/
+                            // Parse the output to extract values
+                            def reasonMatch = scriptOutput =~ /Reason: (.+)/
+                            def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
+                            def devicesMatch = scriptOutput =~ /Devices: (.+)/
 
-                        def reason = reasonMatch ? reasonMatch[0][1].trim() : null
-                        def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
-                        def devices = devicesMatch ? devicesMatch[0][1].trim() : null
+                            def reason = reasonMatch ? reasonMatch[0][1].trim() : null
+                            def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
+                            def devices = devicesMatch ? devicesMatch[0][1].trim() : null
 
-                        // Print or use the captured values as needed
-                        echo "Mobile Test Overview:"
-                        echo "Test Grid Report URL: ${testGridReportUrl}"
-                        echo "Devices : ${devices}"
-                        echo "Final Status: ${reason}"
+                            // Print or use the captured values as needed
+                            echo "Mobile Test Overview:"
+                            echo "Test Grid Report URL: ${testGridReportUrl}"
+                            echo "Devices : ${devices}"
+                            echo "Final Status: ${reason}"
 
-
-                        // Check if the script should be rerun based on the reason
-                        if (reason == 'ResourcesUnavailable') {
-                            echo 'Reason: ResourcesUnavailable. Rerunning the script...'
-                            shouldRerun = true
-                        } else {
-                            shouldRerun = false
+                            // Check if the script should be rerun based on the reason
+                            if (reason == 'ResourcesUnavailable') {
+                                echo 'Reason: ResourcesUnavailable. Rerunning the script...'
+                                shouldRerun = true
+                            } else {
+                                shouldRerun = false
+                            }
                         }
                     }
                 }
             }
         }
 
+        stage('Confirm User Registration Process') {
+            steps {
+                    echo 'Registered Users in Database after Registration Test'
+                    sh 'sudo chmod 777 ./auto/listbankusers.sh'
+                    sh 'sudo ./auto/listbankusers.sh'
+                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+            }
+        }
 
         stage('Execute Load and EUX (Mobile and Web) Test') {
             steps {
@@ -143,9 +170,9 @@ pipeline {
             }
         }
 
-        stage('Remove Mock Service') {
+        stage('Remove Virtual Service') {
             steps {
-                echo 'Remove Mock Service'
+                echo 'Remove Virtual Service'
                 sh 'sudo /usr/bin/python ./auto/delete_mock.py'
             }
         }
