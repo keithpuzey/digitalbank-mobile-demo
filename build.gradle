@@ -9,13 +9,11 @@ buildscript {
         jcenter()
         maven { url 'https://jitpack.io' }
         maven { url "https://repo1.perfectomobile.com/public/repositories/maven" }
-
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.3'
+        classpath 'com.android.tools.build:gradle:8.2.0'  // Update to a version that supports SDK 35
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.perfectomobile.instrumentedtest.gradleplugin:plugin:+'
-
     }
 }
 
@@ -24,7 +22,6 @@ allprojects {
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
-
     }
 }
 

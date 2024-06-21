@@ -13,15 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import xyz.digitalbank.demo.Activity.MainActivity;
-import xyz.digitalbank.demo.Model.User;
+
 import xyz.digitalbank.demo.R;
-import xyz.digitalbank.demo.Services.ServiceApi;
+
 import android.widget.ArrayAdapter;
 
-import android.widget.DatePicker;
+
 import android.widget.Spinner;
-import android.widget.Toast;
-import java.text.SimpleDateFormat;
+
 import android.app.DatePickerDialog;
 import java.util.Calendar;
 
@@ -35,17 +34,11 @@ import org.json.JSONObject;
 import xyz.digitalbank.demo.Model.UserRequest;
 import java.util.Locale;
 import android.widget.RadioButton;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.TextWatcher;
-import android.widget.EditText;
+
 import xyz.digitalbank.demo.Model.UserResponse;
 import com.google.gson.Gson;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
 import androidx.appcompat.app.AlertDialog;
 import org.json.JSONArray;
 import java.io.IOException;
