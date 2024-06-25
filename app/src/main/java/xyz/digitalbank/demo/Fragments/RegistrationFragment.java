@@ -11,19 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
 import xyz.digitalbank.demo.Activity.MainActivity;
-
 import xyz.digitalbank.demo.R;
-
 import android.widget.ArrayAdapter;
-
-
 import android.widget.Spinner;
-
 import android.app.DatePickerDialog;
 import java.util.Calendar;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,15 +27,14 @@ import org.json.JSONObject;
 import xyz.digitalbank.demo.Model.UserRequest;
 import java.util.Locale;
 import android.widget.RadioButton;
-
 import xyz.digitalbank.demo.Model.UserResponse;
 import com.google.gson.Gson;
 import android.widget.CheckBox;
-
 import androidx.appcompat.app.AlertDialog;
 import org.json.JSONArray;
 import java.io.IOException;
 import android.content.Context;
+import android.os.Handler;
 
 
 
@@ -303,9 +295,7 @@ public class RegistrationFragment extends Fragment {
     }
 
     private void registerUserDetailsApiCall(String authToken, String title, String Fname, String Lname, String gender, String dob, String ssn, String email,
-                                            String password, String address, String locality, String region, String zipCode, String country, String homephone, String mobilephone, String workphone ) {
-
-
+                                            String password, String address, String locality, String region, String zipCode, String country, String homephone, String mobilephone, String workphone) {
         UserRequest userRequest = new UserRequest();
         userRequest.setTitle(title);
         userRequest.setFirstName(Fname);
@@ -324,73 +314,54 @@ public class RegistrationFragment extends Fragment {
         userRequest.setMobilePhone(mobilephone);
         userRequest.setWorkPhone(workphone);
 
-
-         Log.e("API", "User Registration Token : " + authToken);
-         Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString() );
+        Log.e("API", "User Registration Token : " + authToken);
+        Log.e("API", "User Registration JSON Body : " + userRequest.toJsonString());
 
         // Make the second API call to register the user details
-        RetrofitClient.getServiceApi(requireContext()).registerUser(authToken,  "application/json", ROLE, userRequest)
+        RetrofitClient.getServiceApi(requireContext()).registerUser(authToken, "application/json", ROLE, userRequest)
                 .enqueue(new Callback<Void>() {
-
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
-
-                            //  API call to find user by email and get user ID
+                            // API call to find user by email and get user ID
                             RetrofitClient.getServiceApi(context).findUserId(authToken, email)
                                     .enqueue(new Callback<UserResponse>() {
                                         @Override
                                         public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                                             if (response.isSuccessful()) {
-
-
                                                 // Log success information
-                                      //          Log.d("API", "Request successful: " + call.request().url());
-                                      //          Log.d("API", "Response Code: " + response.code());
-
-
-                                                // Log response body as JSON string
                                                 UserResponse userResponse = response.body();
                                                 if (userResponse != null) {
                                                     int userId = userResponse.getId();
                                                     String responseBodyJson = new Gson().toJson(userResponse);
                                                     Log.d("API", "Response Body: " + responseBodyJson);
-                                                    Log.d("API", "ID Value = : " + userId );
+                                                    Log.d("API", "ID Value = : " + userId);
 
-                                                    createUserData(authToken, userId);
-
+                                                    // Introduce a delay before calling createUserData
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            createUserData(authToken, userId);
+                                                        }
+                                                    }, 3000); // 3 seconds delay
                                                 } else {
-                                     //               Log.d("API", "Response Body is null");
+                                                    Log.d("API", "Response Body is null");
                                                 }
-
-
                                             } else {
-                                                // Log error information
-                                      //          Log.e("API", "Request failed: " + call.request().url());
-                                     //           Log.e("API", "Error Code: " + response.code());
-                                       //         Log.e("API", "Error Body: " + response.errorBody().toString());
                                                 MainActivity.appPreference.showToast("User not found");
-
-                                                // Handle the error
                                             }
                                         }
 
-
                                         @Override
                                         public void onFailure(Call<UserResponse> call, Throwable t) {
-                                            // Handle failure
                                             MainActivity.appPreference.showToast("API call failed: " + t.getMessage());
                                         }
                                     });
 
                             MainActivity.appPreference.showToast("Registration successful");
-
                             MainActivity.appPreference.setLoginStatus(true);
-
                             ((MainActivity) requireActivity()).showLoginFragment();
-
                         } else {
-                            // Registration failed
                             handleRegistrationError(response);
                         }
                     }
@@ -398,13 +369,10 @@ public class RegistrationFragment extends Fragment {
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
                         Log.e("API", "Failure: " + t.getMessage());
-                        // Handle the failure of the registration API call
-
                         MainActivity.appPreference.showToast("Registration failed");
                     }
                 });
     }
-
     private void showErrorDialog(String errorMessage) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Error");
