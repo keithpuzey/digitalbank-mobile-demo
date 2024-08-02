@@ -23,7 +23,7 @@ payload = {
     "serviceId": int(ServiceID),
     "shipId": "5d3ccab3526ad28f53205574",
     "thinkTime": int(MockThinkTime),
-    "appliedTemplateId": 5971,
+    "appliedTemplateId": (TemplateID),
     "mockServiceTransactions": [
         {"txnId": 6458371, "priority": 10},
         {"txnId": 6458373, "priority": 10},
