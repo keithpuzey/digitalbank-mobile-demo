@@ -6,7 +6,7 @@ account = 352831
 # Blazemeter Mock Service Details
 ServiceID = "338990"
 MockThinkTime = "60"
-TemplateID = "5971"
+TemplateID = "6183"
 SharedFolderID = "65d71b4e8b2044fe570baf89"
 RegistrationMockID = "144333"
 
