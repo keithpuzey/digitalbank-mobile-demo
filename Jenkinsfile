@@ -36,11 +36,12 @@ pipeline {
                     def snapshotid = env.snapshotid
                     def snapshotvdb = env.snapshotvdb
                     echo 'Registered Users in Database Before Snapshot Refresh'
-                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+                    sh 'sudo chmod 777 ./auto/listbankusers.sh'
+                    sh 'sudo ./auto/listbankusers.sh'
                     echo 'Revert Database to Snapshot'
                     sh "sudo /usr/bin/python ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
                     echo 'Registered Users in Database after Snapshot Refresh'
-                    sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+                    sh 'sudo ./auto/listbankusers.sh'
                 }
             }
         }
