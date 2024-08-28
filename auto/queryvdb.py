@@ -2,7 +2,7 @@ import mysql.connector
 
 # MySQL database connection details
 db_config = {
-    'host': '172.17.0.1',
+    'host': '10.128.0.51',
     'user': 'root',
     'password': 'CAdemo123',
     'database': 'digitalbank',
