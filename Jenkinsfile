@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        perfectotoken = credentials('PERFECTO_TOKEN') // Example of credentials binding
+
         BMCredentials = credentials('BM_CREDENTIALS') // Example of credentials binding
     }
 
@@ -10,7 +10,7 @@ pipeline {
         stage('Update Configuration') {
             steps {
                 script {
-                    updateConfigFile(env.perfectotoken, env.BMCredentials)
+                    updateConfigFile(env.BMCredentials)
                 }
             }
         }
@@ -72,7 +72,6 @@ pipeline {
 def updateConfigFile(perfectotoken, BMCredentials) {
     def configFilePath = 'auto/config.py'
     def configFileContent = readFile(configFilePath)
-    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, perfectotoken)
     configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
     writeFile(file: configFilePath, text: configFileContent)
 }
