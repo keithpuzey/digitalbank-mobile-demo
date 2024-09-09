@@ -27,7 +27,7 @@ pipeline {
             steps {
                 echo 'Running Stage sv1...'
                     // Execute the script and capture the output
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py --name "SV1"', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 echo 'Running Stage sv2...'
                        // Execute the script and capture the output
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py  --name "SV2"', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 echo 'Running Stage sv3...'
                         // Execute the script and capture the output
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py  --name "SV3"', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
