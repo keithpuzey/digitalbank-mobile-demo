@@ -2,28 +2,34 @@ import requests
 import time
 import random
 from datetime import datetime
-from config import workspaceID, account, ServiceID, MockThinkTime, BMCredentials , mock_output, base_dir, mock_output_id , TemplateID
+import argparse
+from config import workspaceID, account, ServiceID, MockThinkTime, BMCredentials, mock_output, base_dir, mock_output_id, TemplateID
+
+# Set up argument parser for command-line arguments
+parser = argparse.ArgumentParser(description="Create a mock service")
+parser.add_argument('--name', required=True, help='Service name to be used in the payload')
+args = parser.parse_args()
 
 # Get the current day as a string (e.g., '01', '02', ..., '31')
 current_day = datetime.now().strftime('%d')
 current_date = datetime.now()
 # Generate a random string of length 6
 random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
-# Combine the current day and the random string
-service_name = current_day + random_string
+# Combine the input from the command line with the current day and random string
+service_name = f"{args.name}_{current_day}{random_string}"
 
 payload = {
-    "description": f"E2E Demo  {current_date}",
+    "description": f"E2E Demo {current_date}",
     "endpointPreference": "HTTPS",
     "harborId": "5c544422c7dc9735767b23ce",
     "type": "TRANSACTIONAL",
     "liveSystemHost": "null",
     "liveSystemPort": "null",
-    "name": f"E2E Demo {service_name}",
+    "name": f"{service_name}",
     "serviceId": int(ServiceID),
     "shipId": "5d3ccab3526ad28f53205574",
     "thinkTime": int(MockThinkTime),
-    "appliedTemplateId": (TemplateID),
+    "appliedTemplateId": TemplateID,
     "mockServiceTransactions": [
         {"txnId": 6458371, "priority": 10},
         {"txnId": 6458373, "priority": 10},
