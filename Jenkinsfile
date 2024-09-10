@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-
-        BMCredentials = credentials('BM_CREDENTIALS') // Example of credentials binding
+                    // Read environment variables from Jenkins
+  
+                    def BMCredentials = env.BMCredentials
     }
 
     stages {
@@ -11,19 +12,15 @@ pipeline {
             steps {
                 script {
                     // Define the custom function inside the script block
-                    def updateConfigFile = { BMCredentials ->
-                        def configFilePath = 'auto/config.py'
-                        def configFileContent = readFile(configFilePath)
-                    // Replace the placeholder "token_BMCredentials" with the actual credentials
-                        configFileContent = configFileContent.replaceAll(/"token_BMCredentials"/, "\"${BMCredentials}\"")
-                        writeFile(file: configFilePath, text: configFileContent)
-                    }
+                      def configFilePath = '\\auto\\config.py'
 
-                    // Call the function
-                    updateConfigFile(env.BMCredentials)
+                      // Read the content of the config.py file
+                      def configFileContent = readFile(configFilePath)
+                      configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
+                      writeFile(file: configFilePath, text: configFileContent)
+                    }
                 }
             }
-        }
 
         stage('sv1') {
             when {
