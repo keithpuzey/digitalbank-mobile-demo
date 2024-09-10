@@ -14,7 +14,8 @@ pipeline {
                     def updateConfigFile = { BMCredentials ->
                         def configFilePath = 'auto/config.py'
                         def configFileContent = readFile(configFilePath)
-                        configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
+                    // Replace the placeholder "token_BMCredentials" with the actual credentials
+                        configFileContent = configFileContent.replaceAll(/"token_BMCredentials"/, "\"${BMCredentials}\"")
                         writeFile(file: configFilePath, text: configFileContent)
                     }
 
