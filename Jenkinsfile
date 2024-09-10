@@ -10,6 +10,15 @@ pipeline {
         stage('Update Configuration') {
             steps {
                 script {
+                    // Define the custom function inside the script block
+                    def updateConfigFile = { BMCredentials ->
+                        def configFilePath = 'auto/config.py'
+                        def configFileContent = readFile(configFilePath)
+                        configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
+                        writeFile(file: configFilePath, text: configFileContent)
+                    }
+
+                    // Call the function
                     updateConfigFile(env.BMCredentials)
                 }
             }
@@ -69,12 +78,7 @@ pipeline {
     }
 }
 
-def updateConfigFile(perfectotoken, BMCredentials) {
-    def configFilePath = 'auto/config.py'
-    def configFileContent = readFile(configFilePath)
-    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
-    writeFile(file: configFilePath, text: configFileContent)
-}
+
 
 def isStageInCommitMessage(String stageName) {
     def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
