@@ -20,7 +20,8 @@ pipeline {
 
                     // Read the content of the config.py file
                     def configFileContent = readFile(configFilePath)
-                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, apiKey)
+                    configFileContent = configFileContent.replaceAll(/token_BMAPIKey/, apiKey)
+                    configFileContent = configFileContent.replaceAll(/token_BMAPISecret/, apiSecret)
                     writeFile(file: configFilePath, text: configFileContent)
                     }
                 }
