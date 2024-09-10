@@ -8,7 +8,7 @@ pipeline {
         stage('Update Configuration') {
             steps {
                 script {
-                    // Define the custom function inside the script block
+
                     // Access API key and secret from the environment variables
                     def apiKey = env.BMCredentials_USR  // API key as username
                     def apiSecret = env.BMCredentials_PSW // API secret as password
@@ -20,7 +20,7 @@ pipeline {
 
                     // Read the content of the config.py file
                     def configFileContent = readFile(configFilePath)
-                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, apikey)
+                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, apiKey)
                     writeFile(file: configFilePath, text: configFileContent)
                     }
                 }
