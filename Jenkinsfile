@@ -7,7 +7,7 @@ pipeline {
                 script {
                     // Define the custom function inside the script block
                       
-                    def BMCredentials = env.BMCredentials
+                    def BMCredentials = env.bzm-api-key
                     def configFilePath = '\\auto\\config.py'
 
                     // Read the content of the config.py file
