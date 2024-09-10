@@ -11,7 +11,7 @@ SharedFolderID = "65d71b4e8b2044fe570baf89"
 RegistrationMockID = "144333"
 
 BMCredentials = (
-    token_BMCredentials )
+    "token_BMAPIKey" , "token_BMAPISecret" )
 
 PerfectoKey = "token_perfectotoken"
 
