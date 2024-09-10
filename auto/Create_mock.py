@@ -16,10 +16,10 @@ current_date = datetime.now()
 # Generate a random string of length 6
 random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
 # Combine the input from the command line with the current day and random string
-service_name = f"{args.name}_{current_day}{random_string}"
+service_name = f"{args.name}_{current_day}"
 
 payload = {
-    "description": f"E2E Demo {current_date}",
+    "description": f"SV Demo {current_date}",
     "endpointPreference": "HTTPS",
     "harborId": "5c544422c7dc9735767b23ce",
     "type": "TRANSACTIONAL",
