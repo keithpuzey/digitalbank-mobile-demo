@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     environment {
-                    // Read environment variables from Jenkins
   
-                    def BMCredentials = env.BMCredentials
     }
 
     stages {
@@ -12,12 +10,14 @@ pipeline {
             steps {
                 script {
                     // Define the custom function inside the script block
-                      def configFilePath = '\\auto\\config.py'
+                      
+                    def BMCredentials = env.BMCredentials
+                    def configFilePath = '\\auto\\config.py'
 
-                      // Read the content of the config.py file
-                      def configFileContent = readFile(configFilePath)
-                      configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
-                      writeFile(file: configFilePath, text: configFileContent)
+                    // Read the content of the config.py file
+                    def configFileContent = readFile(configFilePath)
+                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
+                    writeFile(file: configFilePath, text: configFileContent)
                     }
                 }
             }
