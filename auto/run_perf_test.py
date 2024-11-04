@@ -2,7 +2,7 @@ import requests
 import time
 import json
 import sys
-from config import BMCredentials
+from config import BMCredentials, account
 
 def run_blazemeter_test(test_id):
 
@@ -20,7 +20,7 @@ def run_blazemeter_test(test_id):
     print(f"\nResult ID: {result_id}")
     print(f"Workspace ID: {workspace_id}")
     print(f"Project ID: {project_id}")
-    print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+    print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
 
     testsessionid = json_response['result']['sessionsId'][0]
     print(f"Test Session ID = {testsessionid}")
@@ -29,7 +29,7 @@ def run_blazemeter_test(test_id):
     with open(file_path, 'w') as file:
         try:
             # Write the Test URL to the file
-            file.write(f"https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary")
+            file.write(f"https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary")
             print(f"Test URL written to: {file_path}")
         except Exception as e:
             print(f"Error writing to file: {e}")
@@ -55,17 +55,22 @@ def run_blazemeter_test(test_id):
                 # Take different actions based on reportStatus
                 if report_status == 'pass':
                     print(f'Final Test Result Status = Passed')
-                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
                     sys.exit(0)
                     break
                 elif report_status == 'fail':
                     print(f'Final Test Result Status = Failed')
-                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+                    sys.exit(1)
+
+                elif report_status == 'error':
+                    print(f'Final Test Result Status = Failed')
+                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
                     sys.exit(1)
 
                 elif report_status == 'unset':
                     print(f'Final Test Result Status = Not Set')
-                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+                    print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
                     sys.exit(0)
                     break
                 else:
@@ -79,11 +84,11 @@ def run_blazemeter_test(test_id):
 
             # Break the outer loop if the test passes
             if report_status == "pass":
-                print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+                print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
                 break
 
     else:
-        print(f"Test URL https://a.blazemeter.com/app/#/accounts/352831/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
+        print(f"Test URL https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary ")
     sys.exit(1)
 
 if __name__ == "__main__":
