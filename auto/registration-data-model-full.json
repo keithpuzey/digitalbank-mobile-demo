@@ -65,7 +65,7 @@
 						"datasources": [],
       "requirements": {
         "FirstName": "ifCondition(${title} == \"Mr.\",randFromSeedlist(\"firstnamemaleamerican\"),randFromSeedlist(\"firstnamefemaleamerican\")).replace(/ /g,\".\")",
-        "LastName": "randFromSeedlist(\"lastnames\")",
+        "LastName": "randFromSeedlist(\"lastnames\").replace(/ /g,\".\")",
         "Email": "${FirstName}+\".\"+${LastName}+\"@gmail.com\"",
 		"dob": "datetime(dateOfBirth(18, 100, \"1990-02-10\"), \"MM/DD/YYYY\")",
 		"ssn": "randDigits(3,3)+randDigits(2,2)+randDigits(4,4)",
