@@ -15,7 +15,7 @@ repositories {
     // Add other repositories if necessary
 }
 
-def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.4"
+def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.5"
 
 android {
     compileSdk 35
