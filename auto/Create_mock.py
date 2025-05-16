@@ -23,7 +23,7 @@ payload = {
     "serviceId": int(ServiceID),
     "shipId": "5d3ccab3526ad28f53205574",
     "thinkTime": int(MockThinkTime),
-    "appliedTemplateId": 5971,
+    "appliedTemplateId": (TemplateID),
     "mockServiceTransactions": [
         {"txnId": 6458371, "priority": 10},
         {"txnId": 6458373, "priority": 10},
@@ -38,9 +38,19 @@ response = requests.post(
     headers={'Content-Type': 'application/json'},
     auth=BMCredentials
 )
+
+# Check if the response is successful and contains the expected data
+if response.status_code != 200:
+    print(f"Failed to create mock service. Status code: {response.status_code}, Response: {response.text}")
+    exit(1)
+
 json_response = response.json()
+if 'result' not in json_response or 'id' not in json_response['result']:
+    print(f"Unexpected response format: {json_response}")
+    exit(1)
+
 mockid = json_response['result']['id']
-print(f"Mock Service IDs: {json_response['result']['id']}")
+print(f"Mock Service IDs: {mockid}")
 
 print("Prepare Environment - Start Mock Services ")
 
@@ -51,6 +61,10 @@ response = requests.get(
     auth=BMCredentials
 )
 
+if response.status_code != 200:
+    print(f"Failed to start mock service. Status code: {response.status_code}, Response: {response.text}")
+    exit(1)
+
 while True:
     time.sleep(15)
     # Retrieve Status of Mock Service
@@ -59,16 +73,24 @@ while True:
         headers={'Content-Type': 'application/json'},
         auth=BMCredentials
     )
+
+    if response.status_code != 200:
+        print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
+        continue
+
     json_response = response.json()
-    mockendpoint = json_response['result']['httpsEndpoint']
+    if 'result' not in json_response or 'status' not in json_response['result']:
+        print(f"Unexpected response format: {json_response}")
+        continue
+
+    mockendpoint = json_response['result'].get('httpsEndpoint', 'Unknown')
     mockstat = json_response['result']['status']
-    print(f"Mock Service Status {mockstat}")
+    print(f"Mock Service Status: {mockstat}")
 
     if mockstat == 'RUNNING':
         break
 
-print(f"Mock Service Started - Endpoint details {mockendpoint}")
-
+print(f"Mock Service Started - Endpoint details: {mockendpoint}")
 
 # Deploy Template
 response = requests.patch(
@@ -76,7 +98,8 @@ response = requests.patch(
     headers={'Content-Type': 'application/json'},
     auth=BMCredentials
 )
-print(f"Mock Service Template Status -{response}")
+print(f"Mock Service Template Status: {response.status_code}, Response: {response.text}")
+
 while True:
     time.sleep(15)
     # Retrieve Status of Mock Service
@@ -86,31 +109,31 @@ while True:
         auth=BMCredentials
     )
 
+    if response.status_code != 200:
+        print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
+        continue
+
     json_response = response.json()
+    if 'result' not in json_response or 'status' not in json_response['result']:
+        print(f"Unexpected response format: {json_response}")
+        continue
+
     mockstat = json_response['result']['status']
-    print(f"Mock Service Status {mockstat}")
+    print(f"Mock Service Status: {mockstat}")
 
     if mockstat == 'RUNNING':
         break
 
-#print(f"Mock Service Template Deployed")
-
 with open(mock_output, 'w') as file:
     try:
         # Write the Mock URL to the file
-        file.write(
-            f"{mockendpoint}")
-     #   print(f"Mock URL written to: {mock_output}")
-
+        file.write(f"{mockendpoint}")
     except Exception as e:
         print(f"Error writing to file: {e}")
 
 with open(mock_output_id, 'w') as file:
     try:
         # Write the Mock ID to the file
-        file.write(
-            f"{mockid}")
-     #   print(f"Mock URL written to: {mock_output_id}")
-
+        file.write(f"{mockid}")
     except Exception as e:
         print(f"Error writing to file: {e}")
