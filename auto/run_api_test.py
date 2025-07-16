@@ -20,13 +20,13 @@ else:
 # Configurable values
 RUNSCOPE_TRIGGER_URL = "https://api.runscope.com/radar/49adfa54-2b83-4029-96a0-2285ab48ac47/trigger?runscope_environment=8816780a-0dbc-4f03-854c-10636ab3da36"
 
-
 RESULT_DIR = "test-results"
 RESULT_FILE = os.path.join(RESULT_DIR, "runscope-result.xml")
 
 HEADERS = {
     "Authorization": AUTH_TOKEN
 }
+
 
 def trigger_test():
     print("🔄 Triggering Runscope test...")
@@ -39,6 +39,7 @@ def trigger_test():
         api_test_run_url = run_info["api_test_run_url"]
         test_name = run_info["test_name"]
         test_id = run_info["test_id"]
+        test_run_url = run_info["test_run_url"]
     except (KeyError, IndexError):
         print("❌ Failed to trigger test. Response:")
         print(data)
@@ -50,7 +51,8 @@ def trigger_test():
 
     print(f"✅ Test triggered: {test_name} ({test_id})")
     print(f"🔁 Polling test run at: {api_test_run_url}")
-    return api_test_run_url, test_name
+    return api_test_run_url, test_name, test_run_url
+
 
 def poll_until_complete(api_test_run_url):
     status = "working"
@@ -72,7 +74,8 @@ def poll_until_complete(api_test_run_url):
 
     return data
 
-def generate_junit_xml(test_name, final_result):
+
+def generate_junit_xml(test_name, final_result, test_run_url):
     if not os.path.exists(RESULT_DIR):
         os.makedirs(RESULT_DIR)
 
@@ -81,18 +84,22 @@ def generate_junit_xml(test_name, final_result):
     testcase = ET.SubElement(testsuite, "testcase", classname="Runscope", name=test_name)
 
     if final_result != "pass":
-        failure = ET.SubElement(testcase, "failure", message=f"Runscope test result: {final_result}")
+        ET.SubElement(testcase, "failure", message=f"Runscope test result: {final_result}")
+
+    ET.SubElement(testcase, "system-out").text = f"Test Report URL: {test_run_url}"
 
     tree = ET.ElementTree(testsuite)
     tree.write(RESULT_FILE, encoding="utf-8", xml_declaration=True)
     print(f"📄 JUnit result saved to {RESULT_FILE}")
 
+
 def main():
-    api_test_run_url, test_name = trigger_test()
+    api_test_run_url, test_name, test_run_url = trigger_test()
     status_response = poll_until_complete(api_test_run_url)
     final_result = status_response.get("data", {}).get("result")
     print(f"✅ Final result: {final_result}")
-    generate_junit_xml(test_name, final_result)
+    generate_junit_xml(test_name, final_result, test_run_url)
+
 
 if __name__ == "__main__":
     main()
