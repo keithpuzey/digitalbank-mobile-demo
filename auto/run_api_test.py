@@ -4,9 +4,22 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
+# Get token from environment
+api_token = os.getenv("APICredentials")
+
+if not api_token:
+    print("❌ APICredentials environment variable is not set.")
+    sys.exit(1)
+
+# Prepend "Bearer " if not already included
+if not api_token.lower().startswith("bearer "):
+    AUTH_TOKEN = f"Bearer {api_token}"
+else:
+    AUTH_TOKEN = api_token
+
 # Configurable values
 RUNSCOPE_TRIGGER_URL = "https://api.runscope.com/radar/49adfa54-2b83-4029-96a0-2285ab48ac47/trigger?runscope_environment=8816780a-0dbc-4f03-854c-10636ab3da36"
-AUTH_TOKEN = "Bearer APICredentials"  # Replace with your actual token
+
 
 RESULT_DIR = "test-results"
 RESULT_FILE = os.path.join(RESULT_DIR, "runscope-result.xml")
