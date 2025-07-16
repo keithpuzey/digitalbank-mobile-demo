@@ -4,8 +4,6 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
-from config import APICredentials
-
 # Configurable values
 RUNSCOPE_TRIGGER_URL = "https://api.runscope.com/radar/49adfa54-2b83-4029-96a0-2285ab48ac47/trigger?runscope_environment=8816780a-0dbc-4f03-854c-10636ab3da36"
 AUTH_TOKEN = "Bearer APICredentials"  # Replace with your actual token
