@@ -13,6 +13,8 @@ RegistrationMockID = "144333"
 BMCredentials = (
     token_BMCredentials )
 
+APICredentials = (token_BlazeMeter_API_Token)
+
 PerfectoKey = "token_perfectotoken"
 
 base_dir = '/var/lib/jenkins/workspace/DBank Mobile Pipeline/auto/results/'
