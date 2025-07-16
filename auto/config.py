@@ -1,13 +1,13 @@
 import os
 
 # Get BlazeMeter token from environment
-token_BMCredentials = os.getenv("token_BMCredentials")
+token_BMCredentials = os.getenv("BMCredentials")
 if not token_BMCredentials:
    raise RuntimeError("❌ Environment variable 'token_BMCredentials' is not set.")
 # Use the token as needed
 BMCredentials = token_BMCredentials
 
-PerfectoKey = os.getenv("token_PerfectoToken")
+PerfectoKey = os.getenv("PerfectoToken")
 if not token_BMCredentials:
    raise RuntimeError("❌ Environment variable 'token_PerfectoToken' is not set.")
 # Use the token as needed
