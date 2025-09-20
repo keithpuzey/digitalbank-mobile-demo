@@ -9,8 +9,8 @@
     <item
         android:id="@+id/action_dashboard"
         android:icon="@drawable/outline_bar_chart_20"
-        android:title="My Dashboard"
-        android:contentDescription="My DashBoard" />
+        android:title="Insights"
+        android:contentDescription="Insights" />
 
 
     <item

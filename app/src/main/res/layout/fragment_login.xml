@@ -99,6 +99,6 @@
         android:layout_height="wrap_content"
 
         android:layout_centerHorizontal="false"
-        android:text="Version 1.4.0" />
+        android:text="Version 1.5.0" />
 
 </LinearLayout>

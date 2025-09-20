@@ -18,13 +18,13 @@ repositories {
 def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.5"
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace 'xyz.digitalbank.demo'
     defaultConfig {
         applicationId "xyz.digitalbank.demo"
         minSdkVersion 28
-        targetSdkVersion 35
-        versionCode 4
+        targetSdkVersion 36
+        versionCode 5
         versionName versionNumber
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
