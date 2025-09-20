@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 
 import xyz.digitalbank.demo.Activity.MainActivity;
 import xyz.digitalbank.demo.R;
+import xyz.digitalbank.demo.Constants.Constant;
 
 public class DashboardFragment extends Fragment {
 
@@ -55,7 +56,7 @@ public class DashboardFragment extends Fragment {
         });
 
         progressBar.setVisibility(View.VISIBLE);
-        webView.loadUrl("http://dbankdemo.com/financedashboard.html");
+        webView.loadUrl( DEFAULT_BASE_URL + "/financedashboard.html");
 
         // ✅ Setup Toolbar
         Toolbar toolbar = view.findViewById(R.id.action_bar);
