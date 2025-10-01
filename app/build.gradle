@@ -15,7 +15,7 @@ repositories {
     // Add other repositories if necessary
 }
 
-def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.6"
+def versionNumber = System.getenv("VERSION_NUMBER") ?: "1.6.1"
 
 android {
     compileSdk 36

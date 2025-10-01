@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -40,30 +41,33 @@ import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Services.ServiceApi;
 
-
-
 @RequiresApi(api = Build.VERSION_CODES.P)
-
 public class LoginFragment extends Fragment {
     private MyInterface myInterface;
     private TextView registerTV;
     private EditText emailInput, passwordInput;
-    private Button loginBtn ;
-    private ImageButton biometricBtn ;
+    private Button loginBtn;
+    private ImageButton biometricBtn;
     private ServiceApi serviceApi;
     private static final int REQUEST_BIOMETRIC_PERMISSION = 1;
-    private Context context; // Declare the context variable
+    private Context context;
+
+    // --- Lockout fields ---
+    private static final int MAX_LOGIN_ATTEMPTS = 3;
+    private static final long LOCKOUT_DURATION_MS = 30000; // 30 seconds
+    private int failedAttempts = 0;
+    private boolean isLockedOut = false;
+    private Handler lockoutHandler = new Handler();
+
+    private TextView versionTextView;
+
     public LoginFragment() {
         // Required empty public constructor
     }
 
-    private TextView versionTextView;
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        // Check if the hosting activity implements MyInterface
         if (context instanceof MyInterface) {
             myInterface = (MyInterface) context;
         } else {
@@ -76,102 +80,94 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         context = getContext();
         if (context == null) {
-            // Log an error or handle the null context appropriately
             Log.e("YourFragment", "getContext() returned null in onCreateView()");
-            return null; // Return early or handle the null context case
+            return null;
         }
 
         String BASE_URL = ConstantsManager.getBaseUrl(context);
-
-        // Logging the value of BASE_URL after retrieving it from SharedPreferences
         Log.d("SharedPreferences", "BASE_URL: " + BASE_URL);
 
-// Logging the value of MOCK_URL after retrieving it from SharedPreferences
         String MOCK_URL = ConstantsManager.getMockUrl(context);
         Log.d("SharedPreferences", "MOCK_URL: " + MOCK_URL);
 
-
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         String buildNumber = getString(R.string.app_version);
-
-
-        // Find the TextView for version number
         versionTextView = view.findViewById(R.id.versionTextView);
-
-        // Set version number dynamically
         versionTextView.setText("Version :" + buildNumber);
 
-        // Initialize the ServiceApi instance
         serviceApi = RetrofitClient.getRetrofitInstance(context).create(ServiceApi.class);
 
-        // for login
         emailInput = view.findViewById(R.id.emailInput);
         passwordInput = view.findViewById(R.id.passwordInput);
         loginBtn = view.findViewById(R.id.loginBtn);
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("LoginFragment", "Login button clicked");
-                Log.e("LoginFragment", "BASE URL is = " + BASE_URL);
-                Log.d("SharedPreferences", "BASE_URL: " + BASE_URL);
+        biometricBtn = view.findViewById(R.id.biometricBtn);
+
+        loginBtn.setOnClickListener(v -> {
+            if (isLockedOut) {
+                showToast("Too many failed attempts. Please wait 30 seconds.");
+            } else {
                 loginUser();
             }
         });
-        biometricBtn = view.findViewById(R.id.biometricBtn);
 
-        // Prepopulate the username and password fields
+        // Prepopulate fields
         emailInput.setText("jsmith@demo.io");
         passwordInput.setText("Demo123!");
 
-
         registerTV = view.findViewById(R.id.registerTV);
-        registerTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                myInterface.register(); // Corrected method name
+        registerTV.setOnClickListener(v -> myInterface.register());
+
+        biometricBtn.setOnClickListener(v -> {
+            if (isLockedOut) {
+                showToast("Account locked. Try again in 30 seconds.");
+            } else if (isBiometricPromptEnabled()) {
+                checkBiometricPermission();
             }
         });
-
-
-
-        biometricBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Handle biometric authentication
-                if (isBiometricPromptEnabled()) {
-                    checkBiometricPermission();
-                }
-            }
-        });
-
 
         ImageView cogIcon = view.findViewById(R.id.cogIcon);
-        cogIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String dataPath = getActivity().getFilesDir().getAbsolutePath();
-
-                Log.d("TesseractOCR", "Data Path: " + dataPath);
-                // Open the new page for editing constants
-                openConstantsPage();
-            }
-        });
+        cogIcon.setOnClickListener(v -> openConstantsPage());
 
         return view;
     }
-    private void openConstantsPage() {
-        // Here, you should navigate to the new page for editing constants.
-        // You can use Intent to start a new activity or FragmentTransaction to replace the current fragment.
 
-        // For example, if using Intent:
+    // --- Lockout handling ---
+    private void startLockout() {
+        isLockedOut = true;
+
+        // Disable login button
+        loginBtn.setEnabled(false);
+        loginBtn.setAlpha(0.5f);
+
+        // Disable biometric button
+        biometricBtn.setEnabled(false);
+        biometricBtn.setAlpha(0.5f);
+
+        showToast("Account locked. Try again in 30 seconds.");
+
+        lockoutHandler.postDelayed(() -> {
+            failedAttempts = 0;
+            isLockedOut = false;
+
+            // Re-enable login button
+            loginBtn.setEnabled(true);
+            loginBtn.setAlpha(1.0f);
+
+            // Re-enable biometric button
+            biometricBtn.setEnabled(true);
+            biometricBtn.setAlpha(1.0f);
+
+            showToast("You can try logging in again.");
+        }, LOCKOUT_DURATION_MS);
+    }
+
+    private void openConstantsPage() {
         Intent intent = new Intent(getActivity(), ConstantsEditActivity.class);
         startActivity(intent);
     }
 
     private boolean isBiometricPromptEnabled() {
-        // Check if biometric authentication is available on the device
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && ContextCompat.checkSelfPermission(requireContext(),
                 android.Manifest.permission.USE_BIOMETRIC) == PackageManager.PERMISSION_GRANTED);
@@ -194,49 +190,28 @@ public class LoginFragment extends Fragment {
 
         if (requestCode == REQUEST_BIOMETRIC_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, show biometric prompt
                 showBiometricPrompt();
             } else {
-                // Permission not granted, show a Toast
                 showToast("Biometric authentication is not available.");
             }
         }
     }
 
     private void showToast(String message) {
-        Context context = getContext();
-        if (context != null) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
+
     private void showBiometricPrompt() {
         Executor executor = ContextCompat.getMainExecutor(requireContext());
         BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor,
                 new BiometricPrompt.AuthenticationCallback() {
                     @Override
-                    public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                        super.onAuthenticationError(errorCode, errString);
-
-                        if (errorCode == BiometricPrompt.ERROR_NO_BIOMETRICS) {
-                            showToast("No fingerprints enrolled. Please enroll a fingerprint in your device settings.");
-                        } else {
-                            Log.e("Biometric", "Authentication error: " + errString);
-                        }
-                    }
-                    @Override
                     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
-                        Log.d("Biometric", "Authentication succeeded");
-
-                        try {
-                            // Handle successful authentication
-                            loginUserWithBiometric();
-                        } catch (Exception e) {
-                            // Log any exceptions that might occur during authentication
-                            Log.e("Biometric", "Exception during authentication: " + e.getMessage(), e);
-                        }
+                        loginUserWithBiometric();
                     }
-
 
                     @Override
                     public void onAuthenticationFailed() {
@@ -246,91 +221,79 @@ public class LoginFragment extends Fragment {
                 });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Finger Print  Login")
-                .setNegativeButtonText("Cancel")
+                .setTitle("Finger Print Login")
                 .setDescription("Place your fingerprint on the sensor to log in.")
-                .setNegativeButtonText("Biometric authentication failed. Try again.")
+                .setNegativeButtonText("Cancel")
                 .build();
 
         biometricPrompt.authenticate(promptInfo);
     }
 
     private void loginUserWithBiometric() {
-
         emailInput.setText("nsmith@demo.io");
         passwordInput.setText("Demo123!");
-
-        // Perform login with the predefined user credentials
         loginUser();
-
     }
 
     private void loginUser() {
+        if (isLockedOut) {
+            showToast("Account locked. Try again later.");
+            return;
+        }
+
         String Email = emailInput.getText().toString();
         String Password = passwordInput.getText().toString();
 
         if (TextUtils.isEmpty(Email)) {
             MainActivity.appPreference.showToast("Your email is required.");
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()) {
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()) {
             MainActivity.appPreference.showToast("Invalid email");
-        } else if (TextUtils.isEmpty(Password)) {
+            return;
+        }
+        if (TextUtils.isEmpty(Password)) {
             MainActivity.appPreference.showToast("Password required");
-        } else if (Password.length() < 8) {
+            return;
+        }
+        if (Password.length() < 8) {
             MainActivity.appPreference.showToast("Password must be at least 8 characters long.");
-        } else {
-            Call<User> userCall = serviceApi.doLogin(Email, Password);
-            userCall.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
-                    if (response.body() != null) {
-                      //  Log.d("Response", "Response: " + response.body());
+            return;
+        }
 
-                        ((MainActivity) requireActivity()).setEmail(Email);
-
-                        MainActivity.appPreference.setLoginStatus(true);
-                        Log.d("Login", " Login API Being Called");
-
-                        myInterface.login(response.body().getAuthToken(), Email);
-
+        Call<User> userCall = serviceApi.doLogin(Email, Password);
+        userCall.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.body() != null) {
+                    failedAttempts = 0; // reset on success
+                    ((MainActivity) requireActivity()).setEmail(Email);
+                    MainActivity.appPreference.setLoginStatus(true);
+                    myInterface.login(response.body().getAuthToken(), Email);
+                } else {
+                    failedAttempts++;
+                    if (failedAttempts >= MAX_LOGIN_ATTEMPTS) {
+                        startLockout();
                     } else {
-                        // Login failed
-                        MainActivity.appPreference.showToast("Error. Login Failed");
+                        MainActivity.appPreference.showToast("Error. Login Failed (" +
+                                failedAttempts + "/" + MAX_LOGIN_ATTEMPTS + ")");
                         emailInput.setText("");
                         passwordInput.setText("");
                     }
                 }
+            }
 
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    // Handle failure
-                    Log.e("Login", "Error during login API call", t);
-
-                    if (t instanceof IOException) {
-                        // This exception is thrown for network-related issues
-                        showToast("Server is not available. Please check your internet connection.");
-                    } else if (t instanceof HttpException) {
-                        // This exception is thrown for HTTP error responses
-                        HttpException httpException = (HttpException) t;
-                        Response<?> response = httpException.response();
-                        if (response != null && response.errorBody() != null) {
-                            try {
-                                String errorBody = response.errorBody().string();
-                                Log.e("Login", "Error response: " + errorBody);
-                                // Handle the errorBody as needed
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            showToast("Error during login. Please try again.");
-                        }
-                    } else {
-                        showToast("Error during login. Please try again.");
-                    }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                failedAttempts++;
+                if (failedAttempts >= MAX_LOGIN_ATTEMPTS) {
+                    startLockout();
+                } else {
+                    showToast("Error during login. Please try again. (" +
+                            failedAttempts + "/" + MAX_LOGIN_ATTEMPTS + ")");
                 }
-
-
-            });
-        }
+                Log.e("Login", "Error during login API call", t);
+            }
+        });
     }
 }
