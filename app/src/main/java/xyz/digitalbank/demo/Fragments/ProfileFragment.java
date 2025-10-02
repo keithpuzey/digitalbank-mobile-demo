@@ -99,11 +99,7 @@ public class ProfileFragment extends Fragment {
         authToken = MainActivity.appPreference.getauthToken();
         progressTextView = view.findViewById(R.id.progressTextView);
         Toolbar toolbar = view.findViewById(R.id.action_bar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setHomeAsUpIndicator(null);
+
 
             ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
             toolbarImage.setOnClickListener(new View.OnClickListener() {

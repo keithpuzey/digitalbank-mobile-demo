@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_check_accounts"
+        android:title="My Accounts"
+        android:icon="@drawable/outline_home_24"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_dashboard"
+        android:title="Insights"
+        android:icon="@drawable/outline_bar_chart_20"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_transfer"
+        android:title="Deposit's"
+        android:icon="@drawable/outline_savings_24"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_atm_search"
+        android:title="ATM's NearMe"
+        android:icon="@drawable/outline_travel_explore_24"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/outline_logout_24"
+        android:showAsAction="never" />
+</menu>

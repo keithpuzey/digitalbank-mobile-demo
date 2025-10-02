@@ -9,21 +9,23 @@ import xyz.digitalbank.demo.Fragments.ProfileFragment;
 import xyz.digitalbank.demo.Fragments.RegistrationFragment;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
-
-import android.util.Log;
 import android.view.View;
-import android.content.Intent;
+import android.content.Context;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Fragments.AtmSearchFragment;
 import xyz.digitalbank.demo.Fragments.TransferFragment;
-import android.content.Context;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity implements MyInterface {
 
@@ -31,175 +33,138 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     public static AppPreference appPreference;
     private ServiceApi serviceApi;
 
-    private String email ;
-    private int loggedinuserId ;
+    private String email;
+    private int loggedinuserId;
 
-    private Context context;  // Declare a context variable
-
-    // Add a method to set the email
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    // Add this method to set the loggedinuserId
-    public void setLoggedinuserId(int userId) {
-        loggedinuserId = userId;
-    }
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize the context variable
         context = this;
-        // Use the static variable instead of defining a local variable
         appPreference = new AppPreference(this);
-
         appPreference.setLoginStatus(false);
 
         serviceApi = RetrofitClient.getRetrofitInstance(this).create(ServiceApi.class);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        setBottomNavGravity();
 
-        // Ensure it stays at the bottom
-
-        ViewGroup.LayoutParams layoutParams = bottomNavigationView.getLayoutParams();
-
-        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
-            CoordinatorLayout.LayoutParams coordinatorLayoutParams = (CoordinatorLayout.LayoutParams) layoutParams;
-            coordinatorLayoutParams.gravity = Gravity.BOTTOM;
-        } else if (layoutParams instanceof FrameLayout.LayoutParams) {
-            FrameLayout.LayoutParams frameLayoutParams = (FrameLayout.LayoutParams) layoutParams;
-            frameLayoutParams.gravity = Gravity.BOTTOM;
-        }
-
-
-
+        // Bottom navigation listener
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.action_check_accounts) {
-                if (!(getCurrentFragment() instanceof ProfileFragment)) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new ProfileFragment())
-                            .commit();
-                }
-                return true;
-            } else if (itemId == R.id.action_dashboard) {
-                switchToDashboardFragment();
-                return true;
-            } else if (itemId == R.id.action_transfer) {
-                switchToTransferFragment();
-                return true;
-            } else if (itemId == R.id.action_atm_search) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new AtmSearchFragment())
-                        .commit();
-                return true;
-            }  else {
-                return false;
-            }
+            handleMenuItem(item.getItemId());
+            return true;
         });
 
+        // Show initial fragment
         if (savedInstanceState == null) {
-
             if (appPreference.getLoginStatus()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ProfileFragment())
-                        .commit();
+                switchFragmentWithAnimation(new ProfileFragment());
             } else {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new LoginFragment())
-                        .commit();
+                switchFragmentWithAnimation(new LoginFragment());
             }
         }
     }
 
-
-    public ServiceApi getServiceApi() {
-        return serviceApi;
+    private void setBottomNavGravity() {
+        ViewGroup.LayoutParams layoutParams = bottomNavigationView.getLayoutParams();
+        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+            ((CoordinatorLayout.LayoutParams) layoutParams).gravity = Gravity.BOTTOM;
+        } else if (layoutParams instanceof FrameLayout.LayoutParams) {
+            ((FrameLayout.LayoutParams) layoutParams).gravity = Gravity.BOTTOM;
+        }
     }
+
+    // Shared handler for both bottom nav and top-right menu
+    private void handleMenuItem(int itemId) {
+        if (itemId == R.id.action_check_accounts) {
+            if (!(getCurrentFragment() instanceof ProfileFragment)) {
+                switchFragmentWithAnimation(new ProfileFragment());
+            }
+        } else if (itemId == R.id.action_dashboard) {
+            switchToDashboardFragment();
+        } else if (itemId == R.id.action_transfer) {
+            switchToTransferFragment();
+        } else if (itemId == R.id.action_atm_search) {
+            switchFragmentWithAnimation(new AtmSearchFragment());
+        } else if (itemId == R.id.action_logout) {
+            logout();
+        }
+    }
+
     private Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     }
 
-    @Override
-    public void register() {
+    private void switchToTransferFragment() {
+        switchFragmentWithAnimation(new TransferFragment());
+    }
+
+    private void switchToDashboardFragment() {
+        switchFragmentWithAnimation(new DashboardFragment());
+    }
+
+    // Fragment transaction with simple slide animation
+    private void switchFragmentWithAnimation(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, new RegistrationFragment())
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 
     @Override
-    public void login(String authToken, String Email ) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_right_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        handleMenuItem(item.getItemId());
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void register() {
+        switchFragmentWithAnimation(new RegistrationFragment());
+    }
+
+    @Override
+    public void login(String authToken, String Email) {
         appPreference.setauthToken(authToken);
-        setEmail(email);
+        email = Email;
+
         ProfileFragment profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putString("email", Email);
         profileFragment.setArguments(bundle);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, profileFragment)
-                .commit();
-
+        switchFragmentWithAnimation(profileFragment);
         profileFragment.updateProfileDetails();
 
-        // Make bottomNavigationView visible after login
         bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     public void showLoginFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new LoginFragment())
-                .commit();
-
-        // Hide bottomNavigationView after logout
+        switchFragmentWithAnimation(new LoginFragment());
         bottomNavigationView.setVisibility(View.GONE);
     }
-
 
     public int getLoggedinuserId() {
         return loggedinuserId;
     }
 
-
-
-    // Add this method to set the email in ProfileFragment
     public void setEmailInProfileFragment(String email) {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
+        Fragment currentFragment = getCurrentFragment();
         if (currentFragment instanceof ProfileFragment) {
-            ProfileFragment profileFragment = (ProfileFragment) currentFragment;
-            profileFragment.setEmail(email);
-        } else {
-            // Handle the case where the current fragment is not a ProfileFragment
-            // You might want to log or display an error message
+            ((ProfileFragment) currentFragment).setEmail(email);
         }
     }
 
-
-    private void switchToTransferFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new TransferFragment())
-                .addToBackStack(null)
-                .commit();
-    }
-
-    private void switchToDashboardFragment() {
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new DashboardFragment())
-                .addToBackStack(null)
-                .commit();
-    }
-
-
-    // Add a method to get the email
     public String getEmail() {
         return email;
     }
@@ -210,12 +175,19 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         appPreference.setDisplayEmail("Email");
         appPreference.setCreDate("DATE");
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new LoginFragment())
-                .commit();
-
-        // Hide bottomNavigationView after logout
+        switchFragmentWithAnimation(new LoginFragment());
         bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public ServiceApi getServiceApi() {
+        return serviceApi;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setLoggedinuserId(int userId) {
+        loggedinuserId = userId;
     }
 }

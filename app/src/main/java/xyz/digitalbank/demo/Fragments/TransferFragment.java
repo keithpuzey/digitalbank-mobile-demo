@@ -161,11 +161,7 @@ public class TransferFragment extends Fragment {
         debitRadioButton = view.findViewById(R.id.debitRadioButton);
 
         Toolbar toolbar = view.findViewById(R.id.action_bar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setHomeAsUpIndicator(null);
+
 
         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
         toolbarImage.setOnClickListener(new View.OnClickListener() {

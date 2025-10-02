@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_gravity="right"
-    android:padding="5dp"
+    android:padding="15dp"
     android:background="@android:color/white">
 
 

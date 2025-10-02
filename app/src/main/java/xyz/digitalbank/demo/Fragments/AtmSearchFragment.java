@@ -97,11 +97,7 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
 
 
         Toolbar toolbar = view.findViewById(R.id.action_bar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false); // This will remove the left arrow
-        actionBar.setHomeAsUpIndicator(null);
+
 
         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
         toolbarImage.setOnClickListener(new View.OnClickListener() {
