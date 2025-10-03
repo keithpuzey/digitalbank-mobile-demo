@@ -1,42 +1,21 @@
-<!-- res/layout/your_transfer_screen_layout.xml -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/transfer_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="8dp">
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:elevation="4dp"
-        android:gravity="end"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
-
-        <ImageView
-            android:id="@+id/toolbar_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/outline_more_vert_24"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"/>
-
-    </androidx.appcompat.widget.Toolbar>
-
-    <!-- Header: Account for Deposit -->
+    <!-- Header: Account for Deposit at top -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Account for Deposit"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="Accounts for Deposit" />
+        android:contentDescription="Accounts for Deposit"
+        android:paddingBottom="16dp" />
 
     <!-- Account Spinner -->
     <Spinner
@@ -67,6 +46,7 @@
         android:inputType="numberDecimal"
         android:contentDescription="Enter amount to deposit" />
 
+    <!-- Description Header -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,6 +65,7 @@
         android:hint="Enter description"
         android:contentDescription="Enter description of deposit" />
 
+    <!-- Transaction Type Header -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -124,7 +105,6 @@
         android:layout_marginBottom="90dp"
         android:orientation="vertical">
 
-
         <Button
             android:id="@+id/submitButton"
             android:layout_width="178dp"
@@ -143,6 +123,7 @@
             android:text="Deposit Cheque"
             android:textColor="@color/colorPrimary"
             android:contentDescription="Cheque Feature coming soon" />
+
         <ImageView
             android:id="@+id/cameraIcon"
             android:layout_width="match_parent"
@@ -150,8 +131,6 @@
             android:gravity="center"
             android:src="@drawable/ic_camera" />
 
-
     </LinearLayout>
-
 
 </LinearLayout>

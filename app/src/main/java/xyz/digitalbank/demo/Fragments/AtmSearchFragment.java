@@ -96,13 +96,13 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
       //  updateLocationButton = getView().findViewById(R.id.updateLocationButton);
 
 
-        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
-        toolbarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPopupMenu(v, toolbarImage);
-            }
-        });
+  //      ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+  //      toolbarImage.setOnClickListener(new View.OnClickListener() {
+  //          @Override
+  //          public void onClick(View v) {
+  //              showPopupMenu(v, toolbarImage);
+  //          }
+  //      });
         ;
 
         View rootLayout = view.findViewById(R.id.atm_root_layout);
@@ -931,17 +931,17 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
         if (popupWindow == null) {
             View popupView = getLayoutInflater().inflate(R.layout.popup_user_info, null);
 
-            logoutLinkTextView = popupView.findViewById(R.id.link_logout);
-            logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MainActivity mainActivity = (MainActivity) requireActivity();
-                    if (popupWindow != null && popupWindow.isShowing()) {
-                        popupWindow.dismiss();
-                    }
-                    mainActivity.logout();
-                }
-            });
+   //         logoutLinkTextView = popupView.findViewById(R.id.link_logout);
+   //         logoutLinkTextView.setOnClickListener(new View.OnClickListener() {
+   //             @Override
+   //             public void onClick(View v) {
+   //                 MainActivity mainActivity = (MainActivity) requireActivity();
+   //                 if (popupWindow != null && popupWindow.isShowing()) {
+  //                      popupWindow.dismiss();
+  //                  }
+  //                  mainActivity.logout();
+   //             }
+   //         });
 
     //        int[] location = new int[2];
     //        toolbarImage.getLocationOnScreen(location);

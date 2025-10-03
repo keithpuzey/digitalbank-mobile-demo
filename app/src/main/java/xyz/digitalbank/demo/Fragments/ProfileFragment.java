@@ -101,13 +101,13 @@ public class ProfileFragment extends Fragment {
         Toolbar toolbar = view.findViewById(R.id.action_bar);
 
 
-            ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
-            toolbarImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showPopupMenu(toolbarImage);
-                }
-            });
+   //         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+   //         toolbarImage.setOnClickListener(new View.OnClickListener() {
+   //             @Override
+   //             public void onClick(View v) {
+   //                 showPopupMenu(toolbarImage);
+   //             }
+   //         });
 
             View rootLayout = view.findViewById(R.id.profile_root_layout);
             rootLayout.setOnTouchListener(new View.OnTouchListener() {

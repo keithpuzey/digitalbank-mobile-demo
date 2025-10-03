@@ -64,8 +64,8 @@ public class DashboardFragment extends Fragment {
 
 
 
-        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
-        toolbarImage.setOnClickListener(v -> showPopupMenu(toolbarImage));
+  //      ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+  //      toolbarImage.setOnClickListener(v -> showPopupMenu(toolbarImage));
 
         // ✅ Dismiss popup if user taps outside
         View rootLayout = view.findViewById(R.id.dashboard_root_layout);

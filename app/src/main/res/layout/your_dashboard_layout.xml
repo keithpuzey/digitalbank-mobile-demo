@@ -4,42 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Custom top bar -->
-    <RelativeLayout
-        android:id="@+id/custom_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:elevation="4dp">
-
-        <ImageView
-            android:id="@+id/toolbar_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/outline_more_vert_24" />
-
-    </RelativeLayout>
-
-    <!-- Optional header text -->
+    <!-- Optional header text at the very top -->
     <TextView
         android:id="@+id/account_balance_summary_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/custom_toolbar"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="16dp"
-        android:text="  Financial Dashboard"
+        android:text="Financial Dashboard"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:paddingTop="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
 
     <!-- Content area -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/account_balance_summary_text">
+        android:layout_below="@id/account_balance_summary_text">
 
         <WebView
             android:id="@+id/webView"

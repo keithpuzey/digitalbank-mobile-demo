@@ -28,7 +28,8 @@
     <item
         android:id="@+id/action_logout"
         android:title="Logout"
-        android:icon="@drawable/outline_logout_24" />
+        android:icon="@drawable/outline_logout_24"
+        android:visible="true" />
 
 
 </menu>

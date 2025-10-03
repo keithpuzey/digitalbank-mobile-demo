@@ -16,15 +16,7 @@
         android:background="@android:color/transparent"
         android:elevation="4dp"
         android:gravity="end"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
-
-        <ImageView
-            android:id="@+id/toolbar_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/outline_more_vert_24"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"/>
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" > />
 
     </androidx.appcompat.widget.Toolbar>
 

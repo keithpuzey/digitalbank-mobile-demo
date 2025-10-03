@@ -161,13 +161,13 @@ public class TransferFragment extends Fragment {
         debitRadioButton = view.findViewById(R.id.debitRadioButton);
 
 
-        ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
-        toolbarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPopupMenu(toolbarImage);
-            }
-        });
+ //       ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
+  //      toolbarImage.setOnClickListener(new View.OnClickListener() {
+  //          @Override
+  //          public void onClick(View v) {
+  //              showPopupMenu(toolbarImage);
+  //          }
+  //      });
 
         View rootLayout = view.findViewById(R.id.transfer_root_layout);
         rootLayout.setOnTouchListener(new View.OnTouchListener() {

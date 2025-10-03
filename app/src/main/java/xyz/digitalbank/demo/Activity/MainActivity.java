@@ -9,7 +9,7 @@ import xyz.digitalbank.demo.Fragments.ProfileFragment;
 import xyz.digitalbank.demo.Fragments.RegistrationFragment;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
-
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -24,6 +24,7 @@ import xyz.digitalbank.demo.Services.ServiceApi;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Fragments.AtmSearchFragment;
 import xyz.digitalbank.demo.Fragments.TransferFragment;
+import androidx.fragment.app.FragmentManager;
 
 public class MainActivity extends AppCompatActivity implements MyInterface {
 
@@ -156,14 +157,29 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
     }
 
     public void logout() {
-        appPreference.setLoginStatus(false);
-        appPreference.setDisplayName("Name");
-        appPreference.setDisplayEmail("Email");
-        appPreference.setCreDate("DATE");
-        appPreference.setCreDate("DATE");
+        new AlertDialog.Builder(this)
+                .setTitle("Confirm Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Perform actual logout
+                    appPreference.setLoginStatus(false);
+                    appPreference.setDisplayName("Name");
+                    appPreference.setDisplayEmail("Email");
+                    appPreference.setCreDate("DATE");
 
-        switchFragmentWithAnimation(new LoginFragment());
-        bottomNavigationView.setVisibility(View.GONE);
+                    // Clear the back stack
+                    getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    // Switch to LoginFragment with no animation
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new LoginFragment())
+                            .commit();
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     public ServiceApi getServiceApi() {
