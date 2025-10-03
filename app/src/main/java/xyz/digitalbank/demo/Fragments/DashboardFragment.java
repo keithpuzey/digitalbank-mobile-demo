@@ -61,8 +61,7 @@ public class DashboardFragment extends Fragment {
         String homeUrl = ConstantsManager.getHomeUrl(requireContext());
         webView.loadUrl(homeUrl + "/financedashboard.html");
 
-        // ✅ Setup Toolbar
-        Toolbar toolbar = view.findViewById(R.id.action_bar);
+
 
 
         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);

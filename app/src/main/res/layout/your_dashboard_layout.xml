@@ -4,32 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/action_bar"
+    <!-- Custom top bar -->
+    <RelativeLayout
+        android:id="@+id/custom_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
-        android:elevation="4dp"
-        android:gravity="end"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+        android:elevation="4dp">
 
         <ImageView
             android:id="@+id/toolbar_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="16dp"
             android:src="@drawable/outline_more_vert_24" />
 
-    </androidx.appcompat.widget.Toolbar>
+    </RelativeLayout>
 
     <!-- Optional header text -->
     <TextView
         android:id="@+id/account_balance_summary_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/action_bar"
+        android:layout_below="@+id/custom_toolbar"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
         android:text="  Financial Dashboard"
@@ -42,14 +41,12 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/account_balance_summary_text">
 
-        <!-- ✅ WebView replaces AnyChartView -->
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:visibility="visible" />
 
-        <!-- ProgressBar for loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

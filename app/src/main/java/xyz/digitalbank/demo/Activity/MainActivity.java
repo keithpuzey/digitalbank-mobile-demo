@@ -9,14 +9,12 @@ import xyz.digitalbank.demo.Fragments.ProfileFragment;
 import xyz.digitalbank.demo.Fragments.RegistrationFragment;
 import xyz.digitalbank.demo.R;
 import xyz.digitalbank.demo.Services.MyInterface;
-import android.view.View;
+
 import android.content.Context;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
+import android.view.View;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 
@@ -77,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         }
     }
 
-    // Shared handler for both bottom nav and top-right menu
+    // Shared handler for bottom nav items
     private void handleMenuItem(int itemId) {
         if (itemId == R.id.action_check_accounts) {
             if (!(getCurrentFragment() instanceof ProfileFragment)) {
@@ -114,18 +112,6 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.top_right_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        handleMenuItem(item.getItemId());
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -173,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements MyInterface {
         appPreference.setLoginStatus(false);
         appPreference.setDisplayName("Name");
         appPreference.setDisplayEmail("Email");
+        appPreference.setCreDate("DATE");
         appPreference.setCreDate("DATE");
 
         switchFragmentWithAnimation(new LoginFragment());

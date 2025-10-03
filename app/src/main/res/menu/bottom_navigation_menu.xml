@@ -25,7 +25,10 @@
         android:title="ATM's NearMe"
         android:contentDescription="ATM's Near Me" />
 
-
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/outline_logout_24" />
 
 
 </menu>

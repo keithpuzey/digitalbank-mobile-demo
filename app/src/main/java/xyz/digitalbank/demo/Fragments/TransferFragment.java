@@ -160,8 +160,6 @@ public class TransferFragment extends Fragment {
         creditRadioButton = view.findViewById(R.id.creditRadioButton);
         debitRadioButton = view.findViewById(R.id.debitRadioButton);
 
-        Toolbar toolbar = view.findViewById(R.id.action_bar);
-
 
         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
         toolbarImage.setOnClickListener(new View.OnClickListener() {

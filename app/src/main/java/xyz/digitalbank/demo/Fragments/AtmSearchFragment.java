@@ -96,9 +96,6 @@ public class AtmSearchFragment extends Fragment implements View.OnClickListener 
       //  updateLocationButton = getView().findViewById(R.id.updateLocationButton);
 
 
-        Toolbar toolbar = view.findViewById(R.id.action_bar);
-
-
         ImageView toolbarImage = view.findViewById(R.id.toolbar_image);
         toolbarImage.setOnClickListener(new View.OnClickListener() {
             @Override
