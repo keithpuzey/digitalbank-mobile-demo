@@ -1,42 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp"
     android:orientation="vertical"
     android:padding="10dp"
     tools:context=".Fragments.LoginFragment">
 
+    <!-- Toolbar with Settings Cog -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_marginTop="16dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/light_gray"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:elevation="4dp"
+        android:paddingEnd="8dp">
 
-    <ImageView
-        android:id="@+id/cogIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentEnd="false"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:clickable="true"
-        android:layout_gravity="right"
-        android:src="@drawable/baseline_settings_24"
-        android:contentDescription="Settings Cog Icon" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1" />
 
+        <ImageButton
+            android:id="@+id/cogIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_settings_24"
+            android:contentDescription="Settings Cog Icon"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            android:layout_gravity="end"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </androidx.appcompat.widget.Toolbar>
 
+    <!-- Logo -->
     <ImageView
         android:id="@+id/ic_logo"
         android:layout_width="300dp"
         android:layout_height="100dp"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentEnd="false"
         android:layout_marginTop="36dp"
-        android:gravity="center_horizontal"
-        android:src="@drawable/dblogo"
         android:layout_gravity="center"
-        android:contentDescription="DB Logo"  />
+        android:src="@drawable/dblogo"
+        android:contentDescription="DB Logo" />
 
-
-
+    <!-- Email Input -->
     <EditText
         android:id="@+id/emailInput"
         android:layout_width="match_parent"
@@ -46,6 +61,7 @@
         android:inputType="textEmailAddress"
         android:contentDescription="Enter Email Address" />
 
+    <!-- Password Input -->
     <EditText
         android:id="@+id/passwordInput"
         android:layout_width="match_parent"
@@ -55,6 +71,7 @@
         android:inputType="textPassword"
         android:contentDescription="Enter Password" />
 
+    <!-- Login Button -->
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="match_parent"
@@ -67,6 +84,7 @@
         android:textSize="16sp"
         android:contentDescription="Login Button" />
 
+    <!-- Register Text -->
     <TextView
         android:id="@+id/registerTV"
         android:layout_width="match_parent"
@@ -74,9 +92,10 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="30dp"
         android:gravity="center_horizontal"
-        android:text="Don't have account? Sign Up Here?"
-        android:contentDescription="Click here to Register new account" />
+        android:text="Don't have an account? Sign Up Here!"
+        android:contentDescription="Click here to register new account" />
 
+    <!-- Biometric Button -->
     <FrameLayout
         android:layout_width="75dp"
         android:layout_height="75dp"
@@ -93,12 +112,13 @@
             android:textSize="16sp" />
     </FrameLayout>
 
+    <!-- Version Text -->
     <TextView
         android:id="@+id/versionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_centerHorizontal="false"
-        android:text="Version 1.6.0" />
+        android:text="Version 1.6.0"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>

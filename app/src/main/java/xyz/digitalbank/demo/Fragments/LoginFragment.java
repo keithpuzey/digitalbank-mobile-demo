@@ -40,6 +40,9 @@ import xyz.digitalbank.demo.Services.MyInterface;
 import xyz.digitalbank.demo.Services.RetrofitClient;
 import xyz.digitalbank.demo.Services.ServiceApi;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 
 
 @RequiresApi(api = Build.VERSION_CODES.P)
@@ -95,7 +98,14 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         String buildNumber = getString(R.string.app_version);
-
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
+            if (activity.getSupportActionBar() != null) {
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(false); // hides the title completely
+            }
+        }
 
         // Find the TextView for version number
         versionTextView = view.findViewById(R.id.versionTextView);
