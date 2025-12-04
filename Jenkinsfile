@@ -72,8 +72,6 @@ pipeline {
 
                     sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
 
-                    // /opt/gradle/gradle/bin/gradle wrapper
-                    // sed -i 's/8\\.5/8.11.1/' gradle/wrapper/gradle-wrapper.properties
                     # Build using Gradle Wrapper
                     chmod +x ./gradlew
                     ./gradlew assembleDebug --info
