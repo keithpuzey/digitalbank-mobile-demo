@@ -1,4 +1,4 @@
-pipeline {
+Tokenpipeline {
     agent any
 
     environment {
@@ -176,7 +176,7 @@ def updateConfigFile(perfectotoken, BMCredentials) {
     def configFileContent = readFile(configFilePath)
 
     // Modify the content with the new tokens
-    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, perfectotoken)
+    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, PerfectoToken)
     configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
 
     // Write the updated content back to the config.py file
