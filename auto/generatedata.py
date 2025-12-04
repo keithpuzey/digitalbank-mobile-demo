@@ -1,105 +1,89 @@
-pipeline {
-    agent any
+import json
+import csv
+import requests
+from config import workspaceID, BMCredentials, test_data_csv, SharedFolderID
 
-    environment {
-        ANDROID_HOME = '/opt/Android'
-        BMCredentials = credentials('BMCredentials')
-        PerfectoToken = credentials('Demo-Perfecto')
-    }
+class CSVDataGeneration:
+    def __init__(self, datamodel_path, repeat_count):
+        self.datamodel_path = datamodel_path
+        self.repeat_count = repeat_count
 
-    stages {
+    def generate_test_data(self):
+        try:
+            # Open Data Model file
+            with open(self.datamodel_path, 'r', encoding='utf-8') as datamodel_file:
+                datamodel_def = json.load(datamodel_file)
 
-        stage('Verify Python Scripts') {
-            steps {
-                echo 'Checking that Python scripts exist and are valid'
-                sh 'ls -la ${WORKSPACE}/auto'
-                sh 'head -n 5 ${WORKSPACE}/auto/generatedata.py'
+            # Update repeat count in Data Model
+            default_obj = datamodel_def['data']['attributes']['model']['entities']['default']
+            default_obj['repeat'] = self.repeat_count
+
+            # Generate Test Data
+            url = f"https://tdm.blazemeter.com/api/v1/workspaces/{workspaceID}/testdata/generatefile?entity=default"
+            headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json,text/javascript, */*',
             }
-        }
 
-        stage('Install Python Packages') {
-            steps {
-                echo 'Installing required Python packages'
-                sh 'python3.8 -m pip install --upgrade pip'
-                sh 'python3.8 -m pip install requests mysql-connector-python'
-            }
-        }
+            response = requests.post(
+                url,
+                json=datamodel_def,
+                headers=headers,
+                auth=BMCredentials
+            )
+            response.raise_for_status()
 
-        stage('Update Configuration') {
-            steps {
-                script {
-                    // Update config.py with Jenkins credentials
-                    def configFilePath = "${WORKSPACE}/auto/config.py"
-                    def configFileContent = readFile(configFilePath)
+            # Save the response data to a CSV file
+            result_data = response.json().get('result', {})
+            if result_data:
+                csv_file_name = result_data.get('fileName', 'blazedata-test.csv')
+                csv_file_path = f"{test_data_csv}_{csv_file_name}"
+                with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
+                    csv_writer = csv.writer(csv_file)
+                    csv_content = result_data.get('content', '')
+                    csv_reader = csv.reader(csv_content.splitlines())
+                    for row in csv_reader:
+                        csv_writer.writerow(row)
+                        print(', '.join(row))
 
-                    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, env.PerfectoToken)
-                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, env.BMCredentials)
+                print(f"Data saved to CSV file: {csv_file_path}")
 
-                    writeFile(file: configFilePath, text: configFileContent)
-                    echo 'config.py updated with Jenkins credentials'
-                }
-            }
-        }
+            print(f"\n{self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
+            # print(response.text)
 
-        stage('Generate Synthetic Data') {
-            steps {
-                echo "BMCredentials is set: ${env.BMCredentials}"
-                sh "python3.8 ${WORKSPACE}/auto/generatedata.py ${WORKSPACE}/auto/registration-data-model-full.json 2"
-            }
-        }
+            # Make the API request to get the signed URL of the Shared Folder
+            # API endpoint URL to download the JSON data
+            response = requests.get(
+                'https://a.blazemeter.com/api/v4/folders/' + SharedFolderID + '/s3/sign?fileName=test_data.csv_blazedata-test.csv',
+                headers=headers,
+                auth=BMCredentials
+            )
 
-        stage('Upload CSV to Perfecto') {
-            steps {
-                sh "python3.8 ${WORKSPACE}/auto/upload-csv-perfecto.py"
-            }
-        }
+            # Load the JSON response
+            data = response.json()
 
-        stage('Create Virtual Service') {
-            steps {
-                def scriptOutput = sh(script: "python3.8 ${WORKSPACE}/auto/Create_mock.py", returnStdout: true).trim()
-                def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
-                def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
-                echo "Mock Service Endpoint: ${endpoint}"
-            }
-        }
+            # Extract the signed URL from the JSON response
+            signed_url = data["result"]
 
-        stage('Build Mobile App') {
-            steps {
-                sh '''
-                    export ANDROID_HOME=$ANDROID_HOME
-                    export APP_VERSION=1.4.$BUILD_NUMBER
-                    /opt/gradle/gradle/bin/gradle assembleDebug --info
-                    /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
-                '''
-            }
-        }
+            # Use the signed_url to upload the file to the BlazeMeter Shared folder
 
-        stage('Upload Mobile App to Perfecto') {
-            steps {
-                dir("${WORKSPACE}/app/build/outputs/apk/debug/") {
-                    sh '''
-                        curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
-                             -H "Perfecto-Authorization: $PerfectoToken" \
-                             -F "inputStream=@Digital-Bank-1.4.apk" \
-                             -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
-                             -v
-                    '''
-                }
-            }
-        }
+            with open(csv_file_path, "rb") as file:
+                response = requests.put(signed_url, data=file)
 
-        stage('Execute Mobile Registration Test') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh "python3.8 ${WORKSPACE}/auto/run_scriptless_test.py"
-                }
-            }
-        }
+                # Check if the upload was successful
+                if response.status_code != 200:
+                    print(f"Error: Failed to upload file. Status Code: {response.status_code}")
+                else:
+                    print("File successfully uploaded to BlazeMeter shared folder.")
 
-        stage('Cleanup Virtual Service') {
-            steps {
-                sh "python3.8 ${WORKSPACE}/auto/delete_mock.py"
-            }
-        }
-    }
-}
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+if __name__ == "__main__":
+    # Assuming command line arguments: datamodel_path repeat_count
+    import sys
+    datamodel_path = sys.argv[1]
+    repeat_count = sys.argv[2]
+
+    csv_data_generation = CSVDataGeneration(datamodel_path, repeat_count)
+    csv_data_generation.generate_test_data()
