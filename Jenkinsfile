@@ -3,39 +3,37 @@ pipeline {
 
     environment {
         ANDROID_HOME = '/opt/Android'
-        // Use the credentials() helper to bind credentials to environment variables
-        BMCredentials = credentials('BMCredentials') // The ID from step 1
-        perfectotoken = credentials('perfectotoken')
 
+        // Jenkins credentials binding
+        // Creates:  BMCredentials_USR  and  BMCredentials_PSW
+        BMCredentials = credentials('BMCredentials')
+        perfectotoken = credentials('perfectotoken')
     }
 
     stages {
+
         stage('Update Configuration') {
             steps {
                 script {
-                    // Read environment variables from Jenkins
-                    def perfectotoken = env.perfectotoken
-                    // def BMCredentials = env.BMCredentials
+                    def perfectoKey   = env.perfectotoken
+                    def bmApiKey      = env.BMCredentials_USR
+                    def bmApiSecret   = env.BMCredentials_PSW
 
-                    // Access API key and secret from the environment variables
-                    def apiKey = env.BMCredentials_USR  // API key as username
-                    def apiSecret = env.BMCredentials_PSW // API secret as password
+                    echo "Using BlazeMeter API Key: ${bmApiKey}"
 
-                    // Use the credentials in your script or pass them to other commands
-                    echo "Using API Key: ${apiKey}"
-            
-                    def configFilePath = '\\auto\\config.py'
+                    // UPDATE CONFIG.PY (Linux path)
+                    def configFilePath = "./auto/config.py"
+                    def content = readFile(configFilePath)
 
-                    // Read the content of the config.py file
-                    def configFileContent = readFile(configFilePath)
-                    configFileContent = configFileContent.replaceAll(/token_BMAPIKey/, apiKey)
-                    configFileContent = configFileContent.replaceAll(/token_BMAPISecret/, apiSecret)
-                    writeFile(file: configFilePath, text: configFileContent)
+                    content = content.replaceAll(/token_PerfectoKey/, perfectoKey)
+                    content = content.replaceAll(/token_BMAPIKey/, bmApiKey)
+                    content = content.replaceAll(/token_BMAPISecret/, bmApiSecret)
 
+                    writeFile(file: configFilePath, text: content)
 
+                    // Install Python dependency
                     sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
-                    // Update config.py file with the tokens
-                    updateConfigFile(perfectotoken, BMCredentials)
+
                     echo 'Setting up DCT configuration for Jenkins user'
                     sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
@@ -44,47 +42,38 @@ pipeline {
 
         stage('Create Environment - Puppet') {
             steps {
-                echo 'Creating environment using Puppet'
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
 
-
-
         stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
-                echo 'Creating Synthetic Data and Virtual Service'
                 script {
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
-
                     sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
-                    def updateOutput = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
-                    // Extract the endpoint details using regular expressions
-                    // Execute the script and capture the output
+                    def outputVS = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
+
                     def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
-                    def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
-                    echo "Mock Service Endpoint: ${endpoint}"
-
+                    echo "Mock Service Endpoint: ${endpointMatch ? endpointMatch[0][1].trim() : 'NONE'}"
                 }
             }
         }
 
-
         stage('Build Mobile App') {
             steps {
-                echo 'Create Latest Version of Mobile APK'
                 sh '''
                     export ANDROID_HOME=$ANDROID_HOME
                     ls -lia $ANDROID_HOME
-                    echo $BUILD_NUMBER
+
                     export APP_VERSION=1.4.$BUILD_NUMBER
+                    echo "Building version: $APP_VERSION"
+
                     sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
-                    # Update the BASE_URL to redirect to dev environment
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/Constant.java
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/ConstantsManager.java
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Fragments/ConstantsEditActivity.java
+
+                    /opt/gradle/gradle/bin/gradle wrapper
+                    sed -i 's/8\\.5/8.11.1/' gradle/wrapper/gradle-wrapper.properties
 
                     /opt/gradle/gradle/bin/gradle assembleDebug --info
                     /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
@@ -94,16 +83,13 @@ pipeline {
 
         stage('Upload Mobile App to Perfecto') {
             steps {
-                echo 'Upload latest build version to Perfecto'
-                // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
-                dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
+                dir("app/build/outputs/apk/debug/") {
                     sh '''
                         curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
                             -H 'Content-Type: multipart/form-data' \
                             -H 'Perfecto-Authorization: '$perfectotoken \
                             -F 'inputStream=@Digital-Bank-1.4.apk' \
-                            -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
-                            -v
+                            -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}'
                     '''
                 }
             }
@@ -112,89 +98,44 @@ pipeline {
         stage('Execute Mobile Registration Test - Perfecto') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
                     script {
-                        boolean shouldRerun = true
-                        while (shouldRerun) {
+                        boolean retry = true
+                        while (retry) {
+
                             def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-                            // Parse the output to extract values
-                            def reasonMatch = scriptOutput =~ /Reason: (.+)/
-                            def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
-                            def devicesMatch = scriptOutput =~ /Devices: (.+)/
+                            def reason = (scriptOutput =~ /Reason: (.+)/)[0][1].trim()
+                            def reportUrl = (scriptOutput =~ /Test Grid Report: (.+)/)[0][1].trim()
+                            def devices = (scriptOutput =~ /Devices: (.+)/)[0][1].trim()
 
-                            def reason = reasonMatch ? reasonMatch[0][1].trim() : null
-                            def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
-                            def devices = devicesMatch ? devicesMatch[0][1].trim() : null
+                            echo "Test Grid Report: ${reportUrl}"
+                            echo "Devices: ${devices}"
+                            echo "Reason:  ${reason}"
 
-                            // Print or use the captured values as needed
-                            echo "Mobile Test Overview:"
-                            echo "Test Grid Report URL: ${testGridReportUrl}"
-                            echo "Devices : ${devices}"
-                            echo "Final Status: ${reason}"
-
-                            // Check if the script should be rerun based on the reason
-                            if (reason == 'ResourcesUnavailable') {
-                                echo 'Reason: ResourcesUnavailable. Rerunning the script...'
-                                shouldRerun = true
-                            } else {
-                                shouldRerun = false
-                            }
+                            retry = (reason == 'ResourcesUnavailable')
                         }
                     }
                 }
             }
         }
 
-
-        stage('Execute Load and EUX (Mobile and Web) Test') {
+        stage('Execute Load & EUX Test') {
             steps {
-                echo 'Execute Load and EUX Test - BlazeMeter'
                 script {
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
-
-                    // Extract the test URL from the script output
-                    def testUrlMatch = scriptOutput =~ /Test URL (.+)/
-                    def testUrl = testUrlMatch ? testUrlMatch[0][1].trim() : null
-
-                    // Assign the test URL to a Jenkins variable
-                    if (testUrl) {
-                        env.TEST_URL = testUrl
-                        echo "Test URL: ${env.TEST_URL}"
-                    } else {
-                        echo "Test URL not found in the script output."
-                    }
+                    def output = sh(script: "sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest", returnStdout: true).trim()
+                    def match = output =~ /Test URL (.+)/
+                    env.TEST_URL = match ? match[0][1].trim() : "NOT_FOUND"
+                    echo "Test URL: ${env.TEST_URL}"
                 }
             }
         }
 
         stage('Remove Virtual Service') {
-            steps {
-                echo 'Remove Virtual Service'
-                sh 'sudo /usr/bin/python ./auto/delete_mock.py'
-            }
+            steps { sh 'sudo /usr/bin/python ./auto/delete_mock.py' }
         }
 
         stage('Remove Test Environment - Puppet') {
-            steps {
-                echo 'Remove Test Environment'
-                sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
-            }
+            steps { sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp' }
         }
     }
-}
-
-def updateConfigFile(perfectotoken, BMCredentials) {
-    // Define the path to your config.py file
-    def configFilePath = '\\auto\\config.py'
-
-    // Read the content of the config.py file
-    def configFileContent = readFile(configFilePath)
-
-    // Modify the content with the new tokens
-    configFileContent = configFileContent.replaceAll(/token_PerfectoKey/, perfectotoken)
-    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
-
-    // Write the updated content back to the config.py file
-    writeFile(file: configFilePath, text: configFileContent)
 }
