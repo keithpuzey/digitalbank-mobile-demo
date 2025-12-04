@@ -19,6 +19,7 @@ payload = {
     "type": "TRANSACTIONAL",
     "liveSystemHost": "null",
     "liveSystemPort": "null",
+    "httpRunnerEnabled": "true",
     "name": f"E2E Demo {service_name}",
     "serviceId": int(ServiceID),
     "shipId": "5d3ccab3526ad28f53205574",
