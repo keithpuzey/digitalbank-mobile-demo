@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Read environment variables from Jenkins
-                    def perfectotoken = env.perfectotoken
+                    def PerfectoToken = env.PerfectoToken
                     def BMCredentials = env.BMCredentials
 
                     sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
