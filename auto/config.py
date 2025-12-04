@@ -1,13 +1,8 @@
-import os
+# config.py - Template for Jenkins to inject credentials
 
-# Get tokens from Jenkins environment
-BMCredentials = os.getenv("BMCredentials")
-if not BMCredentials:
-    raise RuntimeError("❌ Environment variable 'BMCredentials' is not set.")
-
-PerfectoKey = os.getenv("PerfectoToken")
-if not PerfectoKey:
-    raise RuntimeError("❌ Environment variable 'PerfectoToken' is not set.")
+# Jenkins will replace these placeholders during the pipeline
+BMCredentials = "token_BMCredentials"
+PerfectoKey = "token_PerfectoToken"
 
 # Blazemeter Environment - Workspace / Account
 workspaceID = 2014117
