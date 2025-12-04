@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         ANDROID_HOME = '/opt/Android'
+        // Inject Jenkins secret text credential (replace with your actual credential ID)
+        BMCredentials = credentials('BMCREDENTIALS_ID')
     }
 
     stages {
@@ -34,6 +36,8 @@ pipeline {
             steps {
                 echo 'Creating Synthetic Data and Virtual Service'
                 script {
+                    // Print the variable for verification (optional)
+                    sh 'echo "BMCredentials is set: $BMCredentials"'
                     sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
                     sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
