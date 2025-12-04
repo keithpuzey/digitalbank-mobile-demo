@@ -38,14 +38,14 @@ pipeline {
                 script {
                     // Print the variable for verification (optional)
                     sh 'echo "BMCredentials is set: $BMCredentials"'
-                    sh 'sudo -E /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh '/usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
-                    sh 'sudo -E /usr/bin/python ./auto/upload-csv-perfecto.py'
-                    def updateOutput = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
+                    sh '/usr/bin/python ./auto/upload-csv-perfecto.py'
+                    def updateOutput = sh(script: '/usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
                     // Extract the endpoint details using regular expressions
                     // Execute the script and capture the output
-                    def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: '/usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
