@@ -23,13 +23,14 @@ class CSVDataGeneration:
             headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json,text/javascript, */*',
+                'Authorization': f'Bearer {BMCredentials}'  # Use Bearer token auth
+                
             }
 
             response = requests.post(
                 url,
                 json=datamodel_def,
-                headers=headers,
-                auth=BMCredentials
+                headers=headers
             )
             response.raise_for_status()
 
