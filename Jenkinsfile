@@ -5,6 +5,7 @@ pipeline {
         ANDROID_HOME = '/opt/Android'
         // Use the credentials() helper to bind credentials to environment variables
         BMCredentials = credentials('BMCredentials') // The ID from step 1
+        perfectotoken = credentials('Demo-Perfecto')
 
     }
 
