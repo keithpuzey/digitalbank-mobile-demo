@@ -11,7 +11,25 @@ pipeline {
                 script {
                     // Read environment variables from Jenkins
                     def perfectotoken = env.perfectotoken
-                    def BMCredentials = env.BMCredentials
+                    // def BMCredentials = env.BMCredentials
+                    // Use the credentials() helper to bind credentials to environment variables
+                    BMCredentials = credentials('BMCredentials') // The ID from step 1
+
+                    // Access API key and secret from the environment variables
+                    def apiKey = env.BMCredentials_USR  // API key as username
+                    def apiSecret = env.BMCredentials_PSW // API secret as password
+
+                    // Use the credentials in your script or pass them to other commands
+                    echo "Using API Key: ${apiKey}"
+            
+                    def configFilePath = '\\auto\\config.py'
+
+                    // Read the content of the config.py file
+                    def configFileContent = readFile(configFilePath)
+                    configFileContent = configFileContent.replaceAll(/token_BMAPIKey/, apiKey)
+                    configFileContent = configFileContent.replaceAll(/token_BMAPISecret/, apiSecret)
+                    writeFile(file: configFilePath, text: configFileContent)
+
 
                     sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
                     // Update config.py file with the tokens

@@ -1,7 +1,8 @@
 import os
 
 # Get tokens from Jenkins environment
-BMCredentials = os.getenv("BMCredentials")
+BMCredentials = (
+    "token_BMAPIKey" , "token_BMAPISecret" )
 if not BMCredentials:
     raise RuntimeError("❌ Environment variable 'BMCredentials' is not set.")
 
