@@ -74,9 +74,10 @@ pipeline {
 
                     /opt/gradle/gradle/bin/gradle wrapper
                     sed -i 's/8\\.5/8.11.1/' gradle/wrapper/gradle-wrapper.properties
-
-                    /opt/gradle/gradle/bin/gradle assembleDebug --info
-                    /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
+                    # Build using Gradle Wrapper
+                    chmod +x ./gradlew
+                    ./gradlew assembleDebug --info
+                    ./gradlew assembleDebugAndroidTest --info
                 '''
             }
         }
