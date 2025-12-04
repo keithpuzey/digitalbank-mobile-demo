@@ -5,7 +5,7 @@ pipeline {
         ANDROID_HOME = '/opt/Android'
         // Inject Jenkins secret text credential (replace with your actual credential ID)
         BMCredentials = credentials('BMCredentials')
-        perfectotoken = credentials('Demo-Perfecto')
+        PerfectoToken = credentials('Demo-Perfecto')
     }
 
     stages {
