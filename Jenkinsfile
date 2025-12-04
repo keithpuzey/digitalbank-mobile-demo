@@ -5,7 +5,7 @@ pipeline {
         ANDROID_HOME = '/opt/Android'
         // Use the credentials() helper to bind credentials to environment variables
         BMCredentials = credentials('BMCredentials') // The ID from step 1
-        PerfectoToken = credentials('perfectotoken') 
+
     }
 
     stages {
@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Read environment variables from Jenkins
-                    def perfectotoken = env.perfectotoken
+                    // def perfectotoken = env.perfectotoken
                     // def BMCredentials = env.BMCredentials
 
                     // Access API key and secret from the environment variables
