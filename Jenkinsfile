@@ -5,7 +5,7 @@ pipeline {
         ANDROID_HOME = '/opt/Android'
         // Use the credentials() helper to bind credentials to environment variables
         BMCredentials = credentials('BMCredentials') // The ID from step 1
-        perfectotoken = credentials('Demo-Perfecto')
+        perfectotoken = credentials('perfectotoken')
 
     }
 
@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     // Read environment variables from Jenkins
-                    // def perfectotoken = env.perfectotoken
+                    def perfectotoken = env.perfectotoken
                     // def BMCredentials = env.BMCredentials
 
                     // Access API key and secret from the environment variables
@@ -192,7 +192,7 @@ def updateConfigFile(perfectotoken, BMCredentials) {
     def configFileContent = readFile(configFilePath)
 
     // Modify the content with the new tokens
-    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, perfectotoken)
+    configFileContent = configFileContent.replaceAll(/token_PerfectoKey/, perfectotoken)
     configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
 
     // Write the updated content back to the config.py file

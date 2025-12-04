@@ -6,7 +6,7 @@ BMCredentials = (
 if not BMCredentials:
     raise RuntimeError("❌ Environment variable 'BMCredentials' is not set.")
 
-PerfectoKey = os.getenv("PerfectoToken")
+PerfectoKey = "token_PerfectoKey"
 
 
 # Blazemeter Environment - Workspace / Account
