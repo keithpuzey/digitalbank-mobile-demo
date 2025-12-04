@@ -38,14 +38,14 @@ pipeline {
                 script {
                     // Print the variable for verification (optional)
                     sh 'echo "BMCredentials is set: $BMCredentials"'
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh 'sudo -E /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
 
-                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
+                    sh 'sudo -E /usr/bin/python ./auto/upload-csv-perfecto.py'
                     def updateOutput = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
                     // Extract the endpoint details using regular expressions
                     // Execute the script and capture the output
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
@@ -99,7 +99,7 @@ pipeline {
                     script {
                         boolean shouldRerun = true
                         while (shouldRerun) {
-                            def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
                             // Parse the output to extract values
                             def reasonMatch = scriptOutput =~ /Reason: (.+)/
@@ -134,7 +134,7 @@ pipeline {
             steps {
                 echo 'Execute Load and EUX Test - BlazeMeter'
                 script {
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
 
                     // Extract the test URL from the script output
                     def testUrlMatch = scriptOutput =~ /Test URL (.+)/
@@ -154,7 +154,7 @@ pipeline {
         stage('Remove Virtual Service') {
             steps {
                 echo 'Remove Virtual Service'
-                sh 'sudo /usr/bin/python ./auto/delete_mock.py'
+                sh 'sudo -E /usr/bin/python ./auto/delete_mock.py'
             }
         }
 
