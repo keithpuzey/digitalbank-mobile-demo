@@ -3,21 +3,19 @@ pipeline {
 
     environment {
         ANDROID_HOME = '/opt/Android'
-        // Inject Jenkins secret text credentials
         BMCredentials = credentials('BMCredentials')
         PerfectoToken = credentials('Demo-Perfecto')
     }
 
     stages {
+
         stage('Setup Python Environment') {
             steps {
                 script {
-                    echo 'Setting up Python virtual environment and installing dependencies'
+                    // Install Python dependencies for Jenkins user
                     sh '''
-                        python3.8 -m venv venv
-                        source venv/bin/activate
-                        pip install --upgrade pip
-                        pip install requests mysql-connector-python
+                        python3.8 -m pip install --user --upgrade pip
+                        python3.8 -m pip install --user requests mysql-connector-python
                     '''
                 }
             }
@@ -26,16 +24,17 @@ pipeline {
         stage('Update Configuration') {
             steps {
                 script {
-                    echo 'Updating config.py with Jenkins credentials'
-                    def configFilePath = './auto/config.py'
-                    def configFileContent = readFile(configFilePath)
-
-                    // Replace placeholders with actual tokens
-                    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, env.PerfectoToken)
-                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, env.BMCredentials)
-
-                    writeFile(file: configFilePath, text: configFileContent)
-                    echo 'Configuration updated'
+                    echo "BMCredentials: ****"
+                    echo "PerfectoToken: ****"
+                    
+                    // Update config.py with the correct credentials
+                    def configFile = './auto/config.py'
+                    def content = readFile(configFile)
+                    content = content.replaceAll(/token_BMCredentials/, env.BMCredentials)
+                    content = content.replaceAll(/token_PerfectoToken/, env.PerfectoToken)
+                    writeFile(file: configFile, text: content)
+                    
+                    echo 'Configuration updated successfully.'
                 }
             }
         }
@@ -50,22 +49,18 @@ pipeline {
         stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
                 script {
-                    echo "BMCredentials is set: ${env.BMCredentials}"
-                    sh 'source venv/bin/activate && python3.8 ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
-                    sh 'source venv/bin/activate && python3.8 ./auto/upload-csv-perfecto.py'
-
-                    def updateOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/Update_mock.py', returnStdout: true).trim()
-                    def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/Create_mock.py', returnStdout: true).trim()
-                    def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
-                    def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
-                    echo "Mock Service Endpoint: ${endpoint}"
+                    echo 'Creating Synthetic Data and Virtual Service'
+                    sh 'python3.8 ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh 'python3.8 ./auto/upload-csv-perfecto.py'
+                    sh 'python3.8 ./auto/Update_mock.py'
+                    sh 'python3.8 ./auto/Create_mock.py'
                 }
             }
         }
 
         stage('Build Mobile App') {
             steps {
-                echo 'Create Latest Version of Mobile APK'
+                echo 'Creating Latest Version of Mobile APK'
                 sh '''
                     export ANDROID_HOME=$ANDROID_HOME
                     export APP_VERSION=1.4.$BUILD_NUMBER
@@ -80,9 +75,9 @@ pipeline {
             steps {
                 dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
                     sh '''
-                        source ../../../../venv/bin/activate
                         curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
-                            -H "Perfecto-Authorization: $PerfectoToken" \
+                            -H 'Content-Type: multipart/form-data' \
+                            -H 'Perfecto-Authorization: '${PerfectoToken} \
                             -F 'inputStream=@Digital-Bank-1.4.apk' \
                             -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
                             -v
@@ -97,55 +92,32 @@ pipeline {
                     script {
                         boolean shouldRerun = true
                         while (shouldRerun) {
-                            def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            def scriptOutput = sh(script: 'python3.8 ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            echo "Script Output: ${scriptOutput}"
                             def reasonMatch = scriptOutput =~ /Reason: (.+)/
-                            def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
-                            def devicesMatch = scriptOutput =~ /Devices: (.+)/
-
                             def reason = reasonMatch ? reasonMatch[0][1].trim() : null
-                            def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
-                            def devices = devicesMatch ? devicesMatch[0][1].trim() : null
-
-                            echo "Mobile Test Overview:"
-                            echo "Test Grid Report URL: ${testGridReportUrl}"
-                            echo "Devices: ${devices}"
-                            echo "Final Status: ${reason}"
-
-                            shouldRerun = reason == 'ResourcesUnavailable'
-                            if (shouldRerun) {
-                                echo 'Resources unavailable. Rerunning...'
-                            }
+                            shouldRerun = (reason == 'ResourcesUnavailable')
                         }
                     }
                 }
             }
         }
 
-        stage('Execute Load and EUX (Mobile and Web) Test') {
+        stage('Execute Load and EUX Test - BlazeMeter') {
             steps {
                 script {
-                    def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'python3.8 ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
                     def testUrlMatch = scriptOutput =~ /Test URL (.+)/
-                    def testUrl = testUrlMatch ? testUrlMatch[0][1].trim() : null
-
-                    if (testUrl) {
-                        env.TEST_URL = testUrl
-                        echo "Test URL: ${env.TEST_URL}"
-                    } else {
-                        echo "Test URL not found in the script output."
-                    }
+                    env.TEST_URL = testUrlMatch ? testUrlMatch[0][1].trim() : ''
+                    echo "Test URL: ${env.TEST_URL}"
                 }
             }
         }
 
-        stage('Remove Virtual Service') {
+        stage('Cleanup') {
             steps {
-                sh 'source venv/bin/activate && python3.8 ./auto/delete_mock.py'
-            }
-        }
-
-        stage('Remove Test Environment - Puppet') {
-            steps {
+                echo 'Removing Virtual Service and Test Environment'
+                sh 'python3.8 ./auto/delete_mock.py'
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
