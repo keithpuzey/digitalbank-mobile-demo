@@ -1,89 +1,153 @@
-import json
-import csv
-import requests
-from config import workspaceID, BMCredentials, test_data_csv, SharedFolderID
+pipeline {
+    agent any
 
-class CSVDataGeneration:
-    def __init__(self, datamodel_path, repeat_count):
-        self.datamodel_path = datamodel_path
-        self.repeat_count = repeat_count
+    environment {
+        ANDROID_HOME = '/opt/Android'
+        // Inject Jenkins secret text credentials
+        BMCredentials = credentials('BMCredentials')
+        PerfectoToken = credentials('Demo-Perfecto')
+    }
 
-    def generate_test_data(self):
-        try:
-            # Open Data Model file
-            with open(self.datamodel_path, 'r', encoding='utf-8') as datamodel_file:
-                datamodel_def = json.load(datamodel_file)
-
-            # Update repeat count in Data Model
-            default_obj = datamodel_def['data']['attributes']['model']['entities']['default']
-            default_obj['repeat'] = self.repeat_count
-
-            # Generate Test Data
-            url = f"https://tdm.blazemeter.com/api/v1/workspaces/{workspaceID}/testdata/generatefile?entity=default"
-            headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json,text/javascript, */*',
+    stages {
+        stage('Setup Python Environment') {
+            steps {
+                script {
+                    echo 'Setting up Python virtual environment and installing dependencies'
+                    sh '''
+                        python3.8 -m venv venv
+                        source venv/bin/activate
+                        pip install --upgrade pip
+                        pip install requests mysql-connector-python
+                    '''
+                }
             }
+        }
 
-            response = requests.post(
-                url,
-                json=datamodel_def,
-                headers=headers,
-                auth=BMCredentials
-            )
-            response.raise_for_status()
+        stage('Update Configuration') {
+            steps {
+                script {
+                    echo 'Updating config.py with Jenkins credentials'
+                    def configFilePath = './auto/config.py'
+                    def configFileContent = readFile(configFilePath)
 
-            # Save the response data to a CSV file
-            result_data = response.json().get('result', {})
-            if result_data:
-                csv_file_name = result_data.get('fileName', 'blazedata-test.csv')
-                csv_file_path = f"{test_data_csv}_{csv_file_name}"
-                with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
-                    csv_writer = csv.writer(csv_file)
-                    csv_content = result_data.get('content', '')
-                    csv_reader = csv.reader(csv_content.splitlines())
-                    for row in csv_reader:
-                        csv_writer.writerow(row)
-                        print(', '.join(row))
+                    // Replace placeholders with actual tokens
+                    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, env.PerfectoToken)
+                    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, env.BMCredentials)
 
-                print(f"Data saved to CSV file: {csv_file_path}")
+                    writeFile(file: configFilePath, text: configFileContent)
+                    echo 'Configuration updated'
+                }
+            }
+        }
 
-            print(f"\n{self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
-            # print(response.text)
+        stage('Create Environment - Puppet') {
+            steps {
+                echo 'Creating environment using Puppet'
+                sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
+            }
+        }
 
-            # Make the API request to get the signed URL of the Shared Folder
-            # API endpoint URL to download the JSON data
-            response = requests.get(
-                'https://a.blazemeter.com/api/v4/folders/' + SharedFolderID + '/s3/sign?fileName=test_data.csv_blazedata-test.csv',
-                headers=headers,
-                auth=BMCredentials
-            )
+        stage('Create Virtual Service and Generate Synthetic Data') {
+            steps {
+                script {
+                    echo "BMCredentials is set: ${env.BMCredentials}"
+                    sh 'source venv/bin/activate && python3.8 ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh 'source venv/bin/activate && python3.8 ./auto/upload-csv-perfecto.py'
 
-            # Load the JSON response
-            data = response.json()
+                    def updateOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/Update_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/Create_mock.py', returnStdout: true).trim()
+                    def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
+                    def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
+                    echo "Mock Service Endpoint: ${endpoint}"
+                }
+            }
+        }
 
-            # Extract the signed URL from the JSON response
-            signed_url = data["result"]
+        stage('Build Mobile App') {
+            steps {
+                echo 'Create Latest Version of Mobile APK'
+                sh '''
+                    export ANDROID_HOME=$ANDROID_HOME
+                    export APP_VERSION=1.4.$BUILD_NUMBER
+                    sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
+                    /opt/gradle/gradle/bin/gradle assembleDebug --info
+                    /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
+                '''
+            }
+        }
 
-            # Use the signed_url to upload the file to the BlazeMeter Shared folder
+        stage('Upload Mobile App to Perfecto') {
+            steps {
+                dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
+                    sh '''
+                        source ../../../../venv/bin/activate
+                        curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
+                            -H "Perfecto-Authorization: $PerfectoToken" \
+                            -F 'inputStream=@Digital-Bank-1.4.apk' \
+                            -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
+                            -v
+                    '''
+                }
+            }
+        }
 
-            with open(csv_file_path, "rb") as file:
-                response = requests.put(signed_url, data=file)
+        stage('Execute Mobile Registration Test - Perfecto') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
+                        boolean shouldRerun = true
+                        while (shouldRerun) {
+                            def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            def reasonMatch = scriptOutput =~ /Reason: (.+)/
+                            def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
+                            def devicesMatch = scriptOutput =~ /Devices: (.+)/
 
-                # Check if the upload was successful
-                if response.status_code != 200:
-                    print(f"Error: Failed to upload file. Status Code: {response.status_code}")
-                else:
-                    print("File successfully uploaded to BlazeMeter shared folder.")
+                            def reason = reasonMatch ? reasonMatch[0][1].trim() : null
+                            def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
+                            def devices = devicesMatch ? devicesMatch[0][1].trim() : null
 
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+                            echo "Mobile Test Overview:"
+                            echo "Test Grid Report URL: ${testGridReportUrl}"
+                            echo "Devices: ${devices}"
+                            echo "Final Status: ${reason}"
 
-if __name__ == "__main__":
-    # Assuming command line arguments: datamodel_path repeat_count
-    import sys
-    datamodel_path = sys.argv[1]
-    repeat_count = sys.argv[2]
+                            shouldRerun = reason == 'ResourcesUnavailable'
+                            if (shouldRerun) {
+                                echo 'Resources unavailable. Rerunning...'
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-    csv_data_generation = CSVDataGeneration(datamodel_path, repeat_count)
-    csv_data_generation.generate_test_data()
+        stage('Execute Load and EUX (Mobile and Web) Test') {
+            steps {
+                script {
+                    def scriptOutput = sh(script: 'source venv/bin/activate && python3.8 ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
+                    def testUrlMatch = scriptOutput =~ /Test URL (.+)/
+                    def testUrl = testUrlMatch ? testUrlMatch[0][1].trim() : null
+
+                    if (testUrl) {
+                        env.TEST_URL = testUrl
+                        echo "Test URL: ${env.TEST_URL}"
+                    } else {
+                        echo "Test URL not found in the script output."
+                    }
+                }
+            }
+        }
+
+        stage('Remove Virtual Service') {
+            steps {
+                sh 'source venv/bin/activate && python3.8 ./auto/delete_mock.py'
+            }
+        }
+
+        stage('Remove Test Environment - Puppet') {
+            steps {
+                sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
+            }
+        }
+    }
+}
