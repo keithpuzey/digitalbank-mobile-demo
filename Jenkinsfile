@@ -100,7 +100,7 @@ pipeline {
                     script {
                         boolean shouldRerun = true
                         while (shouldRerun) {
-                            def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            def scriptOutput = sh(script: '/usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
                             // Parse the output to extract values
                             def reasonMatch = scriptOutput =~ /Reason: (.+)/
@@ -135,7 +135,7 @@ pipeline {
             steps {
                 echo 'Execute Load and EUX Test - BlazeMeter'
                 script {
-                    def scriptOutput = sh(script: 'sudo -E /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
+                    def scriptOutput = sh(script: '/usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
 
                     // Extract the test URL from the script output
                     def testUrlMatch = scriptOutput =~ /Test URL (.+)/
@@ -155,7 +155,7 @@ pipeline {
         stage('Remove Virtual Service') {
             steps {
                 echo 'Remove Virtual Service'
-                sh 'sudo -E /usr/bin/python ./auto/delete_mock.py'
+                sh '/usr/bin/python ./auto/delete_mock.py'
             }
         }
 
@@ -170,7 +170,7 @@ pipeline {
 
 def updateConfigFile(perfectotoken, BMCredentials) {
     // Define the path to your config.py file
-    def configFilePath = '\\auto\\config.py'
+    def configFilePath = './auto/config.py'
 
     // Read the content of the config.py file
     def configFileContent = readFile(configFilePath)
