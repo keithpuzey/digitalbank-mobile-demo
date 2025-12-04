@@ -87,7 +87,7 @@ pipeline {
                         curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
                             -H 'Content-Type: multipart/form-data' \
                             -H 'Perfecto-Authorization: '$perfectotoken \
-                            -F 'inputStream=@Digital-Bank-1.4.apk' \
+                            -F 'inputStream=@Digital-Bank-1.6.apk' \
                             -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}'
                     '''
                 }
