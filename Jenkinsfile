@@ -1,26 +1,29 @@
-Tokenpipeline {
+pipeline {
     agent any
 
+    // Jenkins environment variables
     environment {
         ANDROID_HOME = '/opt/Android'
-        // Inject Jenkins secret text credential (replace with your actual credential ID)
         BMCredentials = credentials('BMCredentials')
         PerfectoToken = credentials('Demo-Perfecto')
     }
 
     stages {
+
         stage('Update Configuration') {
             steps {
                 script {
-                    // Read environment variables from Jenkins
-                    def PerfectoToken = env.PerfectoToken
-                    def BMCredentials = env.BMCredentials
+                    echo "BMCredentials: ****"
+                    echo "PerfectoToken: ****"
 
-                    sh "sudo -u jenkins python3.8 -m pip install mysql-connector-python"
-                    // Update config.py file with the tokens
-                    updateConfigFile(perfectotoken, BMCredentials)
+                    // Install Python dependency for Jenkins user
+                    sh 'python3.8 -m pip install --user mysql-connector-python'
+
+                    // Update config.py file with tokens
+                    updateConfigFile(env.PerfectoToken, env.BMCredentials)
+
                     echo 'Setting up DCT configuration for Jenkins user'
-                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
+                    sh "/src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
             }
         }
@@ -32,43 +35,32 @@ Tokenpipeline {
             }
         }
 
-
         stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
-                echo 'Creating Synthetic Data and Virtual Service'
                 script {
-                    // Print the variable for verification (optional)
+                    echo 'Creating Synthetic Data and Virtual Service'
+
                     sh 'echo "BMCredentials is set: $BMCredentials"'
-                    sh '/usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh "python3.8 ./auto/generatedata.py ./auto/registration-data-model-full.json 2"
+                    sh "python3.8 ./auto/upload-csv-perfecto.py"
 
-                    sh '/usr/bin/python ./auto/upload-csv-perfecto.py'
-                    def updateOutput = sh(script: '/usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
+                    def updateOutput = sh(script: 'python3.8 ./auto/Update_mock.py', returnStdout: true).trim()
 
-                    // Extract the endpoint details using regular expressions
-                    // Execute the script and capture the output
-                    def scriptOutput = sh(script: '/usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: 'python3.8 ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Mock Service Started - Endpoint details (.+)/
                     def endpoint = endpointMatch ? endpointMatch[0][1].trim() : null
                     echo "Mock Service Endpoint: ${endpoint}"
-
                 }
             }
         }
 
-
         stage('Build Mobile App') {
             steps {
-                echo 'Create Latest Version of Mobile APK'
+                echo 'Build Latest Version of Mobile APK'
                 sh '''
                     export ANDROID_HOME=$ANDROID_HOME
-                    ls -lia $ANDROID_HOME
-                    echo $BUILD_NUMBER
                     export APP_VERSION=1.4.$BUILD_NUMBER
                     sed -i "s/<string name=\\"app_version\\">[^<]*<\\/string>/<string name=\\"app_version\\">$APP_VERSION<\\/string>/" ./app/src/main/res/values/strings.xml
-                    # Update the BASE_URL to redirect to dev environment
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/Constant.java
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Constants/ConstantsManager.java
-                    sed -i 's|http://dbankdemo.com/bank/|http://dbankdemo.com/bank/|' ./app/src/main/java/xyz/digitalbank/demo/Fragments/ConstantsEditActivity.java
 
                     /opt/gradle/gradle/bin/gradle assembleDebug --info
                     /opt/gradle/gradle/bin/gradle assembleDebugAndroidTest --info
@@ -78,13 +70,11 @@ Tokenpipeline {
 
         stage('Upload Mobile App to Perfecto') {
             steps {
-                echo 'Upload latest build version to Perfecto'
-                // Assuming the APK is located at /var/lib/jenkins/workspace/Digital Bank Mobile/app/build/outputs/apk/debug/
                 dir("/var/lib/jenkins/workspace/DBank Mobile Pipeline/app/build/outputs/apk/debug/") {
                     sh '''
                         curl --location 'https://demo.app.perfectomobile.com/repository/api/v1/artifacts' \
                             -H 'Content-Type: multipart/form-data' \
-                            -H 'Perfecto-Authorization: '$perfectotoken \
+                            -H 'Perfecto-Authorization: '$PerfectoToken \
                             -F 'inputStream=@Digital-Bank-1.4.apk' \
                             -F 'requestPart={"artifactLocator":"PUBLIC:Digital-Bank-wip.apk", "tags":["Bank"], "mimeType":"multipart/form-data", "override": true, "artifactType": "ANDROID"}' \
                             -v
@@ -96,33 +86,27 @@ Tokenpipeline {
         stage('Execute Mobile Registration Test - Perfecto') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo 'Execute User Registration Tests using Synthetic Data on Mobile Devices - Perfecto'
                     script {
                         boolean shouldRerun = true
                         while (shouldRerun) {
-                            def scriptOutput = sh(script: '/usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+                            def output = sh(script: 'python3.8 ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-                            // Parse the output to extract values
-                            def reasonMatch = scriptOutput =~ /Reason: (.+)/
-                            def testGridReportUrlMatch = scriptOutput =~ /Test Grid Report: (.+)/
-                            def devicesMatch = scriptOutput =~ /Devices: (.+)/
+                            def reasonMatch = output =~ /Reason: (.+)/
+                            def testGridReportUrlMatch = output =~ /Test Grid Report: (.+)/
+                            def devicesMatch = output =~ /Devices: (.+)/
 
                             def reason = reasonMatch ? reasonMatch[0][1].trim() : null
                             def testGridReportUrl = testGridReportUrlMatch ? testGridReportUrlMatch[0][1].trim() : null
                             def devices = devicesMatch ? devicesMatch[0][1].trim() : null
 
-                            // Print or use the captured values as needed
                             echo "Mobile Test Overview:"
                             echo "Test Grid Report URL: ${testGridReportUrl}"
                             echo "Devices : ${devices}"
                             echo "Final Status: ${reason}"
 
-                            // Check if the script should be rerun based on the reason
-                            if (reason == 'ResourcesUnavailable') {
-                                echo 'Reason: ResourcesUnavailable. Rerunning the script...'
-                                shouldRerun = true
-                            } else {
-                                shouldRerun = false
+                            shouldRerun = (reason == 'ResourcesUnavailable')
+                            if (shouldRerun) {
+                                echo 'Resources unavailable. Rerunning the script...'
                             }
                         }
                     }
@@ -130,23 +114,18 @@ Tokenpipeline {
             }
         }
 
-
-        stage('Execute Load and EUX (Mobile and Web) Test') {
+        stage('Execute Load and EUX Test') {
             steps {
-                echo 'Execute Load and EUX Test - BlazeMeter'
                 script {
-                    def scriptOutput = sh(script: '/usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest', returnStdout: true).trim()
-
-                    // Extract the test URL from the script output
-                    def testUrlMatch = scriptOutput =~ /Test URL (.+)/
+                    def output = sh(script: "python3.8 ./auto/run_perf_multi_test_param.py $BlazeMeterTest", returnStdout: true).trim()
+                    def testUrlMatch = output =~ /Test URL (.+)/
                     def testUrl = testUrlMatch ? testUrlMatch[0][1].trim() : null
 
-                    // Assign the test URL to a Jenkins variable
                     if (testUrl) {
                         env.TEST_URL = testUrl
                         echo "Test URL: ${env.TEST_URL}"
                     } else {
-                        echo "Test URL not found in the script output."
+                        echo "Test URL not found."
                     }
                 }
             }
@@ -154,31 +133,25 @@ Tokenpipeline {
 
         stage('Remove Virtual Service') {
             steps {
-                echo 'Remove Virtual Service'
-                sh '/usr/bin/python ./auto/delete_mock.py'
+                sh 'python3.8 ./auto/delete_mock.py'
             }
         }
 
         stage('Remove Test Environment - Puppet') {
             steps {
-                echo 'Remove Test Environment'
                 sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp'
             }
         }
     }
 }
 
-def updateConfigFile(perfectotoken, BMCredentials) {
-    // Define the path to your config.py file
+// Helper method to update config.py
+def updateConfigFile(perfectoToken, BMCredentials) {
     def configFilePath = './auto/config.py'
+    def content = readFile(configFilePath)
 
-    // Read the content of the config.py file
-    def configFileContent = readFile(configFilePath)
+    content = content.replaceAll(/token_perfectotoken/, perfectoToken)
+    content = content.replaceAll(/token_BMCredentials/, BMCredentials)
 
-    // Modify the content with the new tokens
-    configFileContent = configFileContent.replaceAll(/token_perfectotoken/, PerfectoToken)
-    configFileContent = configFileContent.replaceAll(/token_BMCredentials/, BMCredentials)
-
-    // Write the updated content back to the config.py file
-    writeFile(file: configFilePath, text: configFileContent)
+    writeFile(file: configFilePath, text: content)
 }
