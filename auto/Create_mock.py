@@ -82,7 +82,7 @@ while True:
     data = response.json()
     result = data.get("result", {})
     mockstat = result.get("status")
-    print (f{data})
+
     print(f"Mock Service Status: {mockstat}")
 
     endpoints = result.get("endpoints", [])
@@ -94,6 +94,7 @@ while True:
     # Only exit when both RUNNING *and* endpoint exists
     if mockstat == "RUNNING" and endpoint_value:
         mockendpoint = endpoint_value
+        print (f"{data}")
         print(f"Endpoint now available: {mockendpoint}")
         break
     else:
