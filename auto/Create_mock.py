@@ -85,14 +85,19 @@ while True:
 
     print(f"Mock Service Status: {mockstat}")
 
-    if mockstat == "RUNNING":
-        # NEW: read from endpoints array
-        endpoints = result.get("endpoints", [])
-        if endpoints and "endpoint" in endpoints[0]:
-            mockendpoint = endpoints[0]["endpoint"]
-        else:
-            mockendpoint = "Unknown"
+    endpoints = result.get("endpoints", [])
+    endpoint_value = None
+
+    if endpoints:
+        endpoint_value = endpoints[0].get("endpoint")
+
+    # Only exit when both RUNNING *and* endpoint exists
+    if mockstat == "RUNNING" and endpoint_value:
+        mockendpoint = endpoint_value
+        print(f"Endpoint now available: {mockendpoint}")
         break
+    else:
+        print("Waiting for endpoint assignment...")
 
 print(f"Mock Service Started - Endpoint details: {mockendpoint}")
 
