@@ -82,7 +82,7 @@ while True:
     data = response.json()
     result = data.get("result", {})
     mockstat = result.get("status")
-
+    print (f{data})
     print(f"Mock Service Status: {mockstat}")
 
     endpoints = result.get("endpoints", [])

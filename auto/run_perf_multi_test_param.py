@@ -23,10 +23,10 @@ def run_blazemeter_test(test_id):
         project_id = json_response['result']['projectId']
 
         # Print extracted values
-        logging.info(f"Result ID: {result_id}")
-        logging.info(f"Workspace ID: {workspace_id}")
-        logging.info(f"Project ID: {project_id}")
-        logging.info(f"Test URL: https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary")
+        # logging.info(f"Result ID: {result_id}")
+        # logging.info(f"Workspace ID: {workspace_id}")
+        # logging.info(f"Project ID: {project_id}")
+        # logging.info(f"Test URL: https://a.blazemeter.com/app/#/accounts/{account}/workspaces/{workspace_id}/projects/{project_id}/masters/{result_id}/summary")
 
         testsessionid = json_response['result']['sessionsId'][0]
         logging.info(f"Test Session ID: {testsessionid}")
