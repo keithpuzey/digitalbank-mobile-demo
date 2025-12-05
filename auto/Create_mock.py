@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 import random
 from datetime import datetime
 from config import workspaceID, account, ServiceID, MockThinkTime, BMCredentials , mock_output, base_dir, mock_output_id , TemplateID
@@ -75,15 +76,19 @@ while True:
         auth=BMCredentials
     )
 
+    data = response.json()
+
+    print("\n===== DEBUG: FULL API RESPONSE =====")
+    print(json.dumps(data, indent=2), flush=True)
+
+    result = data.get("result", {})
+    mockstat = result.get("status")
+    print(f"Mock Service Status: {mockstat}", flush=True)
+    
     if response.status_code != 200:
         print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
         continue
 
-    data = response.json()
-    result = data.get("result", {})
-    mockstat = result.get("status")
-
-    print(f"Mock Service Status: {mockstat}")
 
     endpoints = result.get("endpoints", [])
     endpoint_value = None
@@ -110,6 +115,16 @@ while True:
         headers={'Content-Type': 'application/json'},
         auth=BMCredentials
     )
+
+    data = response.json()
+
+    # DEBUG ALWAYS PRINT
+    print("DEBUG: API response:")
+    print(json.dumps(data, indent=2), flush=True)
+
+    result = data.get("result", {})
+    mockstat = result.get("status")
+    print(f"Mock Service Status: {mockstat}", flush=True)
 
     if response.status_code != 200:
         print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
