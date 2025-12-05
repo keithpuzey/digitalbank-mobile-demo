@@ -68,7 +68,7 @@ if response.status_code != 200:
 
 while True:
     time.sleep(15)
-    # Retrieve Status of Mock Service
+
     response = requests.get(
         f"https://mock.blazemeter.com/api/v1/workspaces/{workspaceID}/service-mocks/{mockid}",
         headers={'Content-Type': 'application/json'},
@@ -79,27 +79,22 @@ while True:
         print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
         continue
 
-    json_response = response.json()
-    if 'result' not in json_response or 'status' not in json_response['result']:
-        print(f"Unexpected response format: {json_response}")
-        continue
+    data = response.json()
+    result = data.get("result", {})
+    mockstat = result.get("status")
 
-    mockendpoint = json_response['result'].get('httpsEndpoint', 'Unknown')
-    mockstat = json_response['result']['status']
     print(f"Mock Service Status: {mockstat}")
 
-    if mockstat == 'RUNNING':
+    if mockstat == "RUNNING":
+        # NEW: read from endpoints array
+        endpoints = result.get("endpoints", [])
+        if endpoints and "endpoint" in endpoints[0]:
+            mockendpoint = endpoints[0]["endpoint"]
+        else:
+            mockendpoint = "Unknown"
         break
 
 print(f"Mock Service Started - Endpoint details: {mockendpoint}")
-
-# Deploy Template
-response = requests.patch(
-    f"https://mock.blazemeter.com/api/v1/workspaces/{workspaceID}/service-mocks/{mockid}/apply-template/5971",
-    headers={'Content-Type': 'application/json'},
-    auth=BMCredentials
-)
-print(f"Mock Service Template Status: {response.status_code}, Response: {response.text}")
 
 while True:
     time.sleep(15)
