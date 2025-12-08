@@ -27,8 +27,8 @@ pipeline {
                     # Ensure npm exists
                     if ! command -v npx >/dev/null 2>&1; then
                         echo "Installing Node.js and npm..."
-                        sudo apt-get update -y
-                        sudo apt-get install -y nodejs npm || true
+                        apt-get update -y
+                        apt-get install -y nodejs npm || true
                     fi
 
                     # Install Claude CLI if missing
