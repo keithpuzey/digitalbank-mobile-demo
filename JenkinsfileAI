@@ -12,38 +12,39 @@ pipeline {
 
     stages {
 
-        stage('Install dependencies') {
-            steps {
-                sh '''
-                    set -e
-                    
-                    # Install uv if missing
-                    if ! command -v uv >/dev/null 2>&1; then
-                        echo "Installing uv..."
-                        curl -LsSf https://astral.sh/uv/install.sh | sh
-                        export PATH="$HOME/.cargo/bin:$PATH"
-                    fi
+stage('Install dependencies') {
+    steps {
+        sh '''
+            set -e
 
-                    # Ensure npm exists
-                    if ! command -v npx >/dev/null 2>&1; then
-                        echo "Installing Node.js and npm..."
-                        apt-get update -y
-                        apt-get install -y nodejs npm || true
-                    fi
+            # Install uv if missing
+            if ! command -v uv >/dev/null 2>&1; then
+                echo "Installing uv..."
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+                export PATH="$HOME/.cargo/bin:$PATH"
+            fi
 
-                    # Install Claude CLI if missing
-                    if ! command -v claude >/dev/null 2>&1; then
-                        echo "Installing Claude CLI..."
-                        curl -fsSL https://cli.claude.ai/install.sh | sh
-                        export PATH="$HOME/.local/bin:$PATH"
-                    fi
+            # Ensure Node.js and npm exist
+            if ! command -v npx >/dev/null 2>&1; then
+                echo "Installing Node.js and npm..."
+                # Use NodeSource repo for CentOS
+                curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+                dnf install -y nodejs
+            fi
 
-                    echo "uv: $(uv --version || echo 'not available')"
-                    echo "npx: $(npx --version || echo 'not available')"
-                    echo "claude: $(claude --version || echo 'not available')"
-                '''
-            }
-        }
+            # Install Claude CLI if missing
+            if ! command -v claude >/dev/null 2>&1; then
+                echo "Installing Claude CLI..."
+                curl -fsSL https://cli.claude.ai/install.sh | sh
+                export PATH="$HOME/.local/bin:$PATH"
+            fi
+
+            echo "uv: $(uv --version || echo 'not available')"
+            echo "npx: $(npx --version || echo 'not available')"
+            echo "claude: $(claude --version || echo 'not available')"
+        '''
+    }
+}
 
         stage('Start BlazeMeter MCP Server') {
             steps {
