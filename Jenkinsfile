@@ -100,18 +100,26 @@ pipeline {
                     script {
                         boolean retry = true
                         while (retry) {
+				def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
-                            def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+				// Debugging – let’s see EXACT output
+				echo "=== RAW OUTPUT FROM run_scriptless_test.py ==="
+				echo scriptOutput
+				echo "=============================================="
 
-                            def reason = (scriptOutput =~ /Reason: (.+)/)[0][1].trim()
-                            def reportUrl = (scriptOutput =~ /Test Grid Report: (.+)/)[0][1].trim()
-                            def devices = (scriptOutput =~ /Devices: (.+)/)[0][1].trim()
+				def reasonMatch = (scriptOutput =~ /Reason: (.+)/)
+				def reportMatch = (scriptOutput =~ /Test Grid Report: (.+)/)
+				def deviceMatch = (scriptOutput =~ /Devices: (.+)/)
 
-                            echo "Test Grid Report: ${reportUrl}"
-                            echo "Devices: ${devices}"
-                            echo "Reason:  ${reason}"
+				def reason    = reasonMatch ? reasonMatch[0][1].trim() : "NOT_FOUND"
+				def reportUrl = reportMatch ? reportMatch[0][1].trim()   : "NOT_FOUND"
+				def devices   = deviceMatch ? deviceMatch[0][1].trim()   : "NONE"
 
-                            retry = (reason == 'ResourcesUnavailable')
+				echo "Test Grid Report: ${reportUrl}"
+				echo "Devices: ${devices}"
+				echo "Reason: ${reason}"
+
+				retry = (reason == 'ResourcesUnavailable')
                         }
                     }
                 }

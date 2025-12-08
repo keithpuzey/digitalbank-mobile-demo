@@ -43,7 +43,7 @@ response = requests.post(
 
 # Check if the response is successful and contains the expected data
 if response.status_code != 200:
-    print(f"Failed to create mock service. Status code: {response.status_code}, Response: {response.text}")
+    print(f"Failed to create Virtual service. Status code: {response.status_code}, Response: {response.text}")
     exit(1)
 
 json_response = response.json()
@@ -52,9 +52,9 @@ if 'result' not in json_response or 'id' not in json_response['result']:
     exit(1)
 
 mockid = json_response['result']['id']
-print(f"Mock Service IDs: {mockid}")
+print(f"Virtual Service IDs: {mockid}")
 
-print("Prepare Environment - Start Mock Services ")
+print("Prepare Environment - Start Virtual Services ")
 
 # Start Mock Service
 response = requests.get(
@@ -64,7 +64,7 @@ response = requests.get(
 )
 
 if response.status_code != 200:
-    print(f"Failed to start mock service. Status code: {response.status_code}, Response: {response.text}")
+    print(f"Failed to start Virtual service. Status code: {response.status_code}, Response: {response.text}")
     exit(1)
 
 while True:
@@ -83,10 +83,10 @@ while True:
 
     result = data.get("result", {})
     mockstat = result.get("status")
-    print(f"Mock Service Status: {mockstat}", flush=True)
+    print(f"Virtual Service Status: {mockstat}", flush=True)
     
     if response.status_code != 200:
-        print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
+        print(f"Failed to retrieve Virtual service status. Status code: {response.status_code}, Response: {response.text}")
         continue
 
 
@@ -105,7 +105,7 @@ while True:
     else:
         print("Waiting for endpoint assignment...")
 
-print(f"Mock Service Started - Endpoint details: {mockendpoint}")
+print(f"Virtual Service Started - Endpoint details: {mockendpoint}")
 
 while True:
     time.sleep(15)
@@ -124,10 +124,10 @@ while True:
 
     result = data.get("result", {})
     mockstat = result.get("status")
-    print(f"Mock Service Status: {mockstat}", flush=True)
+    print(f"Virtual Service Status: {mockstat}", flush=True)
 
     if response.status_code != 200:
-        print(f"Failed to retrieve mock service status. Status code: {response.status_code}, Response: {response.text}")
+        print(f"Failed to retrieve Virtuakl service status. Status code: {response.status_code}, Response: {response.text}")
         continue
 
     json_response = response.json()
@@ -136,7 +136,7 @@ while True:
         continue
 
     mockstat = json_response['result']['status']
-    print(f"Mock Service Status: {mockstat}")
+    print(f"Virtual Service Status: {mockstat}")
 
     if mockstat == 'RUNNING':
         break
