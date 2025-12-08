@@ -79,31 +79,34 @@ pipeline {
       }
     }
 
-    stage('Send prompt to MCP (using MCP CLI)') {
-      steps {
-        script {
-          // use sh with returnStdout to capture the response
-          def mcpResponse = sh(
-            script: '''
-              set -e
-              export PATH="$HOME/.cargo/bin:$PATH"
-              WORKDIR="${WORKSPACE}/mcp_run"
-              cd "$WORKDIR"
+        stage('Send Prompt via Python MCP Client') {
+            steps {
+                script {
+                    def mcpResponse = sh(
+                        script: '''
+                            set -e
+                            WORKDIR="${WORKSPACE}/mcp_run"
+                            cd "$WORKDIR"
 
-              # Install or run the MCP client (npx will download the package once)
-              # We use the new @mcp-use/cli which exposes a 'chat' command.
-              # If your environment uses a different client, adapt this command.
-              npx --yes @mcp-use/cli chat \
-                --server "${MCP_URL}" \
-                --prompt "Summarize the last BlazeMeter test results" \
-                --json || true
-            ''',
-            returnStdout: true
-          ).trim()
-          echo "MCP Response (raw):\n${mcpResponse}"
+                            python3 - <<'EOF'
+import json
+from bzm_mcp_client import MCPClient
+
+server_url = "http://127.0.0.1:3333"
+api_key_file = "api-key.json"
+
+client = MCPClient(server_url=server_url, api_key_file=api_key_file)
+response = client.chat("Summarize the last BlazeMeter test results")
+print(json.dumps(response, indent=2))
+EOF
+                        ''',
+                        returnStdout: true
+                    ).trim()
+
+                    echo "MCP Response:\n${mcpResponse}"
+                }
+            }
         }
-      }
-    }
 
     stage('Cleanup MCP server') {
       steps {
