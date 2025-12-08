@@ -1,113 +1,187 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key') // file credential or secret text
-    MCP_PORT = "3333"
-    MCP_HOST = "127.0.0.1"
-    MCP_URL  = "http://${MCP_HOST}:${MCP_PORT}"
-  }
-
-  stages {
-
-    stage('Install uv & npm (if needed)') {
-      steps {
-        sh '''
-          set -e
-          # install uv if missing
-          if ! command -v uv >/dev/null 2>&1; then
-            echo "Installing uv..."
-            curl -LsSf https://astral.sh/uv/install.sh | sh
-            export PATH="$HOME/.cargo/bin:$PATH"
-          fi
-
-          # ensure npm (npx) exists for the client
-          if ! command -v npx >/dev/null 2>&1; then
-            echo "Node / npm not found — installing minimal node (this step may vary by distro)"
-            # Debian/Ubuntu example - change for RHEL if needed
-            sudo apt-get update -y
-            sudo apt-get install -y nodejs npm || true
-          fi
-
-          echo "uv: $(uv --version || echo 'uv not available')"
-          echo "npx: $(npx --version || echo 'npx not available')"
-        '''
-      }
+    environment {
+        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key') // file credential or secret text
+        MCP_PORT = "3333"
+        MCP_HOST = "127.0.0.1"
+        MCP_URL  = "http://${MCP_HOST}:${MCP_PORT}"
     }
 
-    stage('Start BlazeMeter MCP Server (background)') {
-      steps {
-        sh '''
-          set -e
+    stages {
 
-          export PATH="$HOME/.cargo/bin:$PATH"
-          # create a small working dir for API key
-          WORKDIR="${WORKSPACE}/mcp_run"
-          mkdir -p "$WORKDIR"
-          # If BLAZEMETER_API_KEY is a file credential, ensure it's available here.
-          # Jenkins credentials binding may either create a file or expose as text. Adjust as needed.
-          # For example if it's secret text with JSON content, write it to file:
-          if [ -n "${BLAZEMETER_API_KEY}" ]; then
-            echo "$BLAZEMETER_API_KEY" > "$WORKDIR/api-key.json"
-            export BLAZEMETER_API_KEY="$WORKDIR/api-key.json"
-          fi
+        stage('Install uv & npm (if needed)') {
+            steps {
+                sh '''
+                    set -e
+                    # install uv if missing
+                    if ! command -v uv >/dev/null 2>&1; then
+                        echo "Installing uv..."
+                        # Using curl | sh is common for CI, but review for your security policy
+                        curl -LsSf https://astral.sh/uv/install.sh | sh
+                        export PATH="$HOME/.cargo/bin:$PATH"
+                    fi
 
-          cd "$WORKDIR"
+                    # ensure npm (npx) exists for the client
+                    if ! command -v npx >/dev/null 2>&1; then
+                        echo "Node / npm not found — installing minimal node (this step may vary by distro)"
+                        # Debian/Ubuntu example - change for RHEL if needed
+                        sudo apt-get update -y
+                        sudo apt-get install -y nodejs npm || true
+                    fi
 
-          echo "Launching bzm-mcp server via uvx..."
-          # Start server in background and redirect logs
-          uvx --from git+https://github.com/BlazeMeter/bzm-mcp.git@v1.0.1 -q bzm-mcp --mcp \
-            > bzm-mcp.log 2>&1 &
+                    echo "uv: $(uv --version || echo 'uv not available')"
+                    echo "npx: $(npx --version || echo 'npx not available')"
+                '''
+            }
+        }
 
-          MCP_PID=$!
-          echo $MCP_PID > bzm-mcp.pid
-          echo "bzm-mcp PID: $MCP_PID"
+        stage('Start BlazeMeter MCP Server (background)') {
+            steps {
+                sh '''
+                    set -e
 
-          # Wait for server to be ready (try the health endpoint or port)
-          echo "Waiting for MCP server to respond at ${MCP_URL}..."
-          for i in $(seq 1 30); do
-            # try a common health endpoint; if not available, test TCP listen on port
-            curl -sSf "${MCP_URL}/health" >/dev/null 2>&1 && { echo "MCP healthy"; break; }
-            nc -z ${MCP_HOST} ${MCP_PORT} >/dev/null 2>&1 && { echo "TCP ${MCP_PORT} open"; break; }
-            echo -n "."
-            sleep 1
-          done
+                    export PATH="$HOME/.cargo/bin:$PATH"
+                    # create a small working dir for API key
+                    WORKDIR="${WORKSPACE}/mcp_run"
+                    mkdir -p "$WORKDIR"
+                    
+                    # Ensure the API key is available to the server
+                    if [ -n "${BLAZEMETER_API_KEY}" ]; then
+                        # Assuming BLAZEMETER_API_KEY is secret text, write it to file
+                        echo "$BLAZEMETER_API_KEY" > "$WORKDIR/api-key.json"
+                        # Export this file path so bzm-mcp can read it
+                        export BLAZEMETER_API_KEY="$WORKDIR/api-key.json"
+                    fi
 
-          # show a little of the server log for debugging
-          tail -n +1 bzm-mcp.log | sed -n '1,200p'
-        '''
-      }
+                    cd "$WORKDIR"
+
+                    echo "Launching bzm-mcp server via uvx..."
+                    # Start server in background and redirect logs. 
+                    # Use MCP_URL components for host/port if bzm-mcp supports it.
+                    # As of v1.0.1, the defaults are 127.0.0.1:3333, which matches your env.
+                    uvx --from git+https://github.com/BlazeMeter/bzm-mcp.git@v1.0.1 -q bzm-mcp --mcp \
+                        > bzm-mcp.log 2>&1 &
+
+                    MCP_PID=$!
+                    echo $MCP_PID > bzm-mcp.pid
+                    echo "bzm-mcp PID: $MCP_PID"
+
+                    # Wait for server to be ready (try the health endpoint or port)
+                    echo "Waiting for MCP server to respond at ${MCP_URL}..."
+                    for i in $(seq 1 30); do
+                        # try a common health endpoint; if not available, test TCP listen on port
+                        curl -sSf "${MCP_URL}/health" >/dev/null 2>&1 && { echo "MCP healthy"; break; }
+                        nc -z ${MCP_HOST} ${MCP_PORT} >/dev/null 2>&1 && { echo "TCP ${MCP_PORT} open"; break; }
+                        echo -n "."
+                        sleep 1
+                    done
+
+                    # Check if the server is actually up, fail if not
+                    curl -sSf "${MCP_URL}/health" >/dev/null 2>&1 || { 
+                        echo "ERROR: MCP server failed to start. Logs:"
+                        cat bzm-mcp.log
+                        exit 1
+                    }
+
+                    # show a little of the server log for debugging
+                    echo "--- Server Log Snippet ---"
+                    tail -n +1 bzm-mcp.log | sed -n '1,20p'
+                    echo "--------------------------"
+                '''
+            }
+        }
+
+        stage('Call MCP via Python Client') {
+            steps {
+                script {
+                    def mcpClientScript = """
+# mcp_client.py
+import os
+import json
+from mcp2py import Client, ToolCall
+
+# Get URL from environment variable set in Jenkins
+MCP_URL = os.environ.get('MCP_URL', 'http://127.0.0.1:3333')
+print(f"Connecting to MCP Server at: {MCP_URL}")
+
+# Initialize the client
+client = Client(MCP_URL)
+
+# 1. Prepare the ToolCall for the BlazeMeter tool
+# Assuming the BlazeMeter MCP tool is named 'bzm_run_test' (check bzm-mcp documentation)
+tool_call = ToolCall(
+    tool_name="bzm_run_test", # Replace with the actual tool name exposed by bzm-mcp
+    parameters={
+        "test_id": 123456, # Replace with your actual test ID
+        "test_name": "Jenkins-Triggered Performance Test",
+        # Add any other required parameters (workspace ID, etc.)
     }
+)
 
-stage('Call MCP via Python client') {
-  steps {
-    sh '''
-      python3 -m venv .venv
-      source .venv/bin/activate
-      pip install mcp2py
+# 2. Execute the call and get the response
+try:
+    print(f"Sending request for tool: {tool_call.tool_name}")
+    response = client.call(tool_call)
+    
+    # 3. Process the response
+    print("\\n--- MCP Response ---")
+    print(json.dumps(response.to_dict(), indent=4))
+    print("--------------------\\n")
+    
+    # Example check: look for a successful result
+    if response.is_success():
+        print("MCP call successful!")
+        # Access the result data if needed: response.data
+    else:
+        print(f"MCP call failed: {response.error_message}")
+        # Optionally fail the build
+        # raise Exception("MCP tool execution failed.")
 
-      # Write API key
-      echo "$BLAZEMETER_API_KEY" > api-key.json
+except Exception as e:
+    print(f"An error occurred during MCP client execution: {e}")
+    raise
+"""
+                    // Write the client script to a file
+                    writeFile file: "${WORKSPACE}/mcp_run/mcp_client.py", text: mcpClientScript
+                
+                    // Execute the setup and run steps in the workspace subdirectory
+                    sh '''
+                        set -e
+                        WORKDIR="${WORKSPACE}/mcp_run"
+                        cd "$WORKDIR"
+                        
+                        # Set up virtual environment and install client library
+                        python3 -m venv .venv || /usr/bin/python3 -m venv .venv
+                        source .venv/bin/activate
+                        
+                        # The mcp2py library is used to talk to the MCP server
+                        pip install mcp2py
+                        
+                        # Execute the client script
+                        echo "Starting Python MCP Client..."
+                        python3 mcp_client.py
+                        
+                        deactivate
+                    '''
+                }
+            }
+        }
 
-      # Run the client
-      python3 mcp_client.py
-    '''
-  }
-}
-
-    stage('Cleanup MCP server') {
-      steps {
-        sh '''
-          set -e
-          WORKDIR="${WORKSPACE}/mcp_run"
-          if [ -f "$WORKDIR/bzm-mcp.pid" ]; then
-            PID=$(cat "$WORKDIR/bzm-mcp.pid")
-            echo "Stopping bzm-mcp PID ${PID}..."
-            kill ${PID} || true
-            rm -f "$WORKDIR/bzm-mcp.pid"
-          fi
-        '''
-      }
+        stage('Cleanup MCP server') {
+            steps {
+                sh '''
+                    set -e
+                    WORKDIR="${WORKSPACE}/mcp_run"
+                    if [ -f "$WORKDIR/bzm-mcp.pid" ]; then
+                        PID=$(cat "$WORKDIR/bzm-mcp.pid")
+                        echo "Stopping bzm-mcp PID ${PID}..."
+                        # Use -9 (SIGKILL) if plain kill fails to ensure cleanup
+                        kill ${PID} || kill -9 ${PID} || true 
+                        rm -f "$WORKDIR/bzm-mcp.pid"
+                    fi
+                '''
+            }
+        }
     }
-  }
 }
