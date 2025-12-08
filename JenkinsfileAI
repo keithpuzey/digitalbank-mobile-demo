@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    environment {
+        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key') // Jenkins credentials
+    }
+    stages {
+        stage('Run MCP Command') {
+            steps {
+                script {
+                    def mcpOutput = sh(
+                        script: """
+                            uvx \
+                                --from git+https://github.com/Blazemeter/bzm-mcp.git@v1.0.1 \
+                                -q bzm-mcp --mcp \
+                                --prompt "Summarize the last BlazeMeter test results"
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    echo "MCP Response:\n${mcpOutput}"
+                }
+            }
+        }
+    }
+}
