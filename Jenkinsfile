@@ -130,7 +130,8 @@ pipeline {
             steps {
                 script {
                     def output = sh(script: "sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest", returnStdout: true).trim()
-                    def match = output =~ /Test URL:\s*(.+)/
+                    // Multiline mode (?m) allows ^ and $ to match start/end of each line
+                    def match = (output =~ /(?m)^.*Test URL:\s*(.+)$/)
                     env.TEST_URL = match ? match[0][1].trim() : "NOT_FOUND"
                     echo "BlazeMeter Test URL: ${env.TEST_URL}"
                 }
