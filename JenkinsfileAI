@@ -29,7 +29,7 @@ stage('Install dependencies') {
                 echo "Installing Node.js and npm..."
                 # Use NodeSource repo for CentOS
                 curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-                dnf install -y nodejs
+                sudo dnf install -y nodejs
             fi
 
             # Install Claude CLI if missing
