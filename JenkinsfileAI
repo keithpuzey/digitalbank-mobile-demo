@@ -1,19 +1,44 @@
 pipeline {
     agent any
+
     environment {
-        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key') // Jenkins credentials
+        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key')
+        UV_INSTALL_DIR = "${HOME}/.cargo/bin"
     }
+
     stages {
+
+        stage('Install uv & uvx') {
+            steps {
+                sh '''
+                    set -e
+
+                    echo "Installing uv..."
+                    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+                    echo "Ensuring uv is in PATH..."
+                    export PATH="$HOME/.cargo/bin:$PATH"
+
+                    echo "Verifying uv installation..."
+                    uv --version
+                    uvx --version
+                '''
+            }
+        }
+
         stage('Run MCP Command') {
             steps {
                 script {
                     def mcpOutput = sh(
-                        script: """
+                        script: '''
+                            set -e
+                            export PATH="$HOME/.cargo/bin:$PATH"
+
                             uvx \
-                                --from git+https://github.com/Blazemeter/bzm-mcp.git@v1.0.1 \
-                                -q bzm-mcp --mcp \
-                                --prompt "Summarize the last BlazeMeter test results"
-                        """,
+                              --from git+https://github.com/Blazemeter/bzm-mcp.git@v1.0.1 \
+                              -q bzm-mcp --mcp \
+                              --prompt "Summarize the last BlazeMeter test results"
+                        ''',
                         returnStdout: true
                     ).trim()
 
