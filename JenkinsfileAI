@@ -2,64 +2,67 @@ pipeline {
     agent any
 
     environment {
-        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key') // file credential or secret text
+        BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key')
+        ANTHROPIC_API_KEY = credentials('anthropic-api-key')
         MCP_PORT = "3333"
         MCP_HOST = "127.0.0.1"
-        MCP_URL  = "http://${MCP_HOST}:${MCP_PORT}"
+        MCP_URL = "http://${MCP_HOST}:${MCP_PORT}"
+        CLAUDE_CONFIG_DIR = "${WORKSPACE}/.claude"
     }
 
     stages {
 
-        stage('Install uv & npm (if needed)') {
+        stage('Install dependencies') {
             steps {
                 sh '''
                     set -e
-                    # install uv if missing
+                    
+                    # Install uv if missing
                     if ! command -v uv >/dev/null 2>&1; then
                         echo "Installing uv..."
-                        # Using curl | sh is common for CI, but review for your security policy
                         curl -LsSf https://astral.sh/uv/install.sh | sh
                         export PATH="$HOME/.cargo/bin:$PATH"
                     fi
 
-                    # ensure npm (npx) exists for the client
+                    # Ensure npm exists
                     if ! command -v npx >/dev/null 2>&1; then
-                        echo "Node / npm not found — installing minimal node (this step may vary by distro)"
-                        # Debian/Ubuntu example - change for RHEL if needed
+                        echo "Installing Node.js and npm..."
                         sudo apt-get update -y
                         sudo apt-get install -y nodejs npm || true
                     fi
 
-                    echo "uv: $(uv --version || echo 'uv not available')"
-                    echo "npx: $(npx --version || echo 'npx not available')"
+                    # Install Claude CLI if missing
+                    if ! command -v claude >/dev/null 2>&1; then
+                        echo "Installing Claude CLI..."
+                        curl -fsSL https://cli.claude.ai/install.sh | sh
+                        export PATH="$HOME/.local/bin:$PATH"
+                    fi
+
+                    echo "uv: $(uv --version || echo 'not available')"
+                    echo "npx: $(npx --version || echo 'not available')"
+                    echo "claude: $(claude --version || echo 'not available')"
                 '''
             }
         }
 
-        stage('Start BlazeMeter MCP Server (background)') {
+        stage('Start BlazeMeter MCP Server') {
             steps {
                 sh '''
                     set -e
-
                     export PATH="$HOME/.cargo/bin:$PATH"
-                    # create a small working dir for API key
+                    
                     WORKDIR="${WORKSPACE}/mcp_run"
                     mkdir -p "$WORKDIR"
                     
-                    # Ensure the API key is available to the server
+                    # Set up BlazeMeter API key
                     if [ -n "${BLAZEMETER_API_KEY}" ]; then
-                        # Assuming BLAZEMETER_API_KEY is secret text, write it to file
                         echo "$BLAZEMETER_API_KEY" > "$WORKDIR/api-key.json"
-                        # Export this file path so bzm-mcp can read it
                         export BLAZEMETER_API_KEY="$WORKDIR/api-key.json"
                     fi
 
                     cd "$WORKDIR"
 
-                    echo "Launching bzm-mcp server via uvx..."
-                    # Start server in background and redirect logs. 
-                    # Use MCP_URL components for host/port if bzm-mcp supports it.
-                    # As of v1.0.1, the defaults are 127.0.0.1:3333, which matches your env.
+                    echo "Launching bzm-mcp server..."
                     uvx --from git+https://github.com/BlazeMeter/bzm-mcp.git@v1.0.1 -q bzm-mcp --mcp \
                         > bzm-mcp.log 2>&1 &
 
@@ -67,121 +70,196 @@ pipeline {
                     echo $MCP_PID > bzm-mcp.pid
                     echo "bzm-mcp PID: $MCP_PID"
 
-                    # Wait for server to be ready (try the health endpoint or port)
-                    echo "Waiting for MCP server to respond at ${MCP_URL}..."
+                    # Wait for server to be ready
+                    echo "Waiting for MCP server at ${MCP_URL}..."
                     for i in $(seq 1 30); do
-                        # try a common health endpoint; if not available, test TCP listen on port
                         curl -sSf "${MCP_URL}/health" >/dev/null 2>&1 && { echo "MCP healthy"; break; }
                         nc -z ${MCP_HOST} ${MCP_PORT} >/dev/null 2>&1 && { echo "TCP ${MCP_PORT} open"; break; }
                         echo -n "."
                         sleep 1
                     done
 
-                    # Check if the server is actually up, fail if not
+                    # Verify server is running
                     curl -sSf "${MCP_URL}/health" >/dev/null 2>&1 || { 
                         echo "ERROR: MCP server failed to start. Logs:"
                         cat bzm-mcp.log
                         exit 1
                     }
 
-                    # show a little of the server log for debugging
                     echo "--- Server Log Snippet ---"
-                    tail -n +1 bzm-mcp.log | sed -n '1,20p'
+                    tail -n 20 bzm-mcp.log
                     echo "--------------------------"
                 '''
             }
         }
 
-        stage('Call MCP via Python Client') {
+        stage('Configure Claude with MCP') {
+            steps {
+                sh '''
+                    set -e
+                    export PATH="$HOME/.local/bin:$PATH"
+                    
+                    mkdir -p "${CLAUDE_CONFIG_DIR}"
+                    
+                    # Create MCP configuration for Claude
+                    cat > "${CLAUDE_CONFIG_DIR}/mcp.json" << 'EOF'
+{
+  "mcpServers": {
+    "blazemeter": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/BlazeMeter/bzm-mcp.git@v1.0.1",
+        "-q",
+        "bzm-mcp",
+        "--mcp"
+      ],
+      "env": {
+        "BLAZEMETER_API_KEY": "${BLAZEMETER_API_KEY}"
+      }
+    }
+  }
+}
+EOF
+                    
+                    echo "MCP configuration created at ${CLAUDE_CONFIG_DIR}/mcp.json"
+                    cat "${CLAUDE_CONFIG_DIR}/mcp.json"
+                '''
+            }
+        }
+
+        stage('Authenticate Claude') {
+            steps {
+                sh '''
+                    set -e
+                    export PATH="$HOME/.local/bin:$PATH"
+                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
+                    
+                    echo "Authenticating Claude CLI..."
+                    claude auth login --api-key "${ANTHROPIC_API_KEY}"
+                    
+                    echo "Claude authentication successful"
+                '''
+            }
+        }
+
+        stage('Run Performance Test via Claude') {
             steps {
                 script {
-                    def mcpClientScript = """
-# mcp_client.py
-import os
-import json
-from mcp2py import Client, ToolCall
+                    // Create a prompt file for Claude
+                    def claudePrompt = """
+Please use the BlazeMeter MCP server to run a performance test with the following details:
+- Test ID: 123456 (replace with your actual test ID)
+- Test Name: Jenkins-Triggered Performance Test
 
-# Get URL from environment variable set in Jenkins
-MCP_URL = os.environ.get('MCP_URL', 'http://127.0.0.1:3333')
-print(f"Connecting to MCP Server at: {MCP_URL}")
+After running the test, please provide:
+1. Test execution status
+2. Key performance metrics
+3. Any issues or anomalies detected
+4. Recommendations for optimization
 
-# Initialize the client
-client = Client(MCP_URL)
-
-# 1. Prepare the ToolCall for the BlazeMeter tool
-# Assuming the BlazeMeter MCP tool is named 'bzm_run_test' (check bzm-mcp documentation)
-tool_call = ToolCall(
-    tool_name="bzm_run_test", # Replace with the actual tool name exposed by bzm-mcp
-    parameters={
-        "test_id": 123456, # Replace with your actual test ID
-        "test_name": "Jenkins-Triggered Performance Test",
-        # Add any other required parameters (workspace ID, etc.)
-    }
-)
-
-# 2. Execute the call and get the response
-try:
-    print(f"Sending request for tool: {tool_call.tool_name}")
-    response = client.call(tool_call)
-    
-    # 3. Process the response
-    print("\\n--- MCP Response ---")
-    print(json.dumps(response.to_dict(), indent=4))
-    print("--------------------\\n")
-    
-    # Example check: look for a successful result
-    if response.is_success():
-        print("MCP call successful!")
-        # Access the result data if needed: response.data
-    else:
-        print(f"MCP call failed: {response.error_message}")
-        # Optionally fail the build
-        # raise Exception("MCP tool execution failed.")
-
-except Exception as e:
-    print(f"An error occurred during MCP client execution: {e}")
-    raise
+Format the results in a clear, structured way.
 """
-                    // Write the client script to a file
-                    writeFile file: "${WORKSPACE}/mcp_run/mcp_client.py", text: mcpClientScript
-                
-                    // Execute the setup and run steps in the workspace subdirectory
+                    writeFile file: "${WORKSPACE}/mcp_run/claude_prompt.txt", text: claudePrompt
+                    
                     sh '''
                         set -e
-                        WORKDIR="${WORKSPACE}/mcp_run"
-                        cd "$WORKDIR"
+                        export PATH="$HOME/.local/bin:$PATH"
+                        export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
                         
-                        # Set up virtual environment and install client library
-                        python3 -m venv .venv || /usr/bin/python3 -m venv .venv
-                        source .venv/bin/activate
+                        cd "${WORKSPACE}/mcp_run"
                         
-                        # The mcp2py library is used to talk to the MCP server
-                        pip install mcp2py
+                        echo "Running Claude with BlazeMeter MCP..."
+                        claude chat < claude_prompt.txt > claude_output.txt
                         
-                        # Execute the client script
-                        echo "Starting Python MCP Client..."
-                        python3 mcp_client.py
-                        
-                        deactivate
+                        echo "=== Claude Output ==="
+                        cat claude_output.txt
+                        echo "===================="
                     '''
                 }
             }
         }
 
-        stage('Cleanup MCP server') {
+        stage('Analyze Results with Claude') {
+            steps {
+                sh '''
+                    set -e
+                    export PATH="$HOME/.local/bin:$PATH"
+                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
+                    
+                    cd "${WORKSPACE}/mcp_run"
+                    
+                    # Ask Claude to analyze the test results
+                    echo "Based on the performance test results, please provide:
+1. A summary of test execution
+2. Performance bottlenecks identified
+3. Comparison with baseline metrics (if available)
+4. Actionable recommendations for the development team
+5. Risk assessment (High/Medium/Low) for production deployment
+
+Format this as a brief executive summary suitable for management." | \
+                    claude chat > analysis_report.txt
+                    
+                    echo "=== Analysis Report ==="
+                    cat analysis_report.txt
+                    echo "======================="
+                    
+                    # Archive the reports
+                    cp claude_output.txt analysis_report.txt "${WORKSPACE}/"
+                '''
+            }
+        }
+
+        stage('Alternative: Use Claude Task Command') {
+            steps {
+                sh '''
+                    set -e
+                    export PATH="$HOME/.local/bin:$PATH"
+                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
+                    
+                    cd "${WORKSPACE}/mcp_run"
+                    
+                    # Using claude task for more focused execution
+                    echo "Running focused task with Claude..."
+                    claude task "Use the BlazeMeter MCP to run test ID 123456, analyze the results, and create a summary report with key metrics and recommendations" \
+                        > task_output.txt
+                    
+                    echo "=== Task Output ==="
+                    cat task_output.txt
+                    echo "==================="
+                '''
+            }
+        }
+
+        stage('Cleanup') {
             steps {
                 sh '''
                     set -e
                     WORKDIR="${WORKSPACE}/mcp_run"
+                    
                     if [ -f "$WORKDIR/bzm-mcp.pid" ]; then
                         PID=$(cat "$WORKDIR/bzm-mcp.pid")
                         echo "Stopping bzm-mcp PID ${PID}..."
-                        # Use -9 (SIGKILL) if plain kill fails to ensure cleanup
                         kill ${PID} || kill -9 ${PID} || true 
                         rm -f "$WORKDIR/bzm-mcp.pid"
                     fi
+                    
+                    echo "Cleanup complete"
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            // Archive the Claude outputs and reports
+            archiveArtifacts artifacts: '**/claude_output.txt,**/analysis_report.txt,**/task_output.txt,**/bzm-mcp.log', allowEmptyArchive: true
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
         }
     }
 }
