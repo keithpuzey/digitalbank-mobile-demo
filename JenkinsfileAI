@@ -79,34 +79,21 @@ pipeline {
       }
     }
 
-        stage('Send Prompt via Python MCP Client') {
-            steps {
-                script {
-                    def mcpResponse = sh(
-                        script: '''
-                            set -e
-                            WORKDIR="${WORKSPACE}/mcp_run"
-                            cd "$WORKDIR"
+stage('Call MCP via Python client') {
+  steps {
+    sh '''
+      python3 -m venv .venv
+      source .venv/bin/activate
+      pip install mcp2py
 
-                            python3 - <<'EOF'
-import json
-from bzm_mcp_client import MCPClient
+      # Write API key
+      echo "$BLAZEMETER_API_KEY" > api-key.json
 
-server_url = "http://127.0.0.1:3333"
-api_key_file = "api-key.json"
-
-client = MCPClient(server_url=server_url, api_key_file=api_key_file)
-response = client.chat("Summarize the last BlazeMeter test results")
-print(json.dumps(response, indent=2))
-EOF
-                        ''',
-                        returnStdout: true
-                    ).trim()
-
-                    echo "MCP Response:\n${mcpResponse}"
-                }
-            }
-        }
+      # Run the client
+      python3 mcp_client.py
+    '''
+  }
+}
 
     stage('Cleanup MCP server') {
       steps {
