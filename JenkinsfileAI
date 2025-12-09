@@ -53,6 +53,19 @@ stage('Install dependencies') {
                     set -e
                     export PATH="$HOME/.local/bin:$PATH"
                     
+                    cat > "${CLAUDE_CONFIG_DIR}/settings.local.json" << EOF
+
+{
+  "permissions": {
+    "allow": [
+      "mcp__BlazeMeter__blazemeter_workspaces",
+      "mcp__BlazeMeter__blazemeter_account"
+    ]
+  }
+}
+EOF
+
+
                     mkdir -p "${CLAUDE_CONFIG_DIR}"
                     cat > "${CLAUDE_CONFIG_DIR}/auth.json" << EOF
 
