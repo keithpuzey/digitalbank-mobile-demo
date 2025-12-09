@@ -130,7 +130,7 @@ stage('Execute Load & EUX Test') {
     steps {
         script {
             sh """
-               sudo -E bash -c '/usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} 2>&1 | tee bm_output.log'
+               /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} 2>&1 | tee bm_output.log
             """
 
             def output = readFile("bm_output.log").trim()
