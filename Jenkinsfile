@@ -126,26 +126,31 @@ pipeline {
             }
         }
 
-        stage('Execute Load & EUX Test') {
-            steps {
-                script {
-                    def output = sh(
-                        script: "sudo /usr/bin/python ./auto/run_perf_multi_test_param.py ${BlazeMeterTest}",
-                        returnStdout: true
-                    ).trim()
-                        echo "==== RAW SCRIPT OUTPUT ===="
-                    echo output
-                    echo "==========================="
-                        def matcher = output =~ /Test URL:\s*(https?:\/\/\S+)/
-                        if (matcher.find()) {
-                        env.TEST_URL = matcher.group(1).trim()
-                    } else {
-                        env.TEST_URL = "NOT_FOUND"
-                    }
-                        echo "BlazeMeter Test URL: ${env.TEST_URL}"
-                }
+stage('Execute Load & EUX Test') {
+    steps {
+        script {
+            sh """
+              sudo /usr/bin/python ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} | tee bm_output.log
+            """
+
+            def output = readFile("bm_output.log").trim()
+
+            echo "==== RAW SCRIPT OUTPUT ===="
+            echo output
+            echo "==========================="
+
+            def matcher = output =~ /Test URL:\s*(https?:\/\/\S+)/
+
+            if (matcher.find()) {
+                env.TEST_URL = matcher.group(1).trim()
+            } else {
+                env.TEST_URL = "NOT_FOUND"
             }
+
+            echo "BlazeMeter Test URL: ${env.TEST_URL}"
         }
+    }
+}
 
 
         stage('Remove Virtual Service') {
