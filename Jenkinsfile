@@ -100,7 +100,7 @@ pipeline {
                     script {
                         boolean retry = true
                         while (retry) {
-				def scriptOutput = sh(script: '/usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+				def scriptOutput = sh(script: '/usr/bin/python -u ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
 				// Debugging – let’s see EXACT output
 				echo "=== RAW OUTPUT FROM run_scriptless_test.py ==="
@@ -108,7 +108,7 @@ pipeline {
 				echo "=============================================="
 
 				def reasonMatch = (scriptOutput =~ /Reason: (.+)/)
-				def reportMatch = (scriptOutput =~ /Test Grid Report: (.+)/)
+				def reportMatch = (scriptOutput =~ /Report:\s*(.+)/)
 				def deviceMatch = (scriptOutput =~ /Devices: (.+)/)
 
 				def reason    = reasonMatch ? reasonMatch[0][1].trim() : "NOT_FOUND"
