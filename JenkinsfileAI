@@ -61,15 +61,17 @@ stage('Install dependencies') {
                         export BLAZEMETER_API_KEY="$WORKDIR/api-key.json"
                     fi
 
+
                     cd "$WORKDIR"
 
-                    echo "Launching bzm-mcp server..."
-                    uvx --from git+https://github.com/BlazeMeter/bzm-mcp.git@v1.0.1 -q bzm-mcp --mcp \
-                        > bzm-mcp.log 2>&1 &
+                    echo "Launching bzm-mcp server (native binary)..."
 
-                    MCP_PID=$!
-                    echo $MCP_PID > bzm-mcp.pid
-                    echo "bzm-mcp PID: $MCP_PID"
+                    chmod +x ./bzm-mcp-linux-amd64
+
+                    ./bzm-mcp-linux-amd64 --mcp \
+                    > bzm-mcp.log 2>&1 &
+
+                    echo "MCP PID: $!"D"
 
                     # Wait for server to be ready
                     echo "Waiting for MCP server at ${MCP_URL}..."
