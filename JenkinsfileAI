@@ -44,9 +44,7 @@ pipeline {
                         export PATH="$HOME/.cargo/bin:$PATH" # Only updates PATH inside this 'if'
                     fi
 
-                    echo "uv: $(uv --version || echo 'not available')"
-                    echo "npx: $(npx --version || echo 'not available')"
-                    echo "cursor-agent: $(cursor-agent --version || echo 'not available')"
+
                 '''
             }
         }
@@ -115,7 +113,7 @@ After running the test, please provide:
 
 Format the results in a clear, structured way.
 """
-                    writeFile file: "${WORKSPACE}/mcp_run/cursor_prompt.txt", text: cursorPrompt
+                    writeFile file: "${WORKSPACE}/cursor_prompt.txt", text: cursorPrompt
                     
                     sh '''
                         set -e
@@ -130,10 +128,10 @@ Format the results in a clear, structured way.
                         
                         # CHANGED: Use 'cursor-agent' command with the prompt file
                         # Use '--prompt' or read from stdin. Reading from stdin is cleaner here.
-                        cat "${WORKSPACE}/mcp_run/cursor_prompt.txt" | cursor-agent --api-key ${CURSOR_API_KEY} > "${WORKSPACE}/mcp_run/cursor_output.txt"cursor_output.txt
+                        cat "${WORKSPACE}/cursor_prompt.txt" | cursor-agent --api-key ${CURSOR_API_KEY} > "${WORKSPACE}/cursor_output.txt"cursor_output.txt
                         
                         echo "=== Cursor Agent Output ==="
-                        cat ${WORKSPACE}/mcp_run/cursor_output.txt
+                        cat ${WORKSPACE}/cursor_output.txt
                         echo "========================="
                     '''
                 }
