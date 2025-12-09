@@ -78,20 +78,6 @@ EOF
             }
         }
 
-        stage('Authenticate Claude') {
-            steps {
-                sh '''
-                    set -e
-                    export PATH="$HOME/.local/bin:$PATH"
-                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
-                    
-                    echo "Authenticating Claude CLI..."
-                    claude auth login --api-key "${ANTHROPIC_API_KEY}"
-                    
-                    echo "Claude authentication successful"
-                '''
-            }
-        }
 
         stage('Run Performance Test via Claude') {
             steps {
