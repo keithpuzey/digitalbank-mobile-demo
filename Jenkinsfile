@@ -100,7 +100,7 @@ pipeline {
                     script {
                         boolean retry = true
                         while (retry) {
-				def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
+				def scriptOutput = sh(script: '/usr/bin/python ./auto/run_scriptless_test.py', returnStdout: true).trim()
 
 				// Debugging – let’s see EXACT output
 				echo "=== RAW OUTPUT FROM run_scriptless_test.py ==="
@@ -130,7 +130,7 @@ stage('Execute Load & EUX Test') {
     steps {
         script {
             sh """
-               /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} | tee bm_output.log
+               sudo -E bash -c '/usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} 2>&1 | tee bm_output.log'
             """
 
             def output = readFile("bm_output.log").trim()
