@@ -129,8 +129,12 @@ pipeline {
 stage('Execute Load & EUX Test') {
     steps {
         script {
-            sh """
-               /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} 2>&1 | tee bm_output.log
+sh """
+                # 1. Run the script and write all output (STDOUT + STDERR) directly to the file
+                /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} > bm_output.log 2>&1
+                
+                # 2. Print the file content to the console (for visibility)
+                cat bm_output.log
             """
 
             def output = readFile("bm_output.log").trim()
