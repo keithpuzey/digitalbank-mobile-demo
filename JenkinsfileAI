@@ -35,7 +35,7 @@ stage('Install dependencies') {
             # Install Claude CLI if missing
             if ! command -v claude >/dev/null 2>&1; then
                 echo "Installing Claude CLI..."
-                curl -fsSL https://cli.claude.ai/install.sh | sh
+                curl -fsSL https://claude.ai/install.sh | sh
                 export PATH="$HOME/.local/bin:$PATH"
             fi
 
