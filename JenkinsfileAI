@@ -100,7 +100,7 @@ EOF
                 script {
                     // Create a prompt file for the Cursor Agent
                     def cursorPrompt = """
-Please use the BlazeMeter MCP server to run a performance test with the following details:
+Please use the BlazeMeter MCP server to run a performance test with the following details, do not create a script:
 - Test ID: 13960763
 - Workspace ID : 2014117
 - Test Name: Jenkins-Triggered Performance Test
