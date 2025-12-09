@@ -54,7 +54,20 @@ stage('Install dependencies') {
                     export PATH="$HOME/.local/bin:$PATH"
                     
                     mkdir -p "${CLAUDE_CONFIG_DIR}"
-                    
+                    cat > "${CLAUDE_CONFIG_DIR}/auth.json" << EOF
+
+{
+  "current": "default",
+  "profiles": {
+    "default": {
+      "apiKey": "${ANTHROPIC_API_KEY}",
+      "authType": "apiKey"
+    }
+  }
+}
+EOF
+
+
                     # Create MCP configuration for Claude using native binary
                     cat > "${CLAUDE_CONFIG_DIR}/mcp.json" << EOF
 {
