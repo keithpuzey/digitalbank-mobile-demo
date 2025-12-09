@@ -2,87 +2,66 @@ pipeline {
     agent any
 
     environment {
+        // --- Environment Variables for MCP and API Keys ---
         BLAZEMETER_API_KEY = credentials('BlazeMeter-API-Key')
-        ANTHROPIC_API_KEY = credentials('anthropic-api-key')
+        CURSOR_API_KEY = credentials('cursor-api-key') // Kept the existing Cursor API Key variable
+
+        // These MCP settings are less critical for Cursor CLI as it uses config files, but can remain if needed.
         MCP_PORT = "3333"
         MCP_HOST = "127.0.0.1"
         MCP_URL = "http://${MCP_HOST}:${MCP_PORT}"
-        CLAUDE_CONFIG_DIR = "${WORKSPACE}/.claude"
+
+        // CHANGED: Use a directory for Cursor's configuration files
+        CURSOR_CONFIG_DIR = "${WORKSPACE}/.cursor" 
     }
 
     stages {
 
-stage('Install dependencies') {
-    steps {
-        sh '''
-            set -e
+        stage('Install dependencies') {
+            steps {
+                sh '''
+                    set -e
 
-            # Install uv if missing
-            if ! command -v uv >/dev/null 2>&1; then
-                echo "Installing uv..."
-                curl -LsSf https://astral.sh/uv/install.sh | sh
-                export PATH="$HOME/.cargo/bin:$PATH"
-            fi
+                    # Install uv if missing (uv installation logic remains)
+                    if ! command -v uv >/dev/null 2>&1; then
+                        echo "Installing uv..."
+                        curl -LsSf https://astral.sh/uv/install.sh | sh
+                        export PATH="$HOME/.cargo/bin:$PATH"
+                    fi
 
-            # Ensure Node.js and npm exist
-            if ! command -v npx >/dev/null 2>&1; then
-                echo "Installing Node.js and npm..."
-                # Use NodeSource repo for CentOS
-                curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-                sudo dnf install -y nodejs
-            fi
+                    # Ensure Node.js and npm exist (Node.js installation logic remains)
+                    if ! command -v npx >/dev/null 2>&1; then
+                        echo "Installing Node.js and npm..."
+                        # Use NodeSource repo for CentOS
+                        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+                        sudo dnf install -y nodejs
+                    fi
+                    
+                    # Install the Cursor Agent CLI (if not already installed/available)
+                    if ! command -v cursor-agent >/dev/null 2>&1; then
+                        echo "Installing Cursor Agent CLI..."
+                        npm install -g @cursor-agent/cli || true # Use npm to install the package globally
+                    fi
 
-            # Install Claude CLI if missing
-            if ! command -v claude >/dev/null 2>&1; then
-                echo "Installing Claude CLI..."
-                curl -fsSL https://claude.ai/install.sh | sh
-                export PATH="$HOME/.local/bin:$PATH"
-            fi
+                    echo "uv: $(uv --version || echo 'not available')"
+                    echo "npx: $(npx --version || echo 'not available')"
+                    echo "cursor-agent: $(cursor-agent --version || echo 'not available')"
+                '''
+            }
+        }
 
-            echo "uv: $(uv --version || echo 'not available')"
-            echo "npx: $(npx --version || echo 'not available')"
-            echo "claude: $(claude --version || echo 'not available')"
-        '''
-    }
-}
-
-
-        stage('Configure Claude with MCP') {
+        stage('Configure Cursor with MCP') {
             steps {
                 sh '''
                     set -e
                     export PATH="$HOME/.local/bin:$PATH"
-                    
-                    cat > "${CLAUDE_CONFIG_DIR}/settings.local.json" << EOF
 
-{
-  "permissions": {
-    "allow": [
-      "mcp__BlazeMeter__blazemeter_workspaces",
-      "mcp__BlazeMeter__blazemeter_account"
-    ]
-  }
-}
-EOF
+                    # 1. Create the Cursor config directory
+                    mkdir -p "${CURSOR_CONFIG_DIR}"
 
-
-                    mkdir -p "${CLAUDE_CONFIG_DIR}"
-                    cat > "${CLAUDE_CONFIG_DIR}/auth.json" << EOF
-
-{
-  "current": "default",
-  "profiles": {
-    "default": {
-      "apiKey": "${ANTHROPIC_API_KEY}",
-      "authType": "apiKey"
-    }
-  }
-}
-EOF
-
-
-                    # Create MCP configuration for Claude using native binary
-                    cat > "${CLAUDE_CONFIG_DIR}/mcp.json" << EOF
+                    # 2. Configure MCP for Cursor by creating the project-level .cursor/mcp.json
+                    # The Cursor CLI looks for mcp.json in the current working directory's .cursor/
+                    cat > "${CURSOR_CONFIG_DIR}/mcp.json" << EOF
 {
   "mcpServers": {
     "BlazeMeter": {
@@ -98,18 +77,30 @@ EOF
 }
 EOF
                     
-                    echo "MCP configuration created at ${CLAUDE_CONFIG_DIR}/mcp.json"
-                    cat "${CLAUDE_CONFIG_DIR}/mcp.json"
+                    # 3. (Optional) Create a simple settings file if needed for permissions, though 
+                    #    MCP configuration often handles this implicitly in Cursor CLI
+                    cat > "${CURSOR_CONFIG_DIR}/settings.local.json" << EOF
+{
+  "permissions": {
+    "allow": [
+      "mcp__BlazeMeter__blazemeter_workspaces",
+      "mcp__BlazeMeter__blazemeter_account"
+    ]
+  }
+}
+EOF
+
+                    echo "MCP configuration created at ${CURSOR_CONFIG_DIR}/mcp.json"
+                    cat "${CURSOR_CONFIG_DIR}/mcp.json"
                 '''
             }
         }
 
-
-        stage('Run Performance Test via Claude') {
+        stage('Run Performance Test via Cursor Agent') {
             steps {
                 script {
-                    // Create a prompt file for Claude
-                    def claudePrompt = """
+                    // Create a prompt file for the Cursor Agent
+                    def cursorPrompt = """
 Please use the BlazeMeter MCP server to run a performance test with the following details:
 - Test ID: 123456 (replace with your actual test ID)
 - Test Name: Jenkins-Triggered Performance Test
@@ -122,36 +113,41 @@ After running the test, please provide:
 
 Format the results in a clear, structured way.
 """
-                    writeFile file: "${WORKSPACE}/mcp_run/claude_prompt.txt", text: claudePrompt
+                    writeFile file: "${WORKSPACE}/mcp_run/cursor_prompt.txt", text: cursorPrompt
                     
                     sh '''
                         set -e
                         export PATH="$HOME/.local/bin:$PATH"
-                        export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
+                        # Export the API key for authentication
+                        export CURSOR_API_KEY="${CURSOR_API_KEY}" 
                         
-                        cd "${WORKSPACE}/mcp_run"
+                        # Set WORKSPACE as the current directory so that the agent finds .cursor/mcp.json
+                        cd "${WORKSPACE}" 
                         
-                        echo "Running Claude with BlazeMeter MCP..."
-                        claude chat < claude_prompt.txt > claude_output.txt
+                        echo "Running Cursor Agent with BlazeMeter MCP..."
                         
-                        echo "=== Claude Output ==="
-                        cat claude_output.txt
-                        echo "===================="
+                        # CHANGED: Use 'cursor-agent' command with the prompt file
+                        # Use '--prompt' or read from stdin. Reading from stdin is cleaner here.
+                        cat ${WORKSPACE}/mcp_run/cursor_prompt.txt | cursor-agent > ${WORKSPACE}/mcp_run/cursor_output.txt
+                        
+                        echo "=== Cursor Agent Output ==="
+                        cat ${WORKSPACE}/mcp_run/cursor_output.txt
+                        echo "========================="
                     '''
                 }
             }
         }
 
-        stage('Analyze Results with Claude') {
+        stage('Analyze Results with Cursor Agent') {
             steps {
                 sh '''
                     set -e
                     export PATH="$HOME/.local/bin:$PATH"
-                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
+                    export CURSOR_API_KEY="${CURSOR_API_KEY}" 
                     
-                    cd "${WORKSPACE}/mcp_run"
+                    cd "${WORKSPACE}" 
                     
-                    # Ask Claude to analyze the test results
+                    # Ask Cursor Agent to analyze the test results
                     echo "Based on the performance test results, please provide:
 1. A summary of test execution
 2. Performance bottlenecks identified
@@ -160,38 +156,21 @@ Format the results in a clear, structured way.
 5. Risk assessment (High/Medium/Low) for production deployment
 
 Format this as a brief executive summary suitable for management." | \
-                    claude chat > analysis_report.txt
+                    cursor-agent > ${WORKSPACE}/mcp_run/analysis_report.txt
                     
                     echo "=== Analysis Report ==="
-                    cat analysis_report.txt
+                    cat ${WORKSPACE}/mcp_run/analysis_report.txt
                     echo "======================="
                     
                     # Archive the reports
-                    cp claude_output.txt analysis_report.txt "${WORKSPACE}/"
+                    cp ${WORKSPACE}/mcp_run/cursor_output.txt ${WORKSPACE}/mcp_run/analysis_report.txt "${WORKSPACE}/"
                 '''
             }
         }
 
-        stage('Alternative: Use Claude Task Command') {
-            steps {
-                sh '''
-                    set -e
-                    export PATH="$HOME/.local/bin:$PATH"
-                    export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR}"
-                    
-                    cd "${WORKSPACE}/mcp_run"
-                    
-                    # Using claude task for more focused execution
-                    echo "Running focused task with Claude..."
-                    claude task "Use the BlazeMeter MCP to run test ID 123456, analyze the results, and create a summary report with key metrics and recommendations" \
-                        > task_output.txt
-                    
-                    echo "=== Task Output ==="
-                    cat task_output.txt
-                    echo "==================="
-                '''
-            }
-        }
+        // REMOVED: The 'Alternative: Use Claude Task Command' stage is removed 
+        // as 'cursor-agent' typically handles all tasks via a single prompt,
+        // unlike the separate 'chat' and 'task' commands in the original CLI.
 
         stage('Cleanup') {
             steps {
@@ -202,7 +181,7 @@ Format this as a brief executive summary suitable for management." | \
                     if [ -f "$WORKDIR/bzm-mcp.pid" ]; then
                         PID=$(cat "$WORKDIR/bzm-mcp.pid")
                         echo "Stopping bzm-mcp PID ${PID}..."
-                        kill ${PID} || kill -9 ${PID} || true 
+                        kill ${PID} || kill -9 ${PID} || true  
                         rm -f "$WORKDIR/bzm-mcp.pid"
                     fi
                     
@@ -214,8 +193,8 @@ Format this as a brief executive summary suitable for management." | \
 
     post {
         always {
-            // Archive the Claude outputs and reports
-            archiveArtifacts artifacts: '**/claude_output.txt,**/analysis_report.txt,**/task_output.txt,**/bzm-mcp.log', allowEmptyArchive: true
+            // CHANGED: Updated artifact names to match 'cursor_output.txt'
+            archiveArtifacts artifacts: '**/cursor_output.txt,**/analysis_report.txt,**/bzm-mcp.log', allowEmptyArchive: true
         }
         success {
             echo 'Pipeline completed successfully!'
