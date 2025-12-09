@@ -103,7 +103,8 @@ EOF
                     // Create a prompt file for the Cursor Agent
                     def cursorPrompt = """
 Please use the BlazeMeter MCP server to run a performance test with the following details:
-- Test ID: 123456 (replace with your actual test ID)
+- Test ID: 13960763
+- Workspace ID : 2014117
 - Test Name: Jenkins-Triggered Performance Test
 
 After running the test, please provide:
@@ -139,57 +140,7 @@ Format the results in a clear, structured way.
             }
         }
 
-        stage('Analyze Results with Cursor Agent') {
-            steps {
-                sh '''
-                    set -e
-                    export PATH="$HOME/.local/bin:$PATH"
-                    export CURSOR_API_KEY="${CURSOR_API_KEY}" 
-                    
-                    cd "${WORKSPACE}" 
-                    
-                    # Ask Cursor Agent to analyze the test results
-                    echo "Based on the performance test results, please provide:
-1. A summary of test execution
-2. Performance bottlenecks identified
-3. Comparison with baseline metrics (if available)
-4. Actionable recommendations for the development team
-5. Risk assessment (High/Medium/Low) for production deployment
 
-Format this as a brief executive summary suitable for management." | \
-                    cursor-agent > ${WORKSPACE}/mcp_run/analysis_report.txt
-                    
-                    echo "=== Analysis Report ==="
-                    cat ${WORKSPACE}/mcp_run/analysis_report.txt
-                    echo "======================="
-                    
-                    # Archive the reports
-                    cp ${WORKSPACE}/mcp_run/cursor_output.txt ${WORKSPACE}/mcp_run/analysis_report.txt "${WORKSPACE}/"
-                '''
-            }
-        }
-
-        // REMOVED: The 'Alternative: Use Claude Task Command' stage is removed 
-        // as 'cursor-agent' typically handles all tasks via a single prompt,
-        // unlike the separate 'chat' and 'task' commands in the original CLI.
-
-        stage('Cleanup') {
-            steps {
-                sh '''
-                    set -e
-                    WORKDIR="${WORKSPACE}/mcp_run"
-                    
-                    if [ -f "$WORKDIR/bzm-mcp.pid" ]; then
-                        PID=$(cat "$WORKDIR/bzm-mcp.pid")
-                        echo "Stopping bzm-mcp PID ${PID}..."
-                        kill ${PID} || kill -9 ${PID} || true  
-                        rm -f "$WORKDIR/bzm-mcp.pid"
-                    fi
-                    
-                    echo "Cleanup complete"
-                '''
-            }
-        }
     }
 
     post {
