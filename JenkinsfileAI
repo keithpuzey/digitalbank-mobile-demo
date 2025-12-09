@@ -40,7 +40,7 @@ pipeline {
                     # Install the Cursor Agent CLI (if not already installed/available)
                     if ! command -v cursor-agent >/dev/null 2>&1; then
                         echo "Installing Cursor Agent CLI..."
-                        npm install -g @cursor-agent/cli || true # Use npm to install the package globally
+                        curl https://cursor.com/install -fsS | bash
                     fi
 
                     echo "uv: $(uv --version || echo 'not available')"
