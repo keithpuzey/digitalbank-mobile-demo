@@ -58,6 +58,7 @@ pipeline {
                     # 1. Create the Cursor config directory
                     mkdir -p "${CURSOR_CONFIG_DIR}"
 
+
                     # 2. Configure MCP for Cursor by creating the project-level .cursor/mcp.json
                     # The Cursor CLI looks for mcp.json in the current working directory's .cursor/
                     cat > "${CURSOR_CONFIG_DIR}/mcp.json" << EOF
@@ -132,7 +133,6 @@ Format the results in a clear, structured way.
 cat "${WORKSPACE}/cursor_prompt.txt" | \
 cursor-agent \
   --api-key "${CURSOR_API_KEY}" \
-  --enable-mcp \
   --print \
   > "${WORKSPACE}/cursor_output.txt"
                         

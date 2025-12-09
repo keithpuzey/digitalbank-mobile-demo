@@ -129,14 +129,24 @@ pipeline {
         stage('Execute Load & EUX Test') {
             steps {
                 script {
-                    def output = sh(script: "sudo /usr/bin/python ./auto/run_perf_multi_test_param.py $BlazeMeterTest", returnStdout: true).trim()
-                    // Multiline mode (?m) allows ^ and $ to match start/end of each line
-                    def match = (output =~ /(?m)^.*Test URL:\s*(.+)$/)
-                    env.TEST_URL = match ? match[0][1].trim() : "NOT_FOUND"
-                    echo "BlazeMeter Test URL: ${env.TEST_URL}"
+                    def output = sh(
+                        script: "sudo /usr/bin/python ./auto/run_perf_multi_test_param.py ${BlazeMeterTest}",
+                        returnStdout: true
+                    ).trim()
+                        echo "==== RAW SCRIPT OUTPUT ===="
+                    echo output
+                    echo "==========================="
+                        def matcher = output =~ /Test URL:\s*(https?:\/\/\S+)/
+                        if (matcher.find()) {
+                        env.TEST_URL = matcher.group(1).trim()
+                    } else {
+                        env.TEST_URL = "NOT_FOUND"
+                    }
+                        echo "BlazeMeter Test URL: ${env.TEST_URL}"
                 }
             }
         }
+
 
         stage('Remove Virtual Service') {
             steps { sh 'sudo /usr/bin/python ./auto/delete_mock.py' }
