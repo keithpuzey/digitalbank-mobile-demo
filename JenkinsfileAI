@@ -128,7 +128,7 @@ Format the results in a clear, structured way.
                         
                         # CHANGED: Use 'cursor-agent' command with the prompt file
                         # Use '--prompt' or read from stdin. Reading from stdin is cleaner here.
-                        cat "${WORKSPACE}/cursor_prompt.txt" | cursor-agent --api-key ${CURSOR_API_KEY} --yes --prompt > "${WORKSPACE}/cursor_output.txt"
+                        cat "${WORKSPACE}/cursor_prompt.txt" | cursor-agent --api-key ${CURSOR_API_KEY} --print --prompt > "${WORKSPACE}/cursor_output.txt"
                         
                         echo "=== Cursor Agent Output ==="
                         cat ${WORKSPACE}/cursor_output.txt
