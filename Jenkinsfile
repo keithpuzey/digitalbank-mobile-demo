@@ -76,8 +76,6 @@ stage('Revert Database to Snapshot - Delphix') {
                 sudo chmod 600 ${activeCfg}
             """
 
-            echo 'Registered Users in Database Before Snapshot Refresh'
-            sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
 
             echo 'Reverting Database to Snapshot'
             sh "sudo /usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
