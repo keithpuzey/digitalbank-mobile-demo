@@ -1,4 +1,9 @@
 pipeline {
+    parameters {
+        string(name: 'DCT_URL', description: 'Delphix DCT URL (e.g. https://dct.example.com)')
+        string(name: 'snapshotvdb', description: 'Delphix VDB ID')
+        string(name: 'snapshotid', description: 'Delphix Snapshot ID')
+    }
     agent any
 
     environment {
@@ -8,6 +13,7 @@ pipeline {
         // Creates:  BMCredentials_USR  and  BMCredentials_PSW
         BMCredentials = credentials('BMCredentials')
         perfectotoken = credentials('perfectotoken')
+        DCT_API_KEY = credentials('dct-api-key')
     }
 
     stages {
@@ -45,6 +51,41 @@ pipeline {
                 sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
             }
         }
+        
+stage('Revert Database to Snapshot - Delphix') {
+    steps {
+        script {
+            def snapshotid  = params.snapshotid
+            def snapshotvdb = params.snapshotvdb
+            def dctApiKey   = params.DCT_API_KEY
+            def dctUrl      = params.DCT_URL
+
+            def dctDir      = "/var/lib/jenkins/.dct-toolkit"
+            def defaultCfg  = "${dctDir}/dct-toolkit.properties.default"
+            def activeCfg   = "${dctDir}/dct-toolkit.properties"
+
+            echo 'Updating DCT Toolkit configuration'
+
+            sh """
+                sudo cp ${defaultCfg} ${activeCfg}
+
+                sudo sed -i 's|^api.key=.*|api.key=${dctApiKey}|' ${activeCfg}
+                sudo sed -i 's|^dct.url=.*|dct.url=${dctUrl}|' ${activeCfg}
+
+                sudo chown jenkins:jenkins ${activeCfg}
+                sudo chmod 600 ${activeCfg}
+            """
+
+            echo 'Registered Users in Database Before Snapshot Refresh'
+            sh 'sudo /usr/bin/python3.8 ./auto/queryvdb.py'
+
+            echo 'Reverting Database to Snapshot'
+            sh "sudo /usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+
+
+        }
+    }
+}
 
         stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
