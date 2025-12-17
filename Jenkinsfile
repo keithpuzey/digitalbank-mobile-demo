@@ -57,30 +57,29 @@ stage('Revert Database to Snapshot - Delphix') {
         script {
             def snapshotid  = params.snapshotid
             def snapshotvdb = params.snapshotvdb
-            def dctApiKey   = params.DCT_API_KEY
-            def dctUrl      = params.DCT_URL
-
             def dctDir      = "/var/lib/jenkins/.dct-toolkit"
             def defaultCfg  = "${dctDir}/dct-toolkit.properties.default"
             def activeCfg   = "${dctDir}/dct-toolkit.properties"
 
             echo 'Updating DCT Toolkit configuration'
 
-            sh """
-                sudo cp ${defaultCfg} ${activeCfg}
+            withEnv([
+                "DCT_API_KEY=${env.DCT_API_KEY}",
+                "DCT_URL=${params.DCT_URL}"
+            ]) {
+                sh """
+                    sudo cp ${defaultCfg} ${activeCfg}
 
-                sudo sed -i 's|^api.key=.*|api.key=${dctApiKey}|' ${activeCfg}
-                sudo sed -i 's|^dct.url=.*|dct.url=${dctUrl}|' ${activeCfg}
+                    sudo sed -i "s|^api.key=.*|api.key=\${DCT_API_KEY}|" ${activeCfg}
+                    sudo sed -i "s|^dct.url=.*|dct.url=\${DCT_URL}|" ${activeCfg}
 
-                sudo chown jenkins:jenkins ${activeCfg}
-                sudo chmod 600 ${activeCfg}
-            """
-
+                    sudo chown jenkins:jenkins ${activeCfg}
+                    sudo chmod 600 ${activeCfg}
+                """
+            }
 
             echo 'Reverting Database to Snapshot'
             sh "sudo /usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
-
-
         }
     }
 }
