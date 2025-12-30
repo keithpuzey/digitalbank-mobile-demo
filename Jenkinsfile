@@ -89,9 +89,9 @@ stage('Revert Database to Snapshot - Delphix') {
                     sh '/usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
                     sh '/usr/bin/python ./auto/upload-csv-perfecto.py'
 
-                    def outputVS = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
+                    def outputVS = sh(script: '/usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
-                    def scriptOutput = sh(script: 'sudo /usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
+                    def scriptOutput = sh(script: '/usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Virtual Service Started - Endpoint details:? (.*)/
                     echo "Virtual Service Endpoint: ${endpointMatch ? endpointMatch[0][1].trim() : 'NONE'}"
                 }
