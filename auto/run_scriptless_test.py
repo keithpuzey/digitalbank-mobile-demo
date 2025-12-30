@@ -16,7 +16,7 @@ JENKINS_SERVER_URL = os.environ.get('DemoServerURL', 'http://dbankdemo.com/bank'
 
 # Start the Perfecto script execution
 def start_test():
-    url = f'https://{perfecto_cloud}/services/executions?operation=execute&scriptKey={script_key}&securityToken={PerfectoKey}&output.visibility=public&param.{ServerURL}'
+    url = f'https://{perfecto_cloud}/services/executions?operation=execute&scriptKey={script_key}&securityToken={PerfectoKey}&output.visibility=public&param.ServerURL={JENKINS_SERVER_URL}'
     headers = {
         'Content-Type': 'application/json'
     }
