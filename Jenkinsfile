@@ -40,8 +40,8 @@ pipeline {
                     // Install Python dependency
                     sh "sudo -u jenkins python3.12 -m pip install mysql-connector-python"
 
-                    echo 'Setting up DCT configuration for Jenkins user'
-                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
+                    // echo 'Setting up DCT configuration for Jenkins user'
+                    // sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
             }
         }
@@ -63,13 +63,12 @@ stage('Revert Database to Snapshot - Delphix') {
                 "DCT_URL=${params.DCT_URL}"
             ]) {
                 sh """
-                    sudo cp ${defaultCfg} ${activeCfg}
+                    cp ${defaultCfg} ${activeCfg}
+                    sed -i "s|^api.key=.*|api.key=\${DCT_API_KEY}|" ${activeCfg}
+                    sed -i "s|^dct.url=.*|dct.url=\${DCT_URL}|" ${activeCfg}
 
-                    sudo sed -i "s|^api.key=.*|api.key=\${DCT_API_KEY}|" ${activeCfg}
-                    sudo sed -i "s|^dct.url=.*|dct.url=\${DCT_URL}|" ${activeCfg}
-
-                    sudo chown jenkins:jenkins ${activeCfg}
-                    sudo chmod 600 ${activeCfg}
+                    chown jenkins:jenkins ${activeCfg}
+                    chmod 600 ${activeCfg}
                 """
             }
 
