@@ -195,11 +195,8 @@ sh """
 
 
         stage('Remove Virtual Service') {
-            steps { sh 'sudo /usr/bin/python ./auto/delete_mock.py' }
+            steps { sh '/usr/bin/python ./auto/delete_mock.py' }
         }
 
-        stage('Remove Test Environment - Puppet') {
-            steps { sh 'sudo /usr/local/bin/puppet apply remove_tomcat_host.pp' }
-        }
     }
 }
