@@ -73,7 +73,7 @@ stage('Revert Database to Snapshot - Delphix') {
             }
 
             echo 'Reverting Database to Snapshot'
-            sh "sudo /usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+            sh "/usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
         }
     }
 }
@@ -81,8 +81,8 @@ stage('Revert Database to Snapshot - Delphix') {
         stage('Create Virtual Service and Generate Synthetic Data') {
             steps {
                 script {
-                    sh 'sudo /usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
-                    sh 'sudo /usr/bin/python ./auto/upload-csv-perfecto.py'
+                    sh '/usr/bin/python ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh '/usr/bin/python ./auto/upload-csv-perfecto.py'
 
                     def outputVS = sh(script: 'sudo /usr/bin/python ./auto/Update_mock.py', returnStdout: true).trim()
 
