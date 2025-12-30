@@ -46,11 +46,6 @@ pipeline {
             }
         }
 
-        stage('Create Environment - Puppet') {
-            steps {
-                sh 'sudo /usr/local/bin/puppet apply docker_tomcat_host.pp'
-            }
-        }
         
 stage('Revert Database to Snapshot - Delphix') {
     steps {
