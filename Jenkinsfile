@@ -65,7 +65,7 @@ stage('Revert Database to Snapshot - Delphix') {
                 sh """
                     cp ${defaultCfg} ${activeCfg}
                     sed -i "s|^api.key=.*|api.key=\${DCT_API_KEY}|" ${activeCfg}
-                    sed -i "s|^dct.url=.*|dct.url=\${DCT_URL}|" ${activeCfg}
+                    sed -i "s|^dct.url=.*|dct.url=${DCT_URL}|" "${activeCfg}"
 
                     chown jenkins:jenkins ${activeCfg}
                     chmod 600 ${activeCfg}
