@@ -21,7 +21,7 @@ SharedFolderID = "65d71b4e8b2044fe570baf89"
 RegistrationMockID = "144333"
 
 # Result paths
-base_dir = '/var/lib/jenkins/workspace/DBank Mobile Pipeline/auto/results/'
+base_dir = '/var/lib/jenkins/workspace/DigitalBankDemo/auto/results/'
 mock_output = f'{base_dir}mockurl.txt'
 mock_output_id = f'{base_dir}mockid.txt'
 test_result_url = f'{base_dir}test_result.txt'
