@@ -11,12 +11,19 @@ RESULT_DIR = "test-results"
 RESULT_FILE = os.path.join(RESULT_DIR, "perfecto-result.xml")
 TEST_NAME = "DBankMobileRegistration"
 
+# Get the Jenkins parameter; default to a fallback if not found
+JENKINS_SERVER_URL = os.environ.get('DemoServerURL', 'http://dbankdemo.com/bank')
+
 # Start the Perfecto script execution
 def start_test():
-    url = f'https://{perfecto_cloud}/services/executions?operation=execute&scriptKey={script_key}&securityToken={PerfectoKey}&output.visibility=public'
+    url = f'https://{perfecto_cloud}/services/executions?operation=execute&scriptKey={script_key}&securityToken={PerfectoKey}&output.visibility=public&param.{ServerURL}'
     headers = {
         'Content-Type': 'application/json'
     }
+
+    print(f"🚀 Starting Perfecto test...")
+    print(f"🔗 Using ServerURL from Jenkins: {server_url}")
+
 
     response = requests.post(url, headers=headers)
     if response.status_code == 200:
