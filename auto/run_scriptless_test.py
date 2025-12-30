@@ -22,7 +22,7 @@ def start_test():
     }
 
     print(f"🚀 Starting Perfecto test...")
-    print(f"🔗 Using ServerURL from Jenkins: {server_url}")
+    print(f"🔗 Using ServerURL from Jenkins: ${JENKINS_SERVER_URL}")
 
 
     response = requests.post(url, headers=headers)
