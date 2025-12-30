@@ -73,7 +73,7 @@ stage('Revert Database to Snapshot - Delphix') {
             }
 
             echo 'Reverting Database to Snapshot'
-            sh "/usr/bin/python3.8 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
+            sh "/usr/bin/python3.12 ./auto/delphix_synch.py ${snapshotvdb} ${snapshotid}"
         }
     }
 }
