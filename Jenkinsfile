@@ -1,9 +1,5 @@
 pipeline {
-    parameters {
-        string(name: 'DCT_URL', description: 'Delphix DCT URL (e.g. https://dct.example.com)')
-        string(name: 'snapshotvdb', description: 'Delphix VDB ID')
-        string(name: 'snapshotid', description: 'Delphix Snapshot ID')
-    }
+
     agent any
 
     environment {
@@ -18,6 +14,15 @@ pipeline {
 
     stages {
 
+        stage('Setup Python') {
+            steps {
+                sh '''
+                /usr/bin/python -m venv venv
+                . venv/bin/activate
+                pip install requests
+                '''
+            }
+        }
         stage('Update Configuration') {
             steps {
                 script {
