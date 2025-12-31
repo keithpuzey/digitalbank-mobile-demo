@@ -93,7 +93,7 @@ stage('Revert Database to Snapshot - Delphix') {
 
                     def scriptOutput = sh(script: '/usr/bin/python ./auto/Create_mock.py', returnStdout: true).trim()
                     def endpointMatch = scriptOutput =~ /Virtual Service Started - Endpoint details:? (.*)/
-                    echo "Virtual Service Endpoint: ${endpointMatch ? endpointMatch[0][1].trim() : 'NONE'}"
+                    echo "🔗 Virtual Service Endpoint: ${endpointMatch ? endpointMatch[0][1].trim() : 'NONE'}"
                 }
             }
         }
@@ -188,7 +188,7 @@ sh """
                 env.TEST_URL = "NOT_FOUND"
             }
 
-            echo "BlazeMeter Test URL: ${env.TEST_URL}"
+            echo "🚀 BlazeMeter Test URL: ${env.TEST_URL}"
         }
     }
 }

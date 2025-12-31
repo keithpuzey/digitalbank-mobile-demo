@@ -118,6 +118,9 @@ def write_junit(result, report_url, reason=None):
 # -----------------------------
 # Main
 # -----------------------------
+# -----------------------------
+# Main
+# -----------------------------
 def main():
     execution_id, report_url = start_test()
 
@@ -130,26 +133,33 @@ def main():
     while True:
         status_info = get_status(execution_id)
 
-        status = status_info["status"]
-        end_code = status_info["endCode"]
+        status = status_info["status"].upper()  # Normalize case
+        end_code = status_info.get("endCode", "").upper()  # Normalize case
 
-        print("Status:", status)
+        print(f"Status: {status}")
 
-        if status == "Completed":
-            print("Devices:", status_info["devices"])
+        if status == "COMPLETED":
+            print("Devices:", status_info.get("devices", []))
             print("End code:", end_code)
 
-            if end_code == "Success":
+            if end_code == "SUCCESS":
                 write_junit("passed", report_url)
+                print("✅ Test passed, exiting 0")
                 exit(0)
             else:
-                write_junit(
-                    "failed",
-                    report_url,
-                    status_info["completionDescription"]
-                )
+                reason = status_info.get("completionDescription", "Test failed")
+                write_junit("failed", report_url, reason)
+                print(f"❌ Test failed: {reason}, exiting 1")
                 exit(1)
 
+        elif status in ["FAILED", "STOPPED"]:
+            reason = status_info.get("completionDescription", "Test did not complete successfully")
+            write_junit("failed", report_url, reason)
+            print(f"❌ Test ended prematurely: {reason}, exiting 1")
+            exit(1)
+
+        # If still running
+        print("⏳ Test still running, waiting 10s...")
         time.sleep(10)
 
 
