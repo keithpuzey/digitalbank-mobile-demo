@@ -121,44 +121,66 @@ def write_junit(result, report_url, reason=None):
 # -----------------------------
 # Main
 # -----------------------------
+# -----------------------------
+# Main
+# -----------------------------
 def main():
     execution_id, report_url = start_test()
 
     if not execution_id:
         write_junit("failed", "N/A", "Failed to start execution")
+        print("❌ Failed to start execution, exiting 1")
         exit(1)
 
     print("🕒 Polling execution status...")
 
+    max_retries = 3  # retries if status fetch fails
+    retry_count = 0
+
     while True:
-        status_info = get_status(execution_id)
+        try:
+            status_info = get_status(execution_id)
+        except Exception as e:
+            print(f"❌ Error fetching status: {e}")
+            retry_count += 1
+            if retry_count > max_retries:
+                write_junit("failed", report_url, f"Failed to fetch status after {max_retries} attempts")
+                print("❌ Exceeded max retries, exiting 1")
+                exit(1)
+            print(f"⏳ Retrying in 10s... (attempt {retry_count}/{max_retries})")
+            time.sleep(10)
+            continue
 
-        status = status_info["status"].upper()  # Normalize case
-        end_code = status_info.get("endCode", "").upper()  # Normalize case
+        if not status_info:
+            print("❌ Received empty status info, retrying in 10s...")
+            time.sleep(10)
+            continue
 
-        print(f"Status: {status}")
+        # Safe extraction and normalization
+        status = (status_info.get("status") or "").upper()
+        end_code = (status_info.get("endCode") or "").upper()
+        completion_description = status_info.get("completionDescription", "")
+        devices = status_info.get("devices", [])
+
+        print(f"Status: {status}, End code: {end_code}")
+        print(f"Devices: {devices}")
 
         if status == "COMPLETED":
-            print("Devices:", status_info.get("devices", []))
-            print("End code:", end_code)
-
             if end_code == "SUCCESS":
                 write_junit("passed", report_url)
                 print("✅ Test passed, exiting 0")
                 exit(0)
             else:
-                reason = status_info.get("completionDescription", "Test failed")
-                write_junit("failed", report_url, reason)
-                print(f"❌ Test failed: {reason}, exiting 1")
+                write_junit("failed", report_url, completion_description or "Test failed")
+                print(f"❌ Test failed: {completion_description}, exiting 1")
                 exit(1)
 
         elif status in ["FAILED", "STOPPED"]:
-            reason = status_info.get("completionDescription", "Test did not complete successfully")
-            write_junit("failed", report_url, reason)
-            print(f"❌ Test ended prematurely: {reason}, exiting 1")
+            write_junit("failed", report_url, completion_description or "Test did not complete successfully")
+            print(f"❌ Test ended prematurely: {completion_description}, exiting 1")
             exit(1)
 
-        # If still running
+        # Still running
         print("⏳ Test still running, waiting 10s...")
         time.sleep(10)
 
