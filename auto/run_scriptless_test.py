@@ -4,120 +4,166 @@ import os
 import xml.etree.ElementTree as ET
 from config import PerfectoKey
 
+# -----------------------------
 # Config
-perfecto_cloud = 'demo.perfectomobile.com'
-script_key = 'PUBLIC:DBankMobileRegistrationDelphix.xml'
+# -----------------------------
+perfecto_cloud = "demo.perfectomobile.com"
+script_key = "PUBLIC:DBankMobileRegistrationDelphix.xml"
+
 RESULT_DIR = "test-results"
 RESULT_FILE = os.path.join(RESULT_DIR, "perfecto-result.xml")
 TEST_NAME = "DBankMobileRegistration"
 
-# Get the Jenkins parameter; default to a fallback if not found
-JENKINS_SERVER_URL = os.environ.get('DemoServerURL', 'http://dbankdemo.com/bank')
+# Jenkins parameter (fallback if not set)
+JENKINS_SERVER_URL = os.environ.get("DemoServerURL", "http://dbankdemo.com/bank")
 
-# Start the Perfecto script execution
+HEADERS = {
+    "Content-Type": "application/json"
+}
+
+# -----------------------------
+# Start the Perfecto test
+# -----------------------------
 def start_test():
-    url = f'https://{perfecto_cloud}/services/executions?operation=execute&scriptKey={script_key}&securityToken={PerfectoKey}&output.visibility=public&param.ServerURL={JENKINS_SERVER_URL}'
-    headers = {
-        'Content-Type': 'application/json'
+    url = f"https://{perfecto_cloud}/scriptless/api/executions"
+
+    params = {
+        "operation": "execute",
+        "testKey": script_key,
+        "securityToken": PerfectoKey,
+        "output.visibility": "public",
+        "param.ServerURL": JENKINS_SERVER_URL
     }
 
-    print(f"🚀 Starting Perfecto test...")
-    print(f"🔗 Using ServerURL from Jenkins: ${JENKINS_SERVER_URL}")
+    print("🚀 Starting Perfecto test")
+    print(f"🔗 Using ServerURL from Jenkins: {JENKINS_SERVER_URL}")
 
+    response = requests.post(url, headers=HEADERS, params=params)
 
-    response = requests.post(url, headers=headers)
-    if response.status_code == 200:
-        try:
-            response_json = response.json()
-            execution_id = response_json.get('executionId')
-            report_key = response_json.get('reportKey')
-            test_grid_report_url = response_json.get('testGridReportUrl')
-            single_test_report_url = response_json.get('singleTestReportUrl')
-            print("Single Test Report:", single_test_report_url)
-
-            return execution_id, report_key, test_grid_report_url, single_test_report_url
-        except KeyError:
-            print("❌ Error parsing response:")
-            print(response.content)
-            return None, None, None, None
-    else:
-        print("❌ Error starting test:", response.text)
+    if response.status_code != 200:
+        print("❌ Failed to start test")
+        print(response.text)
         return None, None, None, None
 
-# Poll until the test completes
+    data = response.json()
+
+    execution_id = data.get("executionId")
+    report_key = data.get("reportKey")
+    test_grid_report_url = data.get("testGridReportUrl")
+    single_test_report_url = data.get("singleTestReportUrl")
+
+    print("🧪 Execution ID:", execution_id)
+    print("📊 Test Grid Report:", test_grid_report_url)
+    print("📄 Single Test Report:", single_test_report_url)
+
+    return execution_id, report_key, test_grid_report_url, single_test_report_url
+
+
+# -----------------------------
+# Poll test status
+# -----------------------------
 def check_test_status(execution_id):
-    url = f'https://{perfecto_cloud}/services/executions/{execution_id}?operation=status&securityToken={PerfectoKey}'
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        json_data = response.json()
-        return (
-            json_data.get('status'),
-            json_data.get('flowEndCode'),
-            json_data.get('reportKey'),
-            json_data.get('reason'),
-            json_data.get('devices')
-        )
-    except requests.exceptions.RequestException as e:
-        print("❌ Error checking test status:", e)
-        return None, None, None, None, None
+    url = f"https://{perfecto_cloud}/services/executions/{execution_id}"
 
-# Create a JUnit XML result file
+    params = {
+        "operation": "status",
+        "securityToken": PerfectoKey
+    }
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+
+    data = response.json()
+
+    return (
+        data.get("status"),
+        data.get("flowEndCode"),
+        data.get("reportKey"),
+        data.get("reason"),
+        data.get("devices")
+    )
+
+
+# -----------------------------
+# Generate JUnit XML
+# -----------------------------
 def generate_junit_xml(test_name, result, report_url, reason=None):
-    if not os.path.exists(RESULT_DIR):
-        os.makedirs(RESULT_DIR)
+    os.makedirs(RESULT_DIR, exist_ok=True)
 
-    testsuite = ET.Element("testsuite", name="Perfecto Test Suite", tests="1", failures="0" if result == "passed" else "1")
-    testcase = ET.SubElement(testsuite, "testcase", classname="PerfectoTest", name=test_name)
+    failures = "0" if result == "passed" else "1"
+
+    testsuite = ET.Element(
+        "testsuite",
+        name="Perfecto Scriptless Tests",
+        tests="1",
+        failures=failures
+    )
+
+    testcase = ET.SubElement(
+        testsuite,
+        "testcase",
+        classname="Perfecto",
+        name=test_name
+    )
 
     if result != "passed":
-        failure_message = f"Test failed. Reason: {reason}" if reason else "Test failed."
-        ET.SubElement(testcase, "failure", message=failure_message)
+        message = f"Test failed. Reason: {reason}" if reason else "Test failed"
+        ET.SubElement(testcase, "failure", message=message)
 
-    ET.SubElement(testcase, "system-out").text = f"Full Report: {report_url}"
+    ET.SubElement(testcase, "system-out").text = f"Report URL: {report_url}"
 
     tree = ET.ElementTree(testsuite)
     tree.write(RESULT_FILE, encoding="utf-8", xml_declaration=True)
-    print(f"📄 JUnit result saved to {RESULT_FILE}")
 
-# Main function
+    print(f"📄 JUnit result written to {RESULT_FILE}")
+
+
+# -----------------------------
+# Main
+# -----------------------------
 def main():
     execution_id, report_key, test_grid_report_url, single_test_report_url = start_test()
-    if execution_id is None:
-        print("❌ Failed to start test.")
-        generate_junit_xml(TEST_NAME, "failed", "N/A", reason="Failed to start test.")
+
+    if not execution_id:
+        generate_junit_xml(
+            TEST_NAME,
+            "failed",
+            "N/A",
+            reason="Failed to start Perfecto test"
+        )
         exit(1)
 
-    print("🕒 Test execution started with ID:", execution_id)
+    print("🕒 Waiting for test completion...")
 
     while True:
-        status, flow_end_code, report_key, reason, devices = check_test_status(execution_id)
-        if status is None:
-            print("❌ Could not get test status.")
-            generate_junit_xml(TEST_NAME, "failed", single_test_report_url, reason="Could not fetch status")
-            exit(1)
+        status, flow_end_code, _, reason, devices = check_test_status(execution_id)
 
         print("Current status:", status)
         print("Flow End Code:", flow_end_code)
 
-        if status.lower() in ['completed', 'failed', 'stopped']:
-            print("✅ Test execution completed.")
-            if flow_end_code == 'Failed':
-                print("Test failed.")
-                print("Reason:", reason)
-                print("Devices:", devices)
-                print("Report:", single_test_report_url)
-                generate_junit_xml(TEST_NAME, "failed", single_test_report_url, reason)
+        if status and status.lower() in ["completed", "failed", "stopped"]:
+            print("✅ Test execution finished")
+            print("Devices:", devices)
+            print("Report:", single_test_report_url)
+
+            if flow_end_code and flow_end_code.lower() != "passed":
+                generate_junit_xml(
+                    TEST_NAME,
+                    "failed",
+                    single_test_report_url,
+                    reason
+                )
                 exit(1)
             else:
-                print("Test passed.")
-                print("Reason:", reason)
-                print("Devices:", devices)
-                print("Report:", single_test_report_url)
-                generate_junit_xml(TEST_NAME, "passed", single_test_report_url)
+                generate_junit_xml(
+                    TEST_NAME,
+                    "passed",
+                    single_test_report_url
+                )
                 exit(0)
 
         time.sleep(10)
+
 
 if __name__ == "__main__":
     main()
