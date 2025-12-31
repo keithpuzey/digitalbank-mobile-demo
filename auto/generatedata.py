@@ -33,22 +33,35 @@ class CSVDataGeneration:
             )
             response.raise_for_status()
 
-            # Save the response data to a CSV file
-            result_data = response.json().get('result', {})
-            if result_data:
-                csv_file_name = result_data.get('fileName', 'blazedata-test.csv')
-                csv_file_path = f"{test_data_csv}_{csv_file_name}"
-                with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
-                    csv_writer = csv.writer(csv_file)
-                    csv_content = result_data.get('content', '')
-                    csv_reader = csv.reader(csv_content.splitlines())
-                    for row in csv_reader:
-                        csv_writer.writerow(row)
-                        print(', '.join(row))
 
-                print(f"Data saved to CSV file: {csv_file_path}")
+            print("📦 Processing test data response")
 
-            print(f"\n{self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
+            result_data = response.json().get("result", {})
+            if not result_data:
+                print("⚠️ No result data found")
+                return
+
+            csv_file_name = result_data.get("fileName", "blazedata-test.csv")
+            csv_file_path = f"{test_data_csv}_{csv_file_name}"
+
+            print(f"📄 Output file: {csv_file_path}")
+            print("📊 CSV Preview")
+            print("─" * 60)
+
+            with open(csv_file_path, "w", newline="", encoding="utf-8") as csv_file:
+                csv_writer = csv.writer(csv_file)
+
+                csv_content = result_data.get("content", "")
+                csv_reader = csv.reader(csv_content.splitlines())
+
+                for row in csv_reader:
+                    csv_writer.writerow(row)
+                    print(" | ".join(row))
+
+            print("─" * 60)
+            print(f"✅ Data saved to CSV file")
+
+            print(f"\n🧾  {self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
             # print(response.text)
 
             # Make the API request to get the signed URL of the Shared Folder

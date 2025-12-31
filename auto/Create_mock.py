@@ -105,7 +105,7 @@ while True:
     else:
         print("Waiting for endpoint assignment...")
 
-print(f"Virtual Service Started - Endpoint details: {mockendpoint}")
+print(f"🔗  Virtual Service Started - Endpoint details: {mockendpoint}")
 
 while True:
     time.sleep(15)
