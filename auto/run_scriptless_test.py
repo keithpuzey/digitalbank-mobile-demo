@@ -1,117 +1,161 @@
 import requests
 import time
-import sys
 import os
+import sys
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from config import PerfectoKey
 
-# =========================
-# CONFIGURATION
-# =========================
-PERFECTO_CLOUD = "demo.app.perfectomobile.com"
-PERFECTO_TOKEN = os.environ.get("PERFECTO_TOKEN")
+# -----------------------------
+# Config
+# -----------------------------
+PERFECTO_CLOUD = "demo.perfectomobile.com"
+SCRIPT_KEY = "PUBLIC:DBankMobileRegistrationDelphix.xml"
 
-SCRIPTLESS_EXECUTION_ID = os.environ.get("PERFECTO_EXECUTION_ID")
-POLL_INTERVAL = 10
-JUNIT_PATH = "test-results/perfecto-result.xml"
+RESULT_DIR = "test-results"
+RESULT_FILE = os.path.join(RESULT_DIR, "perfecto-result.xml")
+TEST_NAME = "DBankMobileRegistration"
+
+SERVER_URL = os.environ.get("DemoServerURL", "http://dbankdemo.com/bank")
 
 HEADERS = {
-    "Authorization": f"Bearer {PERFECTO_TOKEN}",
+    "Perfecto-Authorization": PerfectoKey,
     "Content-Type": "application/json"
 }
 
-# =========================
-# HELPERS
-# =========================
-def get_execution_status(execution_id):
+POLL_INTERVAL = 10
+
+# -----------------------------
+# Start test execution
+# -----------------------------
+def start_test():
+    url = f"https://{PERFECTO_CLOUD}/scriptless/api/executions"
+
+    payload = {
+        "testKey": SCRIPT_KEY,
+        "params": {
+            "ServerURL": SERVER_URL
+        }
+    }
+
+    print("🚀 Starting Perfecto Scriptless test")
+    print(f"🔗 ServerURL: {SERVER_URL}")
+
+    response = requests.post(url, headers=HEADERS, json=payload)
+
+    if response.status_code != 201:
+        print("❌ Failed to start test")
+        print(response.text)
+        return None
+
+    data = response.json()
+    execution_id = data.get("executionId")
+
+    print("🧪 Execution ID:", execution_id)
+    return execution_id
+
+# -----------------------------
+# Get execution status
+# -----------------------------
+def get_status(execution_id):
     url = f"https://{PERFECTO_CLOUD}/scriptless/api/executions/{execution_id}"
     response = requests.get(url, headers=HEADERS)
     response.raise_for_status()
     return response.json()
 
+# -----------------------------
+# Write JUnit
+# -----------------------------
+def write_junit(end_code, report_key, device_summary):
+    os.makedirs(RESULT_DIR, exist_ok=True)
 
-def write_junit(report_key, platform_name, platform_version, end_code):
-    os.makedirs(os.path.dirname(JUNIT_PATH), exist_ok=True)
+    failures = "0" if end_code == "SUCCESS" else "1"
 
-    testsuite = ET.Element(
+    suite = ET.Element(
         "testsuite",
-        name="Perfecto Scriptless Test",
+        name="Perfecto Scriptless",
         tests="1",
-        failures="1" if end_code != "SUCCESS" else "0",
-        time="0"
+        failures=failures
     )
 
-    testcase = ET.SubElement(
-        testsuite,
+    case = ET.SubElement(
+        suite,
         "testcase",
-        classname="perfecto.scriptless",
-        name=f"{platform_name} {platform_version}"
+        classname="Perfecto",
+        name=TEST_NAME
     )
 
     if end_code != "SUCCESS":
-        failure = ET.SubElement(
-            testcase,
-            "failure",
-            message="Perfecto test failed"
-        )
+        failure = ET.SubElement(case, "failure", message="Test failed")
         failure.text = f"Report: {report_key}"
 
-    system_out = ET.SubElement(testcase, "system-out")
+    system_out = ET.SubElement(case, "system-out")
     system_out.text = (
-        f"Report URL: {report_key}\n"
-        f"Platform: {platform_name} {platform_version}\n"
-        f"End Code: {end_code}"
+        f"End Code: {end_code}\n"
+        f"Device: {device_summary}\n"
+        f"Report: {report_key}"
     )
 
-    tree = ET.ElementTree(testsuite)
-    tree.write(JUNIT_PATH, encoding="utf-8", xml_declaration=True)
+    ET.ElementTree(suite).write(RESULT_FILE, encoding="utf-8", xml_declaration=True)
+    print(f"📄 JUnit written to {RESULT_FILE}")
 
-    print(f"📄 JUnit written to {JUNIT_PATH}")
+# -----------------------------
+# Main
+# -----------------------------
+def main():
+    execution_id = start_test()
 
+    if not execution_id:
+        print("❌ No execution ID returned")
+        sys.exit(1)
 
-# =========================
-# MAIN POLLING LOOP
-# =========================
-print(f"🚀 Monitoring Perfecto execution: {SCRIPTLESS_EXECUTION_ID}")
+    print("🕒 Polling execution status...")
 
-while True:
-    status_response = get_execution_status(SCRIPTLESS_EXECUTION_ID)
+    while True:
+        status_response = get_status(execution_id)
 
-    print("🔍 Full status response:", status_response)
+        # 🔍 DEBUG — keep this
+        print("🔍 Full status response:", status_response)
 
-    status = (status_response.get("status") or "").upper()
-    end_code = status_response.get("endCode", "")
-    report_key = status_response.get("reportKey")
+        status = (status_response.get("status") or "").upper()
+        end_code = status_response.get("endCode", "")
+        report_key = status_response.get("reportKey")
 
-    devices = status_response.get("devices") or []
-    platform_name = "Unknown"
-    platform_version = "Unknown"
+        devices = status_response.get("devices") or []
+        device_summary = "None"
 
-    if devices:
-        platform_name = devices[0].get("platformName", "Unknown")
-        platform_version = devices[0].get("platformVersion", "Unknown")
+        if devices:
+            d = devices[0]
+            device_summary = (
+                f"{d.get('platformName')} "
+                f"{d.get('platformVersion')} "
+                f"(Device ID: {d.get('deviceName')})"
+            )
 
-    print(
-        f"{datetime.utcnow().isoformat()} "
-        f"📱 Platform: {platform_name} {platform_version} | "
-        f"Status: {status} | End Code: {end_code}"
-    )
+        print(
+            f"{datetime.utcnow().isoformat()} | "
+            f"Status: {status} | End Code: {end_code} | Device: {device_summary}"
+        )
 
-    if status == "COMPLETED":
-        print("\n📊 FINAL TEST SUMMARY")
-        print("--------------------")
-        print(f"Report URL: {report_key}")
-        print(f"Platform: {platform_name} {platform_version}")
-        print(f"End Code: {end_code}")
+        if status == "COMPLETED":
+            print("\n📊 FINAL RESULT")
+            print("--------------------")
+            print(f"Report URL: {report_key}")
+            print(f"Device: {device_summary}")
+            print(f"End Code: {end_code}")
 
-        write_junit(report_key, platform_name, platform_version, end_code)
+            write_junit(end_code, report_key, device_summary)
 
-        if end_code.upper() == "SUCCESS":
-            print("✅ Test passed — exiting 0")
-            sys.exit(0)
-        else:
-            print("❌ Test failed — exiting 1")
-            sys.exit(1)
+            if end_code == "SUCCESS":
+                print("✅ Test PASSED")
+                sys.exit(0)
+            else:
+                print("❌ Test FAILED")
+                sys.exit(1)
 
-    print(f"⏳ Test still running, waiting {POLL_INTERVAL}s...\n")
-    time.sleep(POLL_INTERVAL)
+        print(f"⏳ Test still running, waiting {POLL_INTERVAL}s...\n")
+        time.sleep(POLL_INTERVAL)
+
+# -----------------------------
+if __name__ == "__main__":
+    main()
