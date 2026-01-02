@@ -131,34 +131,10 @@ stage('Revert Database to Snapshot - Delphix') {
             }
         }
 
-        stage('Execute Mobile Registration Test - Perfecto') {
+        stage('Execute User Registration on Mobile - Perfecto') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    script {
-                        boolean retry = true
-                        while (retry) {
-				def scriptOutput = sh(script: '/usr/bin/python -u ./auto/run_scriptless_test.py', returnStdout: true).trim()
-
-				// Debugging – let’s see EXACT output
-				echo "=== RAW OUTPUT FROM run_scriptless_test.py ==="
-				echo scriptOutput
-				echo "=============================================="
-
-				def reasonMatch = (scriptOutput =~ /Reason: (.+)/)
-				def reportMatch = (scriptOutput =~ /Report:\s*(.+)/)
-				def deviceMatch = (scriptOutput =~ /Devices: (.+)/)
-
-				def reason    = reasonMatch ? reasonMatch[0][1].trim() : "NOT_FOUND"
-				def reportUrl = reportMatch ? reportMatch[0][1].trim()   : "NOT_FOUND"
-				def devices   = deviceMatch ? deviceMatch[0][1].trim()   : "NONE"
-
-				echo "Test Grid Report: ${reportUrl}"
-				echo "Devices: ${devices}"
-				echo "Reason: ${reason}"
-
-				retry = (reason == 'ResourcesUnavailable')
-                        }
-                    }
+                    sh '/usr/bin/python -u ./auto/run_scriptless_test.py'
                 }
             }
         }
