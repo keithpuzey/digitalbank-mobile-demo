@@ -142,29 +142,12 @@ stage('Revert Database to Snapshot - Delphix') {
 stage('Execute Load & EUX Test') {
     steps {
         script {
-sh """
-                # 1. Run the script and write all output (STDOUT + STDERR) directly to the file
-                /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest} > bm_output.log 2>&1
-                
-                # 2. Print the file content to the console (for visibility)
-                cat bm_output.log
-            """
-
-            def output = readFile("bm_output.log").trim()
-
-            echo "==== RAW SCRIPT OUTPUT ===="
-            echo output
-            echo "==========================="
-
-            def matcher = output =~ /Test URL:\s*(https?:\/\/\S+)/
-
-            if (matcher.find()) {
-                env.TEST_URL = matcher.group(1).trim()
-            } else {
-                env.TEST_URL = "NOT_FOUND"
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh """
+                    # Run BlazeMeter test and stream logs to console
+                    /usr/bin/python -u ./auto/run_perf_multi_test_param.py ${BlazeMeterTest}
+                """
             }
-
-            echo "🚀 BlazeMeter Test URL: ${env.TEST_URL}"
         }
     }
 }
