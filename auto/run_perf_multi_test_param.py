@@ -17,7 +17,7 @@ def run_blazemeter_test(test_id):
 
         # Extract values from the response
         json_response = response.json()
-        logging.info(f"Response: {json_response}")
+        #  logging.info(f"Response: {json_response}")
         result_id = json_response['result']['id']
         workspace_id = json_response['result']['workspaceId']
         project_id = json_response['result']['projectId']
