@@ -66,7 +66,7 @@ def main():
         status_response = get_status(execution_id)
 
         # 🔍 Debug – keep this while stabilising
-        print("🔍 Full status response:", status_response)
+        # print("🔍 Full status response:", status_response)
 
         status = (status_response.get("status") or "").upper()
         end_code = status_response.get("endCode")
