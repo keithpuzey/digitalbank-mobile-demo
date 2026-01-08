@@ -46,7 +46,7 @@ pipeline {
                     sh "sudo -u jenkins python3.12 -m pip install mysql-connector-python"
 
                     // echo 'Setting up DCT configuration for Jenkins user'
-                    // sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
+                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
                 }
             }
         }
