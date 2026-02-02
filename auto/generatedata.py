@@ -1,89 +1,98 @@
 import json
-import csv
 import requests
-from config import workspaceID, BMCredentials, test_data_csv, SharedFolderID
+import sys
+import base64
 
-class CSVDataGeneration:
-    def __init__(self, datamodel_path, repeat_count):
-        self.datamodel_path = datamodel_path
-        self.repeat_count = repeat_count
+# ----------------------------------------------------------
+# Read credential (username:secret) passed from Jenkins
+# ----------------------------------------------------------
+# Example: BMCredentials="user123:abcd1234"
+from credentials import BMCredentials   # <-- your Jenkins-injected file
 
-    def generate_test_data(self):
-        try:
-            # Open Data Model file
-            with open(self.datamodel_path, 'r', encoding='utf-8') as datamodel_file:
-                datamodel_def = json.load(datamodel_file)
+try:
+    username, secret = BMCredentials.split(":")
+except ValueError:
+    print("ERROR: BMCredentials is not in username:secret format")
+    sys.exit(1)
 
-            # Update repeat count in Data Model
-            default_obj = datamodel_def['data']['attributes']['model']['entities']['default']
-            default_obj['repeat'] = self.repeat_count
+# ----------------------------------------------------------
+# Build headers
+# ----------------------------------------------------------
+def auth_header(username, secret):
+    token = f"{username}:{secret}".encode("utf-8")
+    b64 = base64.b64encode(token).decode("utf-8")
+    return {"Authorization": f"Basic {b64}"}
 
-            # Generate Test Data
-            url = f"https://tdm.blazemeter.com/api/v1/workspaces/{workspaceID}/testdata/generatefile?entity=default"
-            headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json,text/javascript, */*',
-            }
+# Combine with content headers
+base_headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json,text/javascript,*/*"
+}
 
-            response = requests.post(
-                url,
-                json=datamodel_def,
-                headers=headers,
-                auth=BMCredentials
-            )
-            response.raise_for_status()
 
-            # Save the response data to a CSV file
-            result_data = response.json().get('result', {})
-            if result_data:
-                csv_file_name = result_data.get('fileName', 'blazedata-test.csv')
-                csv_file_path = f"{test_data_csv}_{csv_file_name}"
-                with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
-                    csv_writer = csv.writer(csv_file)
-                    csv_content = result_data.get('content', '')
-                    csv_reader = csv.reader(csv_content.splitlines())
-                    for row in csv_reader:
-                        csv_writer.writerow(row)
-                        print(', '.join(row))
+# ----------------------------------------------------------
+# CLI Inputs
+# ----------------------------------------------------------
+if len(sys.argv) != 3:
+    print("Usage: python generatedata.py <data-model.json> <records>")
+    sys.exit(1)
 
-                print(f"Data saved to CSV file: {csv_file_path}")
+model_file = sys.argv[1]
+count = sys.argv[2]
 
-            print(f"\n{self.repeat_count} Test Data Records generated using Data Model {self.datamodel_path}\n")
-            # print(response.text)
+workspace_id = "<YOUR WORKSPACE>"
+tdm_url = "https://tdm.blazemeter.com/api/v1/workspaces"
 
-            # Make the API request to get the signed URL of the Shared Folder
-            # API endpoint URL to download the JSON data
-            response = requests.get(
-                'https://a.blazemeter.com/api/v4/folders/' + SharedFolderID + '/s3/sign?fileName=test_data.csv_blazedata-test.csv',
-                headers=headers,
-                auth=BMCredentials
-            )
 
-            # Load the JSON response
-            data = response.json()
+# ----------------------------------------------------------
+# Load data model
+# ----------------------------------------------------------
+with open(model_file, "r") as f:
+    datamodel = json.load(f)
 
-            # Extract the signed URL from the JSON response
-            signed_url = data["result"]
+datamodel["recordCount"] = int(count)
 
-            # Use the signed_url to upload the file to the BlazeMeter Shared folder
 
-            with open(csv_file_path, "rb") as file:
-                response = requests.put(signed_url, data=file)
+# ----------------------------------------------------------
+# Step 1: Generate Data File
+# ----------------------------------------------------------
+generate_url = f"{tdm_url}/{workspace_id}/testdata/generatefile?entity=default"
 
-                # Check if the upload was successful
-                if response.status_code != 200:
-                    print(f"Error: Failed to upload file. Status Code: {response.status_code}")
-                else:
-                    print("File successfully uploaded to BlazeMeter shared folder.")
+print("➡️ Calling BlazeMeter GenerateFile...")
 
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+gen_resp = requests.post(
+    generate_url,
+    json=datamodel,
+    headers={**base_headers, **auth_header(username, secret)}
+)
 
-if __name__ == "__main__":
-    # Assuming command line arguments: datamodel_path repeat_count
-    import sys
-    datamodel_path = sys.argv[1]
-    repeat_count = sys.argv[2]
+if gen_resp.status_code != 200:
+    print("❌ GenerateFile failed:", gen_resp.text)
+    sys.exit(1)
 
-    csv_data_generation = CSVDataGeneration(datamodel_path, repeat_count)
-    csv_data_generation.generate_test_data()
+gen_json = gen_resp.json()
+object_key = gen_json.get("objectKey")
+
+print("✔️ Generated objectKey:", object_key)
+
+
+# ----------------------------------------------------------
+# Step 2: Download the generated CSV file
+# ----------------------------------------------------------
+download_url = f"{tdm_url}/objects/download/{object_key}"
+
+print("➡️ Downloading generated CSV...")
+
+csv_resp = requests.get(
+    download_url,
+    headers=auth_header(username, secret)
+)
+
+if csv_resp.status_code != 200:
+    print("❌ Download failed:", csv_resp.text)
+    sys.exit(1)
+
+with open("test_data.csv", "wb") as f:
+    f.write(csv_resp.content)
+
+print("✔️ CSV saved as test_data.csv")
