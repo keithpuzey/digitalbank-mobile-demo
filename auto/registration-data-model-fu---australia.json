@@ -1,0 +1,91 @@
+{
+	"data": {
+		"type": "datamodel",
+		"attributes": {
+			"model": {
+				"id": "3b5f10fd-1923-9eaa-5c8d-2ae45937d972",
+				"kind": "tdm",
+				"type": "object",
+				"title": "DBank Registration",
+				"entities": {
+					"default": {
+						"type": "object",
+						"title": "Test Parameters",
+						"repeat": 20,
+						"targets": {
+							"default": {
+								"type": "csv",
+								"file": "blazedata-test.csv"
+							}
+						},
+      "properties": {
+        "FirstName": {
+          "type": "string"
+        },
+        "LastName": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string"
+        },
+        "ssn": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "State": {
+          "type": "string"
+        },
+        "ZipCode": {
+          "type": "string"
+        },
+        "seq": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "phonenumber": {
+          "type": "string"
+        },
+        "newuserpassword": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        }
+      },
+						"datasources": [],
+      "requirements": {
+        "FirstName": "ifCondition(${title} == \"Mr.\",randFromSeedlist(\"firstnamemaleamerican\"),randFromSeedlist(\"firstnamefemaleamerican\")).replace(/ /g,\".\")",
+        "LastName": "randFromSeedlist(\"lastnames\").replace(/ /g,\".\")",
+        "Email": "${FirstName}+\".\"+${LastName}+\"@gmail.com\"",
+    "dob": "datetime(dateOfBirth(18, 100, \"1990-02-10\"), \"MM/DD/YYYY\")",
+    "ssn": "randDigits(3,3)+randDigits(2,2)+randDigits(4,4)",
+        "address": "anySeedlist(\"Australian street address\")",
+        "city": "anySeedlist(\"Australian city\")",
+        "State": "anySeedlist(\"Australian  state\")",
+        "ZipCode": "anySeedlist(\"Australian postal codes\")",
+        "seq": "randInt(1,1000000)",
+        "title": "randFromList([\"Mr.\",\"Mrs.\",\"Ms.\"])",
+        "phonenumber": "anySeedlist(\"Australian phone numbers\")",
+        "newuserpassword": "randChars(6,8, \"abcdefghijklmnopqrstuvwxyz\")+randChars(3, 6, \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\")+randChars(6,8, \"abcdefghijklmnopqrstuvwxyz\")+randInt(1,50)",
+        "gender": "ifCondition(${title} == \"Mr.\",\"M\",\"F\")"
+
+      }
+					}
+				}
+			},
+			"context": {
+				"csvs": []
+			}
+		}
+	}
+}
