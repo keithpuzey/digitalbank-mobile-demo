@@ -66,7 +66,7 @@
       "requirements": {
         "FirstName": "ifCondition(${title} == \"Mr.\",randFromSeedlist(\"firstnamemaleamerican\"),randFromSeedlist(\"firstnamefemaleamerican\")).replace(/ /g,\".\")",
         "LastName": "randFromSeedlist(\"lastnames\").replace(/ /g,\".\")",
-        "Email": "${FirstName}+\".\"+${LastName}+\"@\"+anySeedlist(\"australian email domain name\")",
+        "Email": "${FirstName}+\".\"+${LastName}+anySeedlist(\"australian email domain name\")",
         "dob": "datetime(dateOfBirth(18, 100, \"1990-02-10\"), \"MM/DD/YYYY\")",
         "ssn": "randDigits(3,3)+randDigits(2,2)+randDigits(4,4)",
         "address": "anySeedlist(\"Australian street address\")",
