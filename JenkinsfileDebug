@@ -1,0 +1,79 @@
+pipeline {
+
+    agent any
+
+    environment {
+        ANDROID_HOME = '/opt/Android'
+
+        // Jenkins credentials binding
+        // Creates:  BMCredentials_USR  and  BMCredentials_PSW
+        BMCredentials = credentials('BMCredentials')
+        perfectotoken = credentials('perfectotoken')
+        DCT_API_KEY = credentials('dct-api-key')
+    }
+
+    stages {
+
+        stage('Setup Python') {
+            steps {
+                sh '''
+                /usr/bin/python -m venv venv
+                . venv/bin/activate
+                pip install requests
+                '''
+            }
+        }
+        stage('Update Configuration') {
+            steps {
+                script {
+                    def perfectoKey   = env.perfectotoken
+                    def bmApiKey      = env.BMCredentials_USR
+                    def bmApiSecret   = env.BMCredentials_PSW
+
+                    echo "Using BlazeMeter API Key: ${bmApiKey}"
+
+                    // UPDATE CONFIG.PY (Linux path)
+                    def configFilePath = "./auto/config.py"
+                    def content = readFile(configFilePath)
+
+                    content = content.replaceAll(/token_PerfectoKey/, perfectoKey)
+                    content = content.replaceAll(/token_BMAPIKey/, bmApiKey)
+                    content = content.replaceAll(/token_BMAPISecret/, bmApiSecret)
+
+                    writeFile(file: configFilePath, text: content)
+
+                    // Install Python dependency
+                    sh "sudo -u jenkins python3.12 -m pip install mysql-connector-python"
+
+                    // echo 'Setting up DCT configuration for Jenkins user'
+                    sh "sudo -u jenkins /src/dct-toolkit create_config dctUrl=${env.dctUrl} apiKey=${env.dctApiKey} --insecureSSL --unsafeHostnameCheck"
+                }
+            }
+        }
+
+
+  
+
+stage('Execute API Smoke Test - API Monitoring') {
+    steps {
+        script {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                withCredentials([
+                    string(credentialsId: 'runscope-api-token', variable: 'APICredentials')
+                ]) {
+                    sh """
+                        echo "🚀 Running Runscope API smoke test"
+                        . venv/bin/activate
+                        /usr/bin/python -u ./auto/run_api_test.py
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'test-results/*.xml'
+        }
+    }
+}
+
