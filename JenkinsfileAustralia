@@ -131,14 +131,6 @@ stage('Revert Database to Snapshot - Delphix') {
             }
         }
 
-        stage('Execute User Registration on Mobile - Perfecto') {
-            steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '/usr/bin/python -u ./auto/run_scriptless_test.py'
-                }
-            }
-        }
-
 stage('Execute API Smoke Test - API Monitoring') {
     steps {
         script {
@@ -160,6 +152,16 @@ stage('Execute API Smoke Test - API Monitoring') {
         }
     }
 }
+
+        stage('Execute User Registration on Mobile - Perfecto') {
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh '/usr/bin/python -u ./auto/run_scriptless_test.py'
+                }
+            }
+        }
+
+
 
 stage('Execute Load & EUX Test') {
     steps {
