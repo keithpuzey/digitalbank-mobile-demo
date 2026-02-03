@@ -139,7 +139,7 @@ stage('Revert Database to Snapshot - Delphix') {
             }
         }
 
-stage('Execute API Smoke Test - Runscope') {
+stage('Execute API Smoke Test - API Monitoring') {
     steps {
         script {
             catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
