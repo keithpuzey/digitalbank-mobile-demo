@@ -139,6 +139,29 @@ stage('Revert Database to Snapshot - Delphix') {
             }
         }
 
+stage('Execute API Smoke Test - Runscope') {
+    steps {
+        script {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                withCredentials([
+                    string(credentialsId: 'runscope-api-token', variable: 'APICredentials')
+                ]) {
+                    sh """
+                        echo "🚀 Running Runscope API smoke test"
+                        . venv/bin/activate
+                        /usr/bin/python -u ./auto/run_api_test.py
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'test-results/*.xml'
+        }
+    }
+}
+
 stage('Execute Load & EUX Test') {
     steps {
         script {
