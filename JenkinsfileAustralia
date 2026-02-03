@@ -146,11 +146,10 @@ stage('Execute API Smoke Test - API Monitoring') {
                 withCredentials([
                     string(credentialsId: 'runscope-api-token', variable: 'APICredentials')
                 ]) {
-                    sh """
-                        echo "🚀 Running Runscope API smoke test"
-                        . venv/bin/activate
-                        /usr/bin/python -u ./auto/run_api_test.py
-                    """
+                    sh '''
+                        echo "🚀 Running API smoke test"
+                        venv/bin/python -u ./auto/run_api_test.py
+                    '''
                 }
             }
         }
