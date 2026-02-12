@@ -131,6 +131,28 @@ stage('Revert Database to Snapshot - Delphix') {
             }
         }
 
+stage('Execute API Smoke Test - API Monitoring') {
+    steps {
+        script {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                withCredentials([
+                    string(credentialsId: 'runscope-api-token', variable: 'APICredentials')
+                ]) {
+                    sh '''
+                        echo "🚀 Running API smoke test"
+                        venv/bin/python -u ./auto/run_api_test.py
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'test-results/*.xml'
+        }
+    }
+}
+
         stage('Execute User Registration on Mobile - Perfecto') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
