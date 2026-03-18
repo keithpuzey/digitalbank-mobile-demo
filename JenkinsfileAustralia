@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     echo 'Creating Synthetic Data and Virtual Service'
-                    sh 'python3.8 ./auto/generatedata.py ./auto/registration-data-model-full.json 2'
+                    sh 'python3.8 ./auto/generatedata.py ./auto/registration-data-model-full-australia.json 2'
                     sh 'python3.8 ./auto/upload-csv-perfecto.py'
                     sh 'python3.8 ./auto/Update_mock.py'
                     sh 'python3.8 ./auto/Create_mock.py'
