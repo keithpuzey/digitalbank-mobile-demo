@@ -2,9 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboard_root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <!-- Optional header text at the very top -->
+    <!-- Header -->
     <TextView
         android:id="@+id/account_balance_summary_text"
         android:layout_width="match_parent"
@@ -16,23 +17,28 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp" />
 
-    <!-- Content area -->
+    <!-- Content -->
     <FrameLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/account_balance_summary_text">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/account_balance_summary_text"
+        android:layout_alignParentBottom="true">
 
+        <!-- WebView -->
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:visibility="visible" />
 
+        <!-- Progress -->
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
     </FrameLayout>
 

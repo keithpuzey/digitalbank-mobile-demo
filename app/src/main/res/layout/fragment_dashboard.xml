@@ -1,38 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dashboard_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/action_bar3"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:elevation="4dp"
-        android:gravity="end"
+        android:background="?attr/colorPrimary"
+        android:elevation="8dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
         <ImageView
             android:id="@+id/toolbar_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/outline_more_vert_24" />
+            android:src="@drawable/outline_more_vert_24"
+            android:contentDescription="Menu"
+            android:clickable="true"
+            android:focusable="true" />
 
     </androidx.appcompat.widget.Toolbar>
 
-    <WebView
-        android:id="@+id/webView"
+    <!-- Content Container -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+        <!-- WebView -->
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-</FrameLayout>
+        <!-- ProgressBar overlay -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</LinearLayout>
